@@ -1,0 +1,8 @@
+https://github.com/espressif/esp-idf/pull/1991#issuecomment-826767659
+
+ESP-IDF v4.2. is required
+
+platformio/platform-espressif32 v 6.10 includes:
+- Arduino - v2.0.17 (based on IDF v4.4.7)
+or
+- ESP-IDF - v5.4.0
