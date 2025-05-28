@@ -88,25 +88,34 @@ AmplitudeCaclulatorState AmplitudeCaclulator::PushSamples(const int16_t *newData
         return m_state;
     }
 
-    //Find falling edge in left half of histogram.
+    //Find first rising edge in left half of histogram.
     constexpr int16_t k_histogramFallingEdgeMinDelta = 1;
+    constexpr int16_t k_histogramRisingEdgeMinDelta = 1;
     int16_t syncTresholdBin = INVALID_VALUE;
-
-    for(size_t bin = 0; bin < k_binsCount/2; bin++)
+    bool histogramWasFalling = false;
+    for(size_t bin = 0; bin < m_amplitudeHistogram.size()-1; bin++)
     {
-        if(m_amplitudeHistogram[bin] - m_amplitudeHistogram[bin+1] > k_histogramFallingEdgeMinDelta)
+        int16_t delta = m_amplitudeHistogram[bin+1] - m_amplitudeHistogram[bin];
+        //Falling
+        if(delta <= (-k_histogramFallingEdgeMinDelta))
         {
-            m_syncValue = m_amplitudeHistogram.GetBinCenter(bin);
-            //Value of next (non-popular) bin
-            m_syncTreshold = m_amplitudeHistogram.GetBinCenter(bin+1);
-            syncTresholdBin = bin+1;
+             histogramWasFalling = true;
+        }
+        //Rising
+        if(histogramWasFalling && delta >= k_histogramRisingEdgeMinDelta)
+        {
+            syncTresholdBin = bin;
+            //m_syncValue = m_amplitudeHistogram.GetBinCenter(bin);
+            //Value of bin before rising edge
+            m_syncTreshold = m_amplitudeHistogram.GetBinCenter(bin);
             break;
         }
-        if(bin == k_binsCount/2 - 1)
-        {
-            //Falling enge not found.
-            //Ask for more samples, and after more failes, give up and set fallback value?
-        }
+    }
+    if(syncTresholdBin == INVALID_VALUE)
+    {
+        //Falling enge not found.
+        //Ask for more samples, and after more failes, give up and set fallback value?
+        m_syncTreshold = m_amplitudeHistogram.m_sampleMin + (m_amplitudeHistogram.m_sampleMax - m_amplitudeHistogram.m_sampleMin)*k_syncTresholdDefault; 
     }
 
      //Find rising edge in right half of histogram.

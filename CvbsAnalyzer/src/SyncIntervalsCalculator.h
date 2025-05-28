@@ -32,7 +32,7 @@ class SyncIntervalsCalculator
     //0 not allowed
     //Max sequence len = +-32767. For more split to multiple.
     //std::vector<int16_t> m_sampleSequences;
-    constexpr static size_t k_binsCount = 40;
+    constexpr static size_t k_binsCount = 100;
     constexpr static uint16_t k_maxSequenceLength = 200;//65535
     
     Histogram<uint32_t, uint32_t, k_binsCount> m_syncSequenceLengthHistogram;

@@ -63,7 +63,8 @@ class AmplitudeCaclulator
     //constexpr static float k_syncPulseMinWidthNtsc = 4.7f/63.5f;
     //constexpr static float k_syncPulseMinWidthPal = 4.7f/64.0f;//7%, byt can be ~5% in practice
 
-    constexpr static float k_syncTresholdDefault = 0.15f;//Let's assume 15% of full signal amplitude
+    constexpr static float k_syncTresholdDefault = 0.15f;//Fallbak. Let's assume 15% of full signal amplitude
+    //constexpr static float k_syncTresholdMax = 0.5f;//
 };
 
 #endif
