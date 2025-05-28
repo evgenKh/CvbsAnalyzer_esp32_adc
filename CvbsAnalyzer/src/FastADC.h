@@ -39,6 +39,7 @@ class FastADC
     FastADCState StopADCSampling();
     
     size_t ReadSamplesBlocking();
+    size_t ReadSamplesBlockingTo(int16_t* outBuf, size_t bufSizeBytes);
 
     QueueHandle_t m_i2sEventQueue = nullptr;
 

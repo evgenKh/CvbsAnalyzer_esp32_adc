@@ -3,17 +3,17 @@
 
 #include "Arduino.h"
 #include "FastADC.h"
+#include "AmplitudeCaclulator.h"
 
 
 class CvbsAnalyzer
 {
     public:
-    CvbsAnalyzer(int gpioPin);
+    CvbsAnalyzer();
     FastADC m_fastAdc;
-
-
-    private:
-    int m_gpioPin;
+    AmplitudeCaclulator m_amplitudeCaclulator;
+    
+    void AnalyzePin(int gpioPin);
 };
 
 #endif // CvbsAnalyzer_H

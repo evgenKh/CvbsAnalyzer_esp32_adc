@@ -229,3 +229,12 @@ size_t FastADC::ReadSamplesBlocking()
     }
     return bytes_read;
 }
+
+size_t FastADC::ReadSamplesBlockingTo(int16_t *outBuf, size_t bufSizeBytes)
+{
+    size_t bytes_read;
+    if (i2s_read(I2S_NUM_0, outBuf, bufSizeBytes, &bytes_read, portMAX_DELAY) != ESP_OK) {
+            printf("i2s_read() fail");
+        }
+    return bytes_read;
+}
