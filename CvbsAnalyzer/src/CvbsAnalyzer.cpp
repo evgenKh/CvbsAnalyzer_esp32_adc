@@ -24,7 +24,13 @@ void CvbsAnalyzer::AnalyzePin(int gpioPin)
             size_t bytesRead = m_fastAdc.ReadSamplesBlockingTo(buf, sizeof(buf));
             if(bytesRead > 100)
             {
-                m_amplitudeCaclulator.PushData(buf, bytesRead/sizeof(int16_t));
+                m_amplitudeCaclulator.PushSamples(buf, bytesRead/sizeof(int16_t));
+
+                if(m_amplitudeCaclulator.m_state == AmplitudeCaclulatorState::k_finished)
+                {
+                    m_syncIntervalsCalculator.PushSamples(buf, bytesRead/sizeof(int16_t), m_amplitudeCaclulator.m_syncTreshold);
+                }
+
                 for (int i = 0; i < bytesRead / 2; i++) {
                     printf("%d\n", buf[i] & 0x0fff);
                 }

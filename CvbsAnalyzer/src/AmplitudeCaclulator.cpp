@@ -1,14 +1,11 @@
 #include "AmplitudeCaclulator.h"
 #include <math.h>
+#include "SyncIntervalsCalculator.h"
 
-AmplitudeCaclulator::AmplitudeCaclulator()
-{
-    Reset();
-}
 
 void AmplitudeCaclulator::Reset()
 {    
-    m_state = AmplitudeCaclulatorState::k_noData;
+    m_state = AmplitudeCaclulatorState::k_noSamples;
 
     m_minValue = MAX_UINT_12BIT;
     m_syncValue = INVALID_VALUE;
@@ -19,20 +16,22 @@ void AmplitudeCaclulator::Reset()
     m_whiteValue = INVALID_VALUE;
     m_colorMaxValue = INVALID_VALUE;
     m_maxValue = 0;
+    m_samplesAccumulated = 0;
 
     m_amplitudeHistogram.fill(0);
 }
 
-inline int16_t GetBinValue(int16_t minValue, float binWidth, size_t binId)
+inline int16_t GetBinCenterValue(int16_t minValue, float binWidth, size_t binId)
 {
-    return (minValue + static_cast<int16_t>(binId * binWidth + 0.5f));
+    //First +0.5 is for centering, second +0.5 is for rounding
+    return (minValue + static_cast<int16_t>((binId + 0.5f) * binWidth + 0.5f));
 }
 
-AmplitudeCaclulatorState AmplitudeCaclulator::PushData(const int16_t *newData, size_t newDataLen)
+AmplitudeCaclulatorState AmplitudeCaclulator::PushSamples(const int16_t *newData, size_t newDataLen)
 {
     if(!newDataLen)
     {
-        return AmplitudeCaclulatorState::k_noData;
+        return AmplitudeCaclulatorState::k_noSamples;
     }
 
     int16_t newDataMinValue = MAX_UINT_12BIT;
@@ -45,56 +44,120 @@ AmplitudeCaclulatorState AmplitudeCaclulator::PushData(const int16_t *newData, s
         if (value < newDataMinValue)
             newDataMinValue = value;
     }
-    const int16_t newDataRange = (newDataMaxValue - newDataMinValue);
+    int16_t newDataRange = (newDataMaxValue - newDataMinValue);
     if(newDataRange < k_minRange)
     {
+        //Skip this dataSet
         return AmplitudeCaclulatorState::k_badAmplitudeTooLow;
     }
+
+    //Resetting min, max, range to standard values for easier merge of multiple sampleSets into one histogram
+    newDataMinValue = 0;
+    newDataMaxValue = MAX_UINT_12BIT;
+    newDataRange = newDataMaxValue - newDataMinValue;
+    m_minValue = newDataMinValue;
+    m_maxValue = newDataMaxValue;
 
     // Calculate bin width
     const float binWidth = static_cast<float>(newDataRange + 1) / k_binsCount;
 
     std::array<uint32_t, k_binsCount> newDataHistogram;
+    uint32_t newDataSamplesAccumulated = 0;
     newDataHistogram.fill(0);
     for (size_t i = 0; i < newDataLen; i++)
     {
         size_t binIndex = static_cast<size_t>((newData[i] - newDataMinValue) / binWidth);
         if (binIndex >= 0 && binIndex < k_binsCount) {
             newDataHistogram[binIndex]++;
+            newDataSamplesAccumulated++;
         }
     }
 
     if(newDataHistogram[k_binsCount-1] > static_cast<uint32_t>(newDataLen * k_highestBinMaxWeight))
     {
+        //Skip this dataSet
         return AmplitudeCaclulatorState::k_badAmplitudeTooHigh;
+    }
+
+    if(newDataSamplesAccumulated != newDataLen)
+    {
+        m_state = AmplitudeCaclulatorState::k_samplesAccumulatedCountMismatch;
+        return m_state;
+    }
+
+    //Merge local histogram to main one.
+    assert(m_minValue == newDataMinValue);
+    assert(m_maxValue == newDataMaxValue);
+    for(size_t bin = 0; bin < k_binsCount; bin++)
+    {
+        m_amplitudeHistogram[bin] += newDataHistogram[bin];
+    }
+    m_samplesAccumulated += newDataSamplesAccumulated;
+
+    if(m_samplesAccumulated >= k_minSamplesForCalculation)
+    {
+        //Change to k_readyForCalculation after test calculation, or just compare with k_minSamplesForCalculation ?
+        m_state = AmplitudeCaclulatorState::k_readyForCalculation;
+    }else{        
+        m_state = AmplitudeCaclulatorState::k_needMoreSamples;
+        return m_state;
     }
 
     //Find falling edge in left half of histogram.
     constexpr int16_t k_histogramFallingEdgeMinDelta = 1;
+    int16_t syncTresholdBin = INVALID_VALUE;
+
     for(size_t bin = 0; bin < k_binsCount/2; bin++)
     {
-        if(newDataHistogram[bin] - newDataHistogram[bin+1] > k_histogramFallingEdgeMinDelta)
+        if(m_amplitudeHistogram[bin] - m_amplitudeHistogram[bin+1] > k_histogramFallingEdgeMinDelta)
         {
-            m_syncValue = GetBinValue(newDataMinValue, binWidth, bin);
+            m_syncValue = GetBinCenterValue(m_minValue, binWidth, bin);
             //Value of next (non-popular) bin
-            m_syncTreshold = GetBinValue(newDataMinValue, binWidth, bin+1);
+            m_syncTreshold = GetBinCenterValue(m_minValue, binWidth, bin+1);
+            syncTresholdBin = bin+1;
             break;
+        }
+        if(bin == k_binsCount/2 - 1)
+        {
+            //Falling enge not found.
+            //Ask for more samples, and after more failes, give up and set fallback value?
         }
     }
 
      //Find rising edge in right half of histogram.
+    int16_t whiteBin = INVALID_VALUE;
     for(size_t bin = k_binsCount - 1; bin > k_binsCount/2; bin--)
     {
-        if(newDataHistogram[bin] - newDataHistogram[bin-1] > k_histogramFallingEdgeMinDelta)
+        if(m_amplitudeHistogram[bin] - m_amplitudeHistogram[bin-1] > k_histogramFallingEdgeMinDelta)
         {
             //Value of right popular bin
-            m_whiteValue = GetBinValue(newDataMinValue, binWidth, bin);
+            m_whiteValue = GetBinCenterValue(m_minValue, binWidth, bin);
+            whiteBin = bin;
             break;
         }
     }
-    Serial.printf("m_syncTreshold = %d\n", m_syncTreshold);
+
+    /*if(whiteBin != INVALID_VALUE && syncTresholdBin != INVALID_VALUE && syncTresholdBin < whiteBin - 1)
+    {
+        size_t maxCount = 0;
+        size_t maxCountBin = syncTresholdBin;
+        //Find most popular bin BETWEEN sync and white bins
+        for(size_t bin = syncTresholdBin; bin < whiteBin; bin++)
+        {
+            if(m_amplitudeHistogram[bin] > maxCount)
+            {
+                maxCount = m_amplitudeHistogram[bin];
+                maxCountBin = bin;
+            }
+        }
+        m_blankingValue = GetBinCenterValue(m_minValue, binWidth, maxCountBin);
+    }*/
+
     Serial.printf("m_syncValue = %d\n", m_syncValue);
+    Serial.printf("m_syncTreshold = %d\n", m_syncTreshold);
+    Serial.printf("m_blankingValue= %d\n", m_blankingValue);
     Serial.printf("m_whiteValue = %d\n", m_whiteValue);
 
-    return AmplitudeCaclulatorState::k_finished;
+    m_state = AmplitudeCaclulatorState::k_finished;
+    return m_state;
 }

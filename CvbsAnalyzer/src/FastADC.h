@@ -61,18 +61,22 @@ class FastADC
     static constexpr uint8_t k_i2sEventQueueSize = 0;
     static constexpr uint32_t k_startAdcDelayMs = 10;
 
-#define FAST_ADC_2Mhz 1
-#define FAST_ADC_1Mhz 0
+#define FAST_ADC_2Mhz 0
+#define FAST_ADC_1Mhz 1
 #if FAST_ADC_2Mhz
+    static constexpr uint32_t k_oversamplingMultiplier = 1;
     static constexpr uint32_t k_sampleRate = 2*1000*1000;
     static constexpr uint8_t k_adcAPBClockDiv = 2;//ADC clock divider, ADC clock is divided from APB clock
     static constexpr uint32_t k_adcSampleCycle = 2;//The number of ADC sampling cycles. Range: 1 ~ 7.
     static constexpr uint16_t k_i2sMclkDiv = 20;// I2S module clock devider, Fmclk = Fsclk /(mclk_div+b/a)
 #elif FAST_ADC_1Mhz
+    //This one gives the most smooth data.
+    //I2S feeds us 2Msamples, but every sample repeats twice
+    static constexpr uint32_t k_oversamplingMultiplier = 2;
     static constexpr uint32_t k_sampleRate = 1*1000*1000;
     static constexpr uint8_t k_adcAPBClockDiv = 2;//ADC clock divider, ADC clock is divided from APB clock
     static constexpr uint32_t k_adcSampleCycle = 4;//The number of ADC sampling cycles. Range: 1 ~ 7.
-    static constexpr uint16_t k_i2sMclkDiv = 40;// I2S module clock devider, Fmclk = Fsclk /(mclk_div+b/a)
+    static constexpr uint16_t k_i2sMclkDiv = 20;// I2S module clock devider, Fmclk = Fsclk /(mclk_div+b/a)
 #endif
     adc1_channel_t gpioToAdc1Channel(int gpio);
 

@@ -4,6 +4,7 @@
 #include "Arduino.h"
 #include "FastADC.h"
 #include "AmplitudeCaclulator.h"
+#include "SyncIntervalsCalculator.h"
 
 
 class CvbsAnalyzer
@@ -12,7 +13,8 @@ class CvbsAnalyzer
     CvbsAnalyzer();
     FastADC m_fastAdc;
     AmplitudeCaclulator m_amplitudeCaclulator;
-    
+    SyncIntervalsCalculator m_syncIntervalsCalculator;
+
     void AnalyzePin(int gpioPin);
 };
 

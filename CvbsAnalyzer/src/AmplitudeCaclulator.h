@@ -8,26 +8,31 @@
 
 enum class AmplitudeCaclulatorState : signed char
 {
-    k_noData = 0,
-    k_sampling = 1,
+    k_noSamples = 0,
+    k_needMoreSamples = 1,
+    k_readyForCalculation = 2,
     k_calculation = 2,
     k_finished = 3,
 
-    k_badData = -1,
-    k_badAmplitudeTooLow = -2,
-    k_badAmplitudeTooHigh = -3,
-    k_badAmplitudeNoisy = -4,
+    k_badData = -127,
+    k_badAmplitudeTooLow,
+    k_badAmplitudeTooHigh,
+    k_badAmplitudeNoisy,
+    k_samplesAccumulatedCountMismatch,
 };
 
 class AmplitudeCaclulator
 {
     public:
-    AmplitudeCaclulator();
+    AmplitudeCaclulator()    
+    {
+        Reset();
+    }
     void Reset();
 
-    AmplitudeCaclulatorState PushData(const int16_t* newData, size_t newDataLen);
+    AmplitudeCaclulatorState PushSamples(const int16_t* newData, size_t newDataLen);
 
-    AmplitudeCaclulatorState m_state = AmplitudeCaclulatorState::k_noData;
+    AmplitudeCaclulatorState m_state = AmplitudeCaclulatorState::k_noSamples;
 
     int16_t m_minValue;
     int16_t m_syncValue;
@@ -38,12 +43,14 @@ class AmplitudeCaclulator
     int16_t m_whiteValue;
     int16_t m_colorMaxValue;
     int16_t m_maxValue;
+    uint32_t m_samplesAccumulated;
 
 
     private:
     constexpr static size_t k_binsCount = 30;
     constexpr static int16_t k_minRange = k_binsCount; //Condition for k_badAmplitudeTooLow
     constexpr static float k_highestBinMaxWeight = 0.55f; //Condition for k_badAmplitudeTooHigh
+    constexpr static size_t k_minSamplesForCalculation = 400;//200us*2Msample
     std::array<uint32_t, k_binsCount> m_amplitudeHistogram;
 
     //constexpr static float k_syncPulseOnlyAmplitudeColorbarsNtscM = 17.0f/170.0f;
