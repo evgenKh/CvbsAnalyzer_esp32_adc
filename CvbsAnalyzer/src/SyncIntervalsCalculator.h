@@ -2,7 +2,7 @@
 #define SyncIntervalsCalculator_H
 #include "Arduino.h"
 #include <vector>
-
+#include "Histogram.h"
 
 enum class SyncIntervalsCalculatorState : signed char
 {
@@ -17,7 +17,9 @@ enum class SyncIntervalsCalculatorState : signed char
 class SyncIntervalsCalculator
 {
     public:
-    SyncIntervalsCalculator()
+    SyncIntervalsCalculator():   
+        m_syncSequenceLengthHistogram(0, k_maxSequenceLength),
+        m_notSyncSequenceLengthHistogram(0, k_maxSequenceLength)
     {
         Reset();
     }
@@ -30,11 +32,11 @@ class SyncIntervalsCalculator
     //0 not allowed
     //Max sequence len = +-32767. For more split to multiple.
     //std::vector<int16_t> m_sampleSequences;
-    constexpr static size_t k_binsCount = 30;
+    constexpr static size_t k_binsCount = 40;
     constexpr static uint16_t k_maxSequenceLength = 200;//65535
     
-    std::array<uint32_t, k_binsCount> m_syncSequenceLengthHistogram;
-    std::array<uint32_t, k_binsCount> m_notSyncSequenceLengthHistogram;
+    Histogram<uint32_t, uint32_t, k_binsCount> m_syncSequenceLengthHistogram;
+    Histogram<uint32_t, uint32_t, k_binsCount> m_notSyncSequenceLengthHistogram;
     //constexpr static int16_t k_tooShortSequence = 1;//samples
 };
 

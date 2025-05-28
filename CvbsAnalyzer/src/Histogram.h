@@ -5,7 +5,7 @@
 #include <algorithm>
 
 template <typename CounterType, typename DataType, size_t k_binsCount>
-class Histogram
+class Histogram : public std::array<CounterType, k_binsCount>
 {
 public:
     Histogram(const DataType binsRangeMin, const DataType binsRangeMax) : m_binsRangeMin(binsRangeMin),
@@ -18,25 +18,25 @@ public:
     void Reset()
     {
         m_totalCount = 0;
-        m_array.fill(0);
+        this->fill(0);
     }
 
-    double GetBinLowBound(size_t binIndex) const
+    inline double GetBinLowBound(size_t binIndex) const
     {
         return m_binsRangeMin + binIndex * m_binWidth;
     }
 
-    double GetBinCenter(size_t binIndex) const
+    inline double GetBinCenter(size_t binIndex) const
     {
         return m_binsRangeMin + (binIndex + 0.5) * m_binWidth;
     }
 
-    double GetBinHighBound(size_t binIndex) const
+    inline double GetBinHighBound(size_t binIndex) const
     {
         return m_binsRangeMin + (binIndex + 1.0) * m_binWidth;
     }
 
-    size_t GetBinIndexForValueWithClamp(DataType sampleValue) const
+    inline size_t GetBinIndexForValueWithClamp(DataType sampleValue) const
     {
         const DataType clamped = (sampleValue < m_binsRangeMin ? m_binsRangeMin : (sampleValue > m_binsRangeMax ? m_binsRangeMax : sampleValue));
         
@@ -46,7 +46,7 @@ public:
         return binIndex;
     }
 
-    int32_t GetBinIndexForValue(DataType sampleValue) const
+    inline int32_t GetBinIndexForValue(DataType sampleValue) const
     {
         const int32_t binIndex = static_cast<int32_t>((sampleValue - m_binsRangeMin) / m_binWidth);
         return binIndex;
@@ -57,7 +57,7 @@ public:
         const DataType clamped = (sampleValue < m_binsRangeMin ? m_binsRangeMin : (sampleValue > m_binsRangeMax ? m_binsRangeMax : sampleValue));
         const size_t binIndex = GetBinIndexForValue(clamped);
 
-        m_array[binIndex]++;
+        std::array<CounterType, k_binsCount>::operator[](binIndex)++;
 
         // Update MinMax using clamped value
         // So [m_sampleMin, m_sampleMax] is always in range of [m_binsRangeMin, m_binsRangeMax]
@@ -68,8 +68,6 @@ public:
 
         m_totalCount++;
     }
-
-    std::array<CounterType, k_binsCount> m_array;
 
     const DataType m_binsRangeMin;
     const DataType m_binsRangeMax;

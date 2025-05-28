@@ -19,12 +19,6 @@ void AmplitudeCaclulator::Reset()
     m_amplitudeHistogram.Reset();
 }
 
-inline int16_t GetBinCenterValue(int16_t minValue, float binWidth, size_t binId)
-{
-    //First +0.5 is for centering, second +0.5 is for rounding
-    return (minValue + static_cast<int16_t>((binId + 0.5f) * binWidth + 0.5f));
-}
-
 AmplitudeCaclulatorState AmplitudeCaclulator::PushSamples(const int16_t *newData, size_t newDataLen)
 {
     if(!newDataLen)
@@ -64,7 +58,7 @@ AmplitudeCaclulatorState AmplitudeCaclulator::PushSamples(const int16_t *newData
         newDataHistogram.PushSample(newData[i]);
     }
 
-    if(newDataHistogram.m_array[k_binsCount-1] > static_cast<uint32_t>(newDataLen * k_highestBinMaxWeight))
+    if(newDataHistogram[k_binsCount-1] > static_cast<uint32_t>(newDataLen * k_highestBinMaxWeight))
     {
         //Skip this dataSet
         return AmplitudeCaclulatorState::k_badAmplitudeTooHigh;
@@ -81,7 +75,7 @@ AmplitudeCaclulatorState AmplitudeCaclulator::PushSamples(const int16_t *newData
     assert(m_amplitudeHistogram.m_binsRangeMax == newDataHistogram.m_binsRangeMax);
     for(size_t bin = 0; bin < k_binsCount; bin++)
     {
-        m_amplitudeHistogram.m_array[bin] += newDataHistogram.m_array[bin];
+        m_amplitudeHistogram[bin] += newDataHistogram[bin];
     }
     m_amplitudeHistogram.m_totalCount += newDataHistogram.m_totalCount;
 
@@ -100,7 +94,7 @@ AmplitudeCaclulatorState AmplitudeCaclulator::PushSamples(const int16_t *newData
 
     for(size_t bin = 0; bin < k_binsCount/2; bin++)
     {
-        if(m_amplitudeHistogram.m_array[bin] - m_amplitudeHistogram.m_array[bin+1] > k_histogramFallingEdgeMinDelta)
+        if(m_amplitudeHistogram[bin] - m_amplitudeHistogram[bin+1] > k_histogramFallingEdgeMinDelta)
         {
             m_syncValue = m_amplitudeHistogram.GetBinCenter(bin);
             //Value of next (non-popular) bin
@@ -119,7 +113,7 @@ AmplitudeCaclulatorState AmplitudeCaclulator::PushSamples(const int16_t *newData
     int16_t whiteBin = INVALID_VALUE;
     for(size_t bin = k_binsCount - 1; bin > k_binsCount/2; bin--)
     {
-        if(m_amplitudeHistogram.m_array[bin] - m_amplitudeHistogram.m_array[bin-1] > k_histogramFallingEdgeMinDelta)
+        if(m_amplitudeHistogram[bin] - m_amplitudeHistogram[bin-1] > k_histogramFallingEdgeMinDelta)
         {
             //Value of right popular bin
             m_whiteValue = m_amplitudeHistogram.GetBinCenter(bin);
