@@ -115,6 +115,8 @@ FastADCState FastADC::StartADCSampling(int8_t gpioPin)
         return m_state;
     }
 
+    adc_ll_digi_convert_limit_disable();
+    
     err = i2s_adc_enable(I2S_NUM_0);
     if(err != ESP_OK)
     {
@@ -128,7 +130,7 @@ FastADCState FastADC::StartADCSampling(int8_t gpioPin)
 
     // delay for I2S bug workaround
     //See https://github.com/espressif/esp-idf/pull/1991#issuecomment-1157404298
-    vTaskDelay(k_startAdcDelayMs / portTICK_PERIOD_MS);//10ms??
+    //vTaskDelay(k_startAdcDelayMs / portTICK_PERIOD_MS);//10ms??
 
     // Enable continuous adc sampling
     //See https://github.com/espressif/esp-idf/pull/1991#issuecomment-1157404298
