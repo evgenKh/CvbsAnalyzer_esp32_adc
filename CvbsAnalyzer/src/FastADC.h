@@ -1,6 +1,16 @@
 #ifndef FastADC_H
 #define FastADC_H
 
+//Uses old ADC+I2S drivers, since arduino framework in platformio is old.
+
+//Tested on:
+// Platformio
+// Platform espressif32 @ 6.10.0
+// framework-arduinoespressif32 @ 3.20017.241212+sha.dcc1105b (https://github.com/platformio/platform-espressif32)
+//  L Contains Arduino support - v2.0.17 (based on IDF v4.4.7)
+//  L Contains ESP-IDF support(without arduino) - v5.4.0
+
+
 #include "Arduino.h"
 //#include "hal/i2c_ll.h"
 //#include "hal/i2s_types.h"
@@ -23,9 +33,6 @@ enum class FastADCState : signed char{
     k_startFailedZeroDma,
     k_startFailedAdcEnable,
     k_stopFailedAdcDisable,
-
-
-
 };
 
 class FastADC
@@ -64,21 +71,31 @@ class FastADC
 #define FAST_ADC_2Mhz 0
 #define FAST_ADC_1Mhz 1
 #if FAST_ADC_2Mhz
-    static constexpr uint32_t k_oversamplingMultiplier = 1;
-    static constexpr uint32_t k_sampleRate = 2*1000*1000;
     static constexpr uint8_t k_adcAPBClockDiv = 2;//ADC clock divider, ADC clock is divided from APB clock
     static constexpr uint32_t k_adcSampleCycle = 2;//The number of ADC sampling cycles. Range: 1 ~ 7.
+    static constexpr uint32_t k_i2sSampleRate = 2*1000*1000;
     static constexpr uint16_t k_i2sMclkDiv = 20;// I2S module clock devider, Fmclk = Fsclk /(mclk_div+b/a)
+    static constexpr uint16_t k_i2sRxBckDiv = 2;//Bit clock configuration bits. I don't know what this means.
+    public:
+    static constexpr uint32_t k_oversamplingMultiplier = 1;
+    static constexpr uint32_t k_sampleRate = k_i2sSampleRate * k_oversamplingMultiplier;
+    static constexpr uint32_t k_sampleRateWithSkippedOversamples = k_i2sSampleRate;
 #elif FAST_ADC_1Mhz
     //This one gives the most smooth data.
-    //I2S feeds us 2Msamples, but every sample repeats twice
-    static constexpr uint32_t k_oversamplingMultiplier = 2;
-    static constexpr uint32_t k_sampleRate = 1*1000*1000;
     static constexpr uint8_t k_adcAPBClockDiv = 2;//ADC clock divider, ADC clock is divided from APB clock
     static constexpr uint32_t k_adcSampleCycle = 4;//The number of ADC sampling cycles. Range: 1 ~ 7.
+    //This in not true sample rate... 
+    static constexpr uint32_t k_i2sSampleRate = 1*1000*1000;
     static constexpr uint16_t k_i2sMclkDiv = 20;// I2S module clock devider, Fmclk = Fsclk /(mclk_div+b/a)
+    static constexpr uint16_t k_i2sRxBckDiv = 2;//Bit clock configuration bits. I don't know what this means.
+
+    public:
+    //This si not real oversampling, but for some reason each sample repeated twice with this settings.
+    //I2S feeds us 2Msamples, but every sample repeats twice
+    static constexpr uint32_t k_oversamplingMultiplier = 2;
+    static constexpr uint32_t k_sampleRate = k_i2sSampleRate * k_oversamplingMultiplier;
+    static constexpr uint32_t k_sampleRateWithSkippedOversamples = k_i2sSampleRate;
 #endif
-    adc1_channel_t gpioToAdc1Channel(int gpio);
 
 };
 

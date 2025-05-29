@@ -43,7 +43,7 @@ FastADCState FastADC::Initialize()
 
     i2s_config_t i2s_conf = {
     	.mode = (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_RX | I2S_MODE_ADC_BUILT_IN),
-	    .sample_rate = k_sampleRate,
+	    .sample_rate = k_i2sSampleRate,
 	    .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT,
 	    .channel_format = I2S_CHANNEL_FMT_ONLY_RIGHT,
 	    .communication_format = I2S_COMM_FORMAT_STAND_I2S,
@@ -144,7 +144,6 @@ FastADCState FastADC::StartADCSampling(int8_t gpioPin)
 
     adc_ll_digi_clear_pattern_table(k_adcLowLevelUnit);
     adc_ll_digi_set_pattern_table_len(k_adcLowLevelUnit, 1);
-
     adc_ll_digi_set_pattern_table(k_adcLowLevelUnit, m_adcChannel, adcDigiPattern);
     
     // reduce sample time  
@@ -161,7 +160,7 @@ FastADCState FastADC::StartADCSampling(int8_t gpioPin)
     };
     i2s_ll_rx_set_clk(&I2S0, &i2sLowLevelClkConfig);
     
-    i2s_ll_rx_set_bck_div_num(&I2S0, 2);//Bit clock configuration bits. if data_bits == 8 { 2 } else { 1 };
+    i2s_ll_rx_set_bck_div_num(&I2S0, k_i2sRxBckDiv);//Bit clock configuration bits. if data_bits == 8 { 2 } else { 1 };
 
     //Calling i2s_zero_dma_buffer to erase data that was sampled with default clock settings.
     err = i2s_zero_dma_buffer(I2S_NUM_0);
