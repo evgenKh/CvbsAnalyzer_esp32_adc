@@ -51,6 +51,7 @@ class FastADC
 
     inline FastADCState GetState() const { return m_state; }
     inline bool IsInErrorState() const { return ((signed char)m_state < 0); }
+    adc1_channel_t GetAdcChannel() const { return m_adcChannel; }
 
     QueueHandle_t m_i2sEventQueue = nullptr;
 

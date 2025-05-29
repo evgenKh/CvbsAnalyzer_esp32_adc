@@ -1,0 +1,3108 @@
+=~=~=~=~=~=~=~=~=~=~=~= PuTTY log 2025.05.30 02:06:14 =~=~=~=~=~=~=~=~=~=~=~=
+Running loop # 0.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2662, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 65,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 2, 5 ],
+"value_count_pairs": [
+[ 3, 1 ],
+[ 5, 22 ],
+[ 6, 42 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 38, 59 ],
+"value_count_pairs": [
+[ 39, 1 ],
+[ 59, 7 ],
+[ 60, 56 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 1.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2662, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 65,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 2, 5 ],
+"value_count_pairs": [
+[ 3, 2 ],
+[ 5, 23 ],
+[ 6, 40 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 58, 59 ],
+"value_count_pairs": [
+[ 59, 6 ],
+[ 60, 58 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 2.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 1297, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 5 ],
+"value_count_pairs": [
+[ 5, 23 ],
+[ 6, 41 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 63,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 56, 59 ],
+"value_count_pairs": [
+[ 57, 1 ],
+[ 59, 5 ],
+[ 60, 57 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 3.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2935, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 73,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 2, 27 ],
+"value_count_pairs": [
+[ 3, 9 ],
+[ 4, 3 ],
+[ 5, 20 ],
+[ 6, 35 ],
+[ 28, 6 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 72,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 61 ],
+"value_count_pairs": [
+[ 5, 1 ],
+[ 6, 5 ],
+[ 28, 1 ],
+[ 30, 5 ],
+[ 31, 6 ],
+[ 57, 1 ],
+[ 59, 4 ],
+[ 60, 48 ],
+[ 62, 1 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 4.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2662, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 74,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 2, 27 ],
+"value_count_pairs": [
+[ 3, 10 ],
+[ 4, 2 ],
+[ 5, 21 ],
+[ 6, 35 ],
+[ 27, 1 ],
+[ 28, 5 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 73,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 59 ],
+"value_count_pairs": [
+[ 5, 1 ],
+[ 6, 5 ],
+[ 30, 4 ],
+[ 31, 8 ],
+[ 57, 1 ],
+[ 59, 4 ],
+[ 60, 50 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 5.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2935, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 5 ],
+"value_count_pairs": [
+[ 5, 22 ],
+[ 6, 42 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 63,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 56, 59 ],
+"value_count_pairs": [
+[ 57, 1 ],
+[ 59, 7 ],
+[ 60, 55 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 6.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2662, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 5 ],
+"value_count_pairs": [
+[ 5, 24 ],
+[ 6, 40 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 56, 59 ],
+"value_count_pairs": [
+[ 57, 1 ],
+[ 59, 4 ],
+[ 60, 59 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 7.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2662, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 65,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 3, 5 ],
+"value_count_pairs": [
+[ 4, 2 ],
+[ 5, 23 ],
+[ 6, 40 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 57, 59 ],
+"value_count_pairs": [
+[ 58, 1 ],
+[ 59, 5 ],
+[ 60, 58 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 8.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2798, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 5 ],
+"value_count_pairs": [
+[ 5, 24 ],
+[ 6, 40 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 63,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 56, 59 ],
+"value_count_pairs": [
+[ 57, 1 ],
+[ 59, 5 ],
+[ 60, 57 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 9.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2662, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 65,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 5 ],
+"value_count_pairs": [
+[ 5, 25 ],
+[ 6, 40 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 56, 59 ],
+"value_count_pairs": [
+[ 57, 1 ],
+[ 59, 4 ],
+[ 60, 59 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 10.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2662, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 5 ],
+"value_count_pairs": [
+[ 5, 23 ],
+[ 6, 41 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 55, 59 ],
+"value_count_pairs": [
+[ 56, 1 ],
+[ 57, 1 ],
+[ 59, 6 ],
+[ 60, 56 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 11.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2662, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 5 ],
+"value_count_pairs": [
+[ 5, 23 ],
+[ 6, 41 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 63,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 56, 59 ],
+"value_count_pairs": [
+[ 57, 1 ],
+[ 59, 5 ],
+[ 60, 57 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 12.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 1297, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 65,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 5 ],
+"value_count_pairs": [
+[ 5, 23 ],
+[ 6, 42 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 56, 59 ],
+"value_count_pairs": [
+[ 57, 1 ],
+[ 59, 6 ],
+[ 60, 57 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 13.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2662, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 73,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 2, 27 ],
+"value_count_pairs": [
+[ 3, 9 ],
+[ 4, 3 ],
+[ 5, 19 ],
+[ 6, 36 ],
+[ 28, 6 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 72,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 59 ],
+"value_count_pairs": [
+[ 5, 1 ],
+[ 6, 5 ],
+[ 30, 6 ],
+[ 31, 6 ],
+[ 57, 1 ],
+[ 59, 6 ],
+[ 60, 47 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 14.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2662, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 73,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 2, 27 ],
+"value_count_pairs": [
+[ 3, 8 ],
+[ 4, 4 ],
+[ 5, 20 ],
+[ 6, 35 ],
+[ 27, 1 ],
+[ 28, 5 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 72,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 5, 61 ],
+"value_count_pairs": [
+[ 6, 6 ],
+[ 28, 1 ],
+[ 30, 6 ],
+[ 31, 5 ],
+[ 57, 1 ],
+[ 59, 5 ],
+[ 60, 47 ],
+[ 62, 1 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 15.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2935, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 65,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 5 ],
+"value_count_pairs": [
+[ 5, 23 ],
+[ 6, 42 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 56, 59 ],
+"value_count_pairs": [
+[ 57, 1 ],
+[ 59, 6 ],
+[ 60, 57 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 16.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2798, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 5 ],
+"value_count_pairs": [
+[ 5, 21 ],
+[ 6, 43 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 63,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 56, 59 ],
+"value_count_pairs": [
+[ 57, 1 ],
+[ 59, 7 ],
+[ 60, 55 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 17.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2525, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 5 ],
+"value_count_pairs": [
+[ 5, 22 ],
+[ 6, 42 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 56, 59 ],
+"value_count_pairs": [
+[ 57, 1 ],
+[ 59, 6 ],
+[ 60, 57 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 18.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2662, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 65,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 2, 5 ],
+"value_count_pairs": [
+[ 3, 2 ],
+[ 5, 23 ],
+[ 6, 40 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 58, 59 ],
+"value_count_pairs": [
+[ 59, 6 ],
+[ 60, 58 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 19.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2662, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 5 ],
+"value_count_pairs": [
+[ 5, 24 ],
+[ 6, 40 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 63,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 56, 59 ],
+"value_count_pairs": [
+[ 57, 1 ],
+[ 59, 5 ],
+[ 60, 57 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 20.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2662, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 65,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 5 ],
+"value_count_pairs": [
+[ 5, 23 ],
+[ 6, 42 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 56, 59 ],
+"value_count_pairs": [
+[ 57, 1 ],
+[ 59, 6 ],
+[ 60, 57 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 21.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2662, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 5 ],
+"value_count_pairs": [
+[ 5, 24 ],
+[ 6, 40 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 55, 59 ],
+"value_count_pairs": [
+[ 56, 1 ],
+[ 57, 1 ],
+[ 59, 4 ],
+[ 60, 58 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 22.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2662, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 5 ],
+"value_count_pairs": [
+[ 5, 24 ],
+[ 6, 40 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 63,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 56, 59 ],
+"value_count_pairs": [
+[ 57, 1 ],
+[ 59, 5 ],
+[ 60, 57 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 23.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2525, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 74,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 2, 27 ],
+"value_count_pairs": [
+[ 3, 9 ],
+[ 4, 3 ],
+[ 5, 21 ],
+[ 6, 35 ],
+[ 28, 6 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 73,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 61 ],
+"value_count_pairs": [
+[ 5, 1 ],
+[ 6, 5 ],
+[ 28, 1 ],
+[ 30, 5 ],
+[ 31, 6 ],
+[ 57, 1 ],
+[ 59, 4 ],
+[ 60, 49 ],
+[ 62, 1 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 24.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2798, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 73,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 2, 27 ],
+"value_count_pairs": [
+[ 3, 9 ],
+[ 4, 3 ],
+[ 5, 19 ],
+[ 6, 36 ],
+[ 27, 1 ],
+[ 28, 5 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 72,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 59 ],
+"value_count_pairs": [
+[ 5, 1 ],
+[ 6, 5 ],
+[ 30, 5 ],
+[ 31, 7 ],
+[ 57, 1 ],
+[ 59, 5 ],
+[ 60, 48 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 25.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2798, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 65,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 3, 5 ],
+"value_count_pairs": [
+[ 4, 1 ],
+[ 5, 24 ],
+[ 6, 40 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 27, 59 ],
+"value_count_pairs": [
+[ 28, 1 ],
+[ 57, 1 ],
+[ 59, 5 ],
+[ 60, 57 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 26.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2798, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 65,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 5 ],
+"value_count_pairs": [
+[ 5, 24 ],
+[ 6, 41 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 56, 59 ],
+"value_count_pairs": [
+[ 57, 1 ],
+[ 59, 5 ],
+[ 60, 58 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 27.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2798, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 5 ],
+"value_count_pairs": [
+[ 5, 22 ],
+[ 6, 42 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 63,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 56, 59 ],
+"value_count_pairs": [
+[ 57, 1 ],
+[ 59, 6 ],
+[ 60, 56 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 28.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2798, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 5 ],
+"value_count_pairs": [
+[ 5, 23 ],
+[ 6, 41 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 56, 59 ],
+"value_count_pairs": [
+[ 57, 1 ],
+[ 59, 6 ],
+[ 60, 57 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 29.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2662, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 65,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 5 ],
+"value_count_pairs": [
+[ 5, 23 ],
+[ 6, 42 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 56, 59 ],
+"value_count_pairs": [
+[ 57, 1 ],
+[ 59, 6 ],
+[ 60, 57 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 30.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2662, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 5 ],
+"value_count_pairs": [
+[ 5, 24 ],
+[ 6, 40 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 63,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 56, 59 ],
+"value_count_pairs": [
+[ 57, 1 ],
+[ 59, 5 ],
+[ 60, 57 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 31.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 1843, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 65,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 5 ],
+"value_count_pairs": [
+[ 5, 24 ],
+[ 6, 41 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 56, 59 ],
+"value_count_pairs": [
+[ 57, 1 ],
+[ 59, 5 ],
+[ 60, 58 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 32.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2662, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 1, 5 ],
+"value_count_pairs": [
+[ 2, 1 ],
+[ 5, 21 ],
+[ 6, 42 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 63,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 58, 59 ],
+"value_count_pairs": [
+[ 59, 7 ],
+[ 60, 56 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 33.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2525, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 73,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 2, 27 ],
+"value_count_pairs": [
+[ 3, 9 ],
+[ 4, 3 ],
+[ 5, 21 ],
+[ 6, 34 ],
+[ 27, 1 ],
+[ 28, 5 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 72,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 5, 59 ],
+"value_count_pairs": [
+[ 6, 6 ],
+[ 30, 6 ],
+[ 31, 6 ],
+[ 56, 1 ],
+[ 59, 2 ],
+[ 60, 51 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 34.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2662, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 74,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 2, 27 ],
+"value_count_pairs": [
+[ 3, 8 ],
+[ 4, 4 ],
+[ 5, 20 ],
+[ 6, 36 ],
+[ 28, 6 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 73,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 61 ],
+"value_count_pairs": [
+[ 5, 2 ],
+[ 6, 4 ],
+[ 28, 1 ],
+[ 30, 5 ],
+[ 31, 6 ],
+[ 57, 1 ],
+[ 59, 4 ],
+[ 60, 49 ],
+[ 62, 1 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 35.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2935, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 65,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 2, 5 ],
+"value_count_pairs": [
+[ 3, 2 ],
+[ 4, 1 ],
+[ 5, 22 ],
+[ 6, 40 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 66,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 29, 59 ],
+"value_count_pairs": [
+[ 30, 2 ],
+[ 31, 1 ],
+[ 55, 1 ],
+[ 57, 1 ],
+[ 59, 5 ],
+[ 60, 56 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 36.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2798, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 65,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 1, 5 ],
+"value_count_pairs": [
+[ 2, 1 ],
+[ 5, 23 ],
+[ 6, 41 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 1, 59 ],
+"value_count_pairs": [
+[ 2, 1 ],
+[ 55, 1 ],
+[ 59, 6 ],
+[ 60, 56 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 37.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2662, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 65,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 5 ],
+"value_count_pairs": [
+[ 5, 23 ],
+[ 6, 42 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 56, 59 ],
+"value_count_pairs": [
+[ 57, 1 ],
+[ 59, 6 ],
+[ 60, 57 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 38.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2798, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 5 ],
+"value_count_pairs": [
+[ 5, 23 ],
+[ 6, 41 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 63,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 56, 59 ],
+"value_count_pairs": [
+[ 57, 1 ],
+[ 59, 5 ],
+[ 60, 57 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 39.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2662, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 5 ],
+"value_count_pairs": [
+[ 5, 22 ],
+[ 6, 42 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 63,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 56, 59 ],
+"value_count_pairs": [
+[ 57, 1 ],
+[ 59, 6 ],
+[ 60, 56 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 40.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2662, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 65,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 5 ],
+"value_count_pairs": [
+[ 5, 24 ],
+[ 6, 41 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 56, 59 ],
+"value_count_pairs": [
+[ 57, 1 ],
+[ 59, 5 ],
+[ 60, 58 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 41.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2798, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 5 ],
+"value_count_pairs": [
+[ 5, 25 ],
+[ 6, 39 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 63,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 56, 59 ],
+"value_count_pairs": [
+[ 57, 1 ],
+[ 59, 3 ],
+[ 60, 59 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 42.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2662, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 5 ],
+"value_count_pairs": [
+[ 5, 23 ],
+[ 6, 41 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 56, 59 ],
+"value_count_pairs": [
+[ 57, 1 ],
+[ 59, 5 ],
+[ 60, 58 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 43.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2935, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 74,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 2, 27 ],
+"value_count_pairs": [
+[ 3, 8 ],
+[ 4, 4 ],
+[ 5, 20 ],
+[ 6, 36 ],
+[ 28, 6 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 73,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 61 ],
+"value_count_pairs": [
+[ 5, 2 ],
+[ 6, 4 ],
+[ 28, 1 ],
+[ 30, 5 ],
+[ 31, 6 ],
+[ 57, 1 ],
+[ 59, 4 ],
+[ 60, 49 ],
+[ 62, 1 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 44.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2798, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 73,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 2, 27 ],
+"value_count_pairs": [
+[ 3, 10 ],
+[ 4, 2 ],
+[ 5, 21 ],
+[ 6, 34 ],
+[ 28, 6 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 72,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 59 ],
+"value_count_pairs": [
+[ 5, 2 ],
+[ 6, 4 ],
+[ 30, 4 ],
+[ 31, 8 ],
+[ 57, 1 ],
+[ 59, 4 ],
+[ 60, 49 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 45.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2935, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 68,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 2, 5 ],
+"value_count_pairs": [
+[ 3, 4 ],
+[ 4, 2 ],
+[ 5, 22 ],
+[ 6, 40 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 67,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 27, 59 ],
+"value_count_pairs": [
+[ 28, 1 ],
+[ 30, 2 ],
+[ 31, 3 ],
+[ 57, 1 ],
+[ 59, 6 ],
+[ 60, 54 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 46.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2798, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 66,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 1, 5 ],
+"value_count_pairs": [
+[ 2, 2 ],
+[ 3, 1 ],
+[ 5, 23 ],
+[ 6, 40 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 65,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 1, 59 ],
+"value_count_pairs": [
+[ 2, 1 ],
+[ 58, 1 ],
+[ 59, 5 ],
+[ 60, 58 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 47.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2662, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 5 ],
+"value_count_pairs": [
+[ 5, 23 ],
+[ 6, 41 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 63,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 56, 59 ],
+"value_count_pairs": [
+[ 57, 1 ],
+[ 59, 6 ],
+[ 60, 56 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 48.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2662, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 65,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 5 ],
+"value_count_pairs": [
+[ 5, 23 ],
+[ 6, 42 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 56, 59 ],
+"value_count_pairs": [
+[ 57, 1 ],
+[ 59, 6 ],
+[ 60, 57 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 49.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2662, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 5 ],
+"value_count_pairs": [
+[ 5, 24 ],
+[ 6, 40 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 56, 59 ],
+"value_count_pairs": [
+[ 57, 1 ],
+[ 58, 1 ],
+[ 59, 5 ],
+[ 60, 57 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 50.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2662, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 5 ],
+"value_count_pairs": [
+[ 5, 24 ],
+[ 6, 40 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 63,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 56, 59 ],
+"value_count_pairs": [
+[ 57, 1 ],
+[ 59, 5 ],
+[ 60, 57 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 51.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2798, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 65,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 5 ],
+"value_count_pairs": [
+[ 5, 24 ],
+[ 6, 41 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 56, 59 ],
+"value_count_pairs": [
+[ 57, 1 ],
+[ 59, 5 ],
+[ 60, 58 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 52.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2662, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 5 ],
+"value_count_pairs": [
+[ 5, 23 ],
+[ 6, 41 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 52, 59 ],
+"value_count_pairs": [
+[ 53, 1 ],
+[ 57, 1 ],
+[ 59, 5 ],
+[ 60, 57 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 53.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 205, 
+"_whiteValue": 2116, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 73,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 2, 27 ],
+"value_count_pairs": [
+[ 3, 10 ],
+[ 4, 2 ],
+[ 5, 26 ],
+[ 6, 29 ],
+[ 27, 1 ],
+[ 28, 5 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 72,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 5, 60 ],
+"value_count_pairs": [
+[ 6, 6 ],
+[ 30, 5 ],
+[ 31, 7 ],
+[ 57, 1 ],
+[ 60, 52 ],
+[ 61, 1 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 54.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2662, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 74,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 2, 27 ],
+"value_count_pairs": [
+[ 3, 8 ],
+[ 4, 4 ],
+[ 5, 21 ],
+[ 6, 35 ],
+[ 28, 6 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 73,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 61 ],
+"value_count_pairs": [
+[ 5, 2 ],
+[ 6, 4 ],
+[ 28, 1 ],
+[ 30, 5 ],
+[ 31, 6 ],
+[ 57, 1 ],
+[ 59, 4 ],
+[ 60, 49 ],
+[ 62, 1 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 55.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2798, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 67,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 2, 27 ],
+"value_count_pairs": [
+[ 3, 5 ],
+[ 4, 1 ],
+[ 5, 22 ],
+[ 6, 38 ],
+[ 28, 1 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 67,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 59 ],
+"value_count_pairs": [
+[ 5, 1 ],
+[ 30, 2 ],
+[ 31, 4 ],
+[ 57, 1 ],
+[ 59, 5 ],
+[ 60, 54 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 56.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2798, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 65,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 1, 5 ],
+"value_count_pairs": [
+[ 2, 1 ],
+[ 5, 23 ],
+[ 6, 41 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 1, 59 ],
+"value_count_pairs": [
+[ 2, 1 ],
+[ 57, 1 ],
+[ 58, 1 ],
+[ 59, 5 ],
+[ 60, 56 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 57.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2798, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 65,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 5 ],
+"value_count_pairs": [
+[ 5, 24 ],
+[ 6, 41 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 55, 59 ],
+"value_count_pairs": [
+[ 56, 1 ],
+[ 59, 4 ],
+[ 60, 59 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 58.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2798, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 5 ],
+"value_count_pairs": [
+[ 5, 21 ],
+[ 6, 43 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 63,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 56, 59 ],
+"value_count_pairs": [
+[ 57, 1 ],
+[ 59, 7 ],
+[ 60, 55 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 59.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2662, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 5 ],
+"value_count_pairs": [
+[ 5, 23 ],
+[ 6, 41 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 56, 59 ],
+"value_count_pairs": [
+[ 57, 1 ],
+[ 59, 6 ],
+[ 60, 57 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 60.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2662, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 65,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 5 ],
+"value_count_pairs": [
+[ 5, 23 ],
+[ 6, 42 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 56, 59 ],
+"value_count_pairs": [
+[ 57, 1 ],
+[ 59, 6 ],
+[ 60, 57 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+Running loop # 61.
+Starting AnalyzePin for gpioPin 36, invertByHardware=0, invertBySoftware=0...
+Stopping ADC sampling for gpioPin 36, samplesReadTotal = 8192, CvbsAnalyzerState = 9
+{
+"CvbsAnalyzer": {
+"state": 10,
+"k_sampleRate": 1000000,
+"k_sampleRateWithSkippedOversamples": 1000000,
+"k_adcDataStrideSamples": 2,
+"k_i2sSampleRate": 1000000,
+"k_oversamplingMultiplier": 2,
+"k_dmaBufLenSamples": 1024,
+"k_dmaBufsCount": 8,
+},
+"FastADC": { "state": 2, "m_adcChannel": 0 },
+"AmplitudeCaclulator": {
+"state": 4, 
+"m_syncTreshold": 341, 
+"_whiteValue": 2525, 
+}, 
+"SyncIntervalsCalculator": {
+"state": 3, 
+"m_syncSequenceLengthHistogram": 
+{
+"m_samplesCount": 64,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 4, 5 ],
+"value_count_pairs": [
+[ 5, 23 ],
+[ 6, 41 ],
+] },
+"m_notSyncSequenceLengthHistogram": 
+{
+"m_samplesCount": 63,
+"k_binsCount": 100,
+"m_binWidth": 1.000000,
+"m_binsRange": [ 0, 100 ],
+"m_sampleValuesRange": [ 56, 59 ],
+"value_count_pairs": [
+[ 57, 1 ],
+[ 59, 6 ],
+[ 60, 56 ],
+] },
+}, 
+}
+CvbsAnalyzer finished with state 10.
+R

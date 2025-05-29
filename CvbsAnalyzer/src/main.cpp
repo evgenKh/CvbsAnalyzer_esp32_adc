@@ -17,13 +17,15 @@ void setup()
     CVBS_ANALYZER_LOG("CvbsAnalyzer initialization failed with state %d!\n", (int)state);
     return;
   }
-
-  state = g_cvbsAnalyzer.AnalyzePin(k_gpioPin);
-  delay(10);
-  CVBS_ANALYZER_LOG("CvbsAnalyzer finished with state %d.\n", (int)state);
-
 }
 
 void loop()
 {
+  static int loopNum = 0;
+  CVBS_ANALYZER_LOG("Running loop # %d.\n", loopNum);
+  CvbsAnalyzerState state = g_cvbsAnalyzer.AnalyzePin(k_gpioPin);
+  CVBS_ANALYZER_LOG("CvbsAnalyzer finished with state %d.\n", (int)state);
+
+  delay(1000);
+  loopNum++;
 }

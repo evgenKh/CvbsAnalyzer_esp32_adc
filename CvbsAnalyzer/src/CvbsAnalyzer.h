@@ -50,6 +50,7 @@ class CvbsAnalyzer
     CvbsAnalyzerState AnalyzePin(int gpioPin);
     inline CvbsAnalyzerState GetState() const { return m_state; }
     inline bool IsInErrorState() const { return ((signed char)m_state < 0); }
+    void Print();
 
     private:
     CvbsAnalyzerState m_state = CvbsAnalyzerState::k_notInitialized;

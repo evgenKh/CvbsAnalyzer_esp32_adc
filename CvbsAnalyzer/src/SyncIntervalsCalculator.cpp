@@ -90,17 +90,12 @@ SyncIntervalsCalculatorState SyncIntervalsCalculator::PushSamples(const uint16_t
 
 void SyncIntervalsCalculator::Print() const
 {
-    CVBS_ANALYZER_LOG("SyncIntervalsCalculator state: %d\n", (int)m_state);
-    CVBS_ANALYZER_LOG("\tm_syncSequenceLengthHistogram = \n");
-    for(int bin = 0; bin < k_binsCount; bin++)
-    {
-        if(m_syncSequenceLengthHistogram[bin])
-            CVBS_ANALYZER_LOG("\t%d: %d\n", (int)m_syncSequenceLengthHistogram.GetBinCenter(bin), m_syncSequenceLengthHistogram[bin]);
-    }
-    CVBS_ANALYZER_LOG("\tm_notSyncSequenceLengthHistogram = \n");
-    for(int bin = 0; bin < k_binsCount; bin++)
-    {
-        if(m_notSyncSequenceLengthHistogram[bin])
-            CVBS_ANALYZER_LOG("\t%d: %d\n", (int)m_notSyncSequenceLengthHistogram.GetBinCenter(bin), m_notSyncSequenceLengthHistogram[bin]);
-    }
+    CVBS_ANALYZER_LOG("\"SyncIntervalsCalculator\": {\n");
+    CVBS_ANALYZER_LOG("\t\"state\": %d, \n", static_cast<int>(m_state));
+    CVBS_ANALYZER_LOG("\t\"m_syncSequenceLengthHistogram\": \n");
+    m_syncSequenceLengthHistogram.Print();
+    CVBS_ANALYZER_LOG("\t\"m_notSyncSequenceLengthHistogram\": \n");
+    m_notSyncSequenceLengthHistogram.Print();
+    CVBS_ANALYZER_LOG("}, \n");
+
 }

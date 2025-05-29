@@ -3,6 +3,7 @@
 
 #include <array>
 #include <algorithm>
+#include "CvbsAnalyzerGlobals.h"
 
 template <typename CounterType, typename DataType, size_t k_binsCount>
 class Histogram : public std::array<CounterType, k_binsCount>
@@ -170,6 +171,22 @@ public:
         return end; // Not found
     }
     
+    void Print() const
+    {
+        CVBS_ANALYZER_LOG("{\n");
+        CVBS_ANALYZER_LOG("\t\"m_samplesCount\": %d,\n", m_samplesCount);
+        CVBS_ANALYZER_LOG("\t\"k_binsCount\": %d,\n", k_binsCount);
+        CVBS_ANALYZER_LOG("\t\"m_binWidth\": %f,\n", m_binWidth);
+        CVBS_ANALYZER_LOG("\t\"m_binsRange\": [ %d, %d ],\n", m_binsRange.first, m_binsRange.second);
+        CVBS_ANALYZER_LOG("\t\"m_sampleValuesRange\": [ %d, %d ],\n", m_sampleValuesRange.first, m_sampleValuesRange.second);
+        CVBS_ANALYZER_LOG("\t\"value_count_pairs\": [\n");
+        for(int bin = 0; bin < k_binsCount; bin++)
+        {
+            if(this->at(bin))
+                CVBS_ANALYZER_LOG("\t[ %d, %d ],\n", (int)GetBinCenter(bin), this->at(bin));
+        }
+        CVBS_ANALYZER_LOG("] },\n");
+    }
 
     //Made this unaccessible since it's not obvoius, no bin or no samples.
     constexpr bool empty() const noexcept = delete;

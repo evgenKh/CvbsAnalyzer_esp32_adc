@@ -80,7 +80,7 @@ void PreProcessBuf(uint16_t* samples, size_t samplesCount, bool invertData, size
 
 CvbsAnalyzerState CvbsAnalyzer::AnalyzePin(int gpioPin)
 {
-    if (m_state != CvbsAnalyzerState::k_initializedAndIdle)
+    if (m_state != CvbsAnalyzerState::k_initializedAndIdle && m_state != CvbsAnalyzerState::k_finished)
     {
         m_state = CvbsAnalyzerState::k_failedBadState;
         return m_state;
@@ -249,8 +249,7 @@ CvbsAnalyzerState CvbsAnalyzer::AnalyzePin(int gpioPin)
         m_state = CvbsAnalyzerState::k_failedFastADCStop;
     }
 
-    m_amplitudeCaclulator.Print();
-    m_syncIntervalsCalculator.Print();
+    Print();
 
     //CVBS_ANALYZER_LOG("Printing last page of %d samples ----------------\n", samplesRead);
     //for (int i = 0; i < samplesRead; i+=k_adcDataStrideSamples)
@@ -258,4 +257,23 @@ CvbsAnalyzerState CvbsAnalyzer::AnalyzePin(int gpioPin)
     //    CVBS_ANALYZER_LOG("%d\n", buf[i]);
     //}
     return m_state;
+}
+
+void CvbsAnalyzer::Print()
+{
+    CVBS_ANALYZER_LOG("{\n");
+    CVBS_ANALYZER_LOG("\"CvbsAnalyzer\": {\n");
+    CVBS_ANALYZER_LOG("\t\"state\": %d,\n", (int)m_state);
+    CVBS_ANALYZER_LOG("\t\"k_sampleRate\": %d,\n", k_sampleRate);
+    CVBS_ANALYZER_LOG("\t\"k_sampleRateWithSkippedOversamples\": %d,\n", k_sampleRateWithSkippedOversamples);
+    CVBS_ANALYZER_LOG("\t\"k_adcDataStrideSamples\": %d,\n", k_adcDataStrideSamples);
+    CVBS_ANALYZER_LOG("\t\"k_i2sSampleRate\": %d,\n", k_i2sSampleRate);
+    CVBS_ANALYZER_LOG("\t\"k_oversamplingMultiplier\": %d,\n", k_oversamplingMultiplier);
+    CVBS_ANALYZER_LOG("\t\"k_dmaBufLenSamples\": %d,\n", k_dmaBufLenSamples);
+    CVBS_ANALYZER_LOG("\t\"k_dmaBufsCount\": %d,\n", k_dmaBufsCount);
+    CVBS_ANALYZER_LOG("\t},\n");
+    CVBS_ANALYZER_LOG("\"FastADC\": { \"state\": %d, \"m_adcChannel\": %d },\n", (int)m_fastAdc.GetState(), (int)m_fastAdc.GetAdcChannel());
+    m_amplitudeCaclulator.Print();
+    m_syncIntervalsCalculator.Print();
+    CVBS_ANALYZER_LOG("}\n");
 }

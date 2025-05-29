@@ -163,10 +163,11 @@ void AmplitudeCaclulator::CalculateBlankingLevel()
 
 void AmplitudeCaclulator::Print() const
 {
-    CVBS_ANALYZER_LOG("AmplitudeCaclulator state: %d\n", static_cast<int>(m_state));
-    CVBS_ANALYZER_LOG("\tm_syncTreshold = %d\n", m_syncTreshold);
-    //CVBS_ANALYZER_LOG("m_blankingValue= %d\n", m_blankingValue);
-    CVBS_ANALYZER_LOG("\tm_whiteValue = %d\n", m_whiteValue);
+    CVBS_ANALYZER_LOG("\"AmplitudeCaclulator\": {\n");
+    CVBS_ANALYZER_LOG("\t\"state\": %d, \n", static_cast<int>(m_state));
+    CVBS_ANALYZER_LOG("\t\"m_syncTreshold\": %d, \n", m_syncTreshold);
+    CVBS_ANALYZER_LOG("\t\"_whiteValue\": %d, \n", m_whiteValue);
+    CVBS_ANALYZER_LOG("}, \n");
 }
 
 void AmplitudeCaclulator::CalculateWhiteLevel()
