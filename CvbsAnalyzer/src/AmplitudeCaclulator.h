@@ -3,17 +3,18 @@
 
 #include "Arduino.h"
 #include "Histogram.h"
+#include "CvbsAnalyzerGlobals.h"
 
-#define MAX_UINT_12BIT (4095)
+constexpr uint16_t MAX_UINT_12BIT = 4095;
 #define INVALID_VALUE (-1)
 
 enum class AmplitudeCaclulatorState : signed char
 {
     //k_noSamples = 0,
     k_needMoreSamples = 1,
-    k_readyForCalculation = 2,
-    k_calculation = 2,
-    k_finished = 3,
+    k_readyForCalculation,
+    k_calculation,
+    k_finished,
 
     k_badData = -127,
     k_badAmplitudeTooLow,
@@ -32,26 +33,33 @@ public:
 
     void Reset();
 
-    AmplitudeCaclulatorState PushSamples(const int16_t *newData, size_t newDataLen);
+    AmplitudeCaclulatorState PushSamples(const uint16_t *newData, size_t newDataLen, size_t dataStrideSamples);
     AmplitudeCaclulatorState Calculate();
+    void CalculateSyncTreshold();
+    void CalculateWhiteLevel();
+    void CalculateBlankingLevel();
+    void Print() const;
 
     inline AmplitudeCaclulatorState GetState() const { return m_state; }
+    inline bool IsInErrorState() const { return ((signed char)m_state < 0); }
 
 
-    int16_t m_syncValue;
-    int16_t m_syncTreshold;
-    int16_t m_colorMinValue;
-    int16_t m_blankingValue;
-    int16_t m_blackValue;
-    int16_t m_whiteValue;
-    int16_t m_colorMaxValue;
+    uint16_t m_syncTreshold;
+    uint16_t m_whiteValue;
+
+    //int16_t m_syncValue;
+    //int16_t m_colorMinValue;
+    //int16_t m_blankingValue;
+    //int16_t m_blackValue;
+    //int16_t m_colorMaxValue;
 
 private:
 
     constexpr static size_t k_binsCount = 30;
-    constexpr static int16_t k_minRange = k_binsCount;        // Condition for k_badAmplitudeTooLow
+    constexpr static int16_t k_minRange = 3;//k_binsCount;        // Condition for k_badAmplitudeTooLow
     constexpr static float k_highestBinMaxWeight = 0.90f;     // Condition for k_badAmplitudeTooHigh
-    constexpr static size_t k_minSamplesForCalculation = 400; // 200us*2Msample
+    constexpr static size_t k_minSamplesForCalculationUs = 140;
+    constexpr static size_t k_minSamplesForCalculation = k_minSamplesForCalculationUs * (k_sampleRate / 1000000);
 
     // constexpr static float k_syncPulseOnlyAmplitudeColorbarsNtscM = 17.0f/170.0f;
     // constexpr static float k_syncPulseOnlyAmplitudeBlackNtscMWithColorBurst = 20.0f/60.0f;
@@ -66,7 +74,7 @@ private:
     // constexpr static float k_syncTresholdMax = 0.5f;//
 
     AmplitudeCaclulatorState m_state;
-    Histogram<uint32_t, int16_t, k_binsCount> m_amplitudeHistogram;
+    Histogram<uint32_t, uint16_t, k_binsCount> m_amplitudeHistogram;
 };
 
 #endif

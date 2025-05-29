@@ -3,49 +3,58 @@
 #include "Arduino.h"
 #include <vector>
 #include "Histogram.h"
+#include "CvbsAnalyzerGlobals.h"
 
 enum class SyncIntervalsCalculatorState : signed char
 {
-    //k_noSamples = 0,
+    // k_noSamples = 0,
     k_needMoreSamples = 1,
-    //k_readyForCalculation = 2,
-    k_calculation = 2,
-    k_finished = 3,
+    // k_readyForCalculation = 2,
+    k_calculation,
+    k_finished,
 
     k_badData = -1,
 };
 
 class SyncIntervalsCalculator
 {
-    public:
-    SyncIntervalsCalculator():   
-        m_syncSequenceLengthHistogram(0, k_maxSequenceLength),
-        m_notSyncSequenceLengthHistogram(0, k_maxSequenceLength)
+public:
+    SyncIntervalsCalculator() : m_syncSequenceLengthHistogram(0, k_maxSequenceLength),
+                                m_notSyncSequenceLengthHistogram(0, k_maxSequenceLength)
     {
         Reset();
     }
     void Reset();
-    SyncIntervalsCalculatorState PushSamples(const int16_t* newData, size_t newDataLen, int16_t syncTreshold);
+    SyncIntervalsCalculatorState PushSamples(const uint16_t *newData, size_t newDataLen, int16_t syncTreshold, size_t dataStrideSamples);
     inline SyncIntervalsCalculatorState GetState() const { return m_state; }
+    inline bool IsInErrorState() const { return ((signed char)m_state < 0); }
 
-    //positive number in array - X samples in row, >=syncThreshold. 
-    //Negative - X samples in row <syncTreshold
-    //0 not allowed
-    //Max sequence len = +-32767. For more split to multiple.
-    //std::vector<int16_t> m_sampleSequences;
-    constexpr static uint16_t k_maxSequenceLength = 200;//65535
-    constexpr static size_t k_binsCount = k_maxSequenceLength;
-    constexpr static size_t k_minSamplesForCalculation = 1400;
-    
+    void Print() const;
+
+    // positive number in array - X samples in row, >=syncThreshold.
+    // Negative - X samples in row <syncTreshold
+    // 0 not allowed
+    // Max sequence len = +-32767. For more split to multiple.
+    // std::vector<int16_t> m_sampleSequences;
+    constexpr static uint16_t k_maxSequenceLengthUs = 100;
+    constexpr static uint16_t k_maxSequenceLength = k_maxSequenceLengthUs * (k_sampleRate / 1000000);
+    constexpr static size_t k_binsCount = k_maxSequenceLength; // Makes sense to *2 for precision, if REAL sampling rate is 2Mhz
+
+    constexpr static size_t k_minSamplesForCalculationUs = 700; //~10 TV lines
+    constexpr static size_t k_minSamplesForCalculation = k_minSamplesForCalculationUs * (k_sampleRate / 1000000);
+
     Histogram<uint32_t, uint32_t, k_binsCount> m_syncSequenceLengthHistogram;
     Histogram<uint32_t, uint32_t, k_binsCount> m_notSyncSequenceLengthHistogram;
 
-    private:
-        SyncIntervalsCalculatorState m_state;    
-        bool m_lastSampleWasSync = false;
-        uint32_t m_samplesSinceLastChange = 1;
-        uint32_t m_samplesProcessed = 0;//Not samples in hystograms, but total processed
-    //constexpr static int16_t k_tooShortSequence = 1;//samples
+private:
+    SyncIntervalsCalculatorState m_state;
+    bool m_lastSampleWasSync = false;
+    uint32_t m_samplesSinceLastChange = 1;
+    uint32_t m_samplesProcessed = 0; // Not samples in hystograms, but total processed
+    uint32_t m_sequencesProcessed = 0;//Should be equal to samples couns in histograms, minus last one if they'reskipped.
+    // constexpr static int16_t k_tooShortSequence = 1;//samples
+    constexpr static bool k_includeFirstSequence = false; //First and last sequences are probably incomplete.
+    constexpr static bool k_includeLastSequence = false; //First and last sequences are probably incomplete.
 };
 
 #endif // SyncIntervalsCalculator_H

@@ -8,10 +8,12 @@ template <typename CounterType, typename DataType, size_t k_binsCount>
 class Histogram : public std::array<CounterType, k_binsCount>
 {
 public:
+
     Histogram(const DataType binsRangeMin, const DataType binsRangeMax)
-        : m_binsRange({binsRangeMin, binsRangeMax}),
+        : m_binsRange(binsRangeMin, binsRangeMax),
           m_binWidth((binsRangeMax - binsRangeMin) / static_cast<double>(k_binsCount))
     {
+        assert(binsRangeMin < binsRangeMax);
         Reset();
     }
 
@@ -60,27 +62,28 @@ public:
 
     inline size_t GetBinIndexForValue(DataType sampleValue) const
     {
-        const DataType clamped = ClampValue(sampleValue);
+        //Not clamping value but clamping index!!!
+        const int32_t binIndexUnclamped = GetBinIndexForValueNotClampingToBinRange(sampleValue);
 
-        const int32_t binIndex = static_cast<int32_t>((clamped - m_binsRange.first) / m_binWidth);
-        assert(binIndex >= 0 && binIndex < k_binsCount); // shouldn't happed if we did clamp
-
-        return binIndex;
+        return (binIndexUnclamped < 0 ? 0 :
+                 (binIndexUnclamped > k_binsCount-1 ? k_binsCount-1 : 
+                    binIndexUnclamped));
     }
 
     // May return bin index out of range if sampleValue is out of range
     inline int32_t GetBinIndexForValueNotClampingToBinRange(DataType sampleValue) const
     {
-        const int32_t binIndex = static_cast<int32_t>((sampleValue - m_binsRange.first) / m_binWidth);
+        const int32_t binIndex = static_cast<int32_t>(((double)sampleValue - (double)m_binsRange.first) / m_binWidth);
         return binIndex;
     }
 
     void PushSample(DataType sampleValue)
     {
         const DataType clamped = ClampValue(sampleValue);
-        const size_t binIndex = GetBinIndexForValueNotClampingToBinRange(clamped);
+        const size_t binIndex = GetBinIndexForValue(clamped);
+        assert(binIndex >= 0 && binIndex < k_binsCount); // shouldn't happed if we did clamp
 
-        std::array<CounterType, k_binsCount>::operator[](binIndex)++;
+        this->operator[](binIndex)++;
 
         // Update MinMax using clamped value
         // So [m_sampleMin, m_sampleMax] is always in range of [m_binsRangeMin, m_binsRangeMax]
@@ -92,9 +95,10 @@ public:
         m_samplesCount++;
     }
 
-    void Extent(const Histogram<CounterType, DataType, k_binsCount> &other)
+    void Extend(const Histogram<CounterType, DataType, k_binsCount> &other)
     {
         if(!other.GetSamplesCount()) return;
+        
         assert(m_binsRange.first == other.m_binsRange.first && m_binsRange.second == other.m_binsRange.second);
 
         for (size_t i = 0; i < k_binsCount; ++i)
@@ -114,7 +118,59 @@ public:
     {
         return m_samplesCount;
     }
+
+    static typename std::array<CounterType, k_binsCount>::iterator FindFallingEdge(
+        typename std::array<CounterType, k_binsCount>::iterator begin,
+        typename std::array<CounterType, k_binsCount>::iterator end,
+                                                                CounterType minDelta)
+    {
+        for(auto it = begin; it != end; ++it)
+        {
+            if(std::next(it) == end) break;
+            if(*std::next(it) < *it &&
+                *it - *std::next(it) >= minDelta)
+            {
+                return it;
+            }
+        }
+        return end; // Not found
+    }
+
+    static typename std::array<CounterType, k_binsCount>::iterator FindRisingEdge(
+        typename std::array<CounterType, k_binsCount>::iterator begin,
+        typename std::array<CounterType, k_binsCount>::iterator end,
+                                                                CounterType minDelta)
+    {
+        for(auto it = begin; it != end; ++it)
+        {
+            if(std::next(it) == end) break;
+            if(*std::next(it) > *it &&
+                *std::next(it) - *it >= minDelta)
+            {
+                return it;
+            }
+        }
+        return end; // Not found
+    }
+
+    static typename std::array<CounterType, k_binsCount>::reverse_iterator FindRisingEdge(
+        typename std::array<CounterType, k_binsCount>::reverse_iterator begin,
+        typename std::array<CounterType, k_binsCount>::reverse_iterator end,
+                                                                CounterType minDelta)
+    {
+        for(auto it = begin; it != end; ++it)
+        {
+            if(std::next(it) == end) break;
+            if(*std::next(it) > *it &&
+                *std::next(it) - *it >= minDelta)
+            {
+                return it;
+            }
+        }
+        return end; // Not found
+    }
     
+
     //Made this unaccessible since it's not obvoius, no bin or no samples.
     constexpr bool empty() const noexcept = delete;
 
@@ -125,5 +181,7 @@ public:
 
     CounterType m_samplesCount = 0;
 };
+
+
 
 #endif // Histogram_H

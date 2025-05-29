@@ -90,7 +90,7 @@ FastADCState FastADC::Deinitialize()
     return m_state;
 }
 
-FastADCState FastADC::StartADCSampling(int8_t gpioPin)
+FastADCState FastADC::StartADCSampling(int8_t gpioPin, bool invertData)
 {
     //m_gpioPin = gpioPin;
     if(k_gpioToAdc1Channel.count(gpioPin) == 0)
@@ -101,6 +101,8 @@ FastADCState FastADC::StartADCSampling(int8_t gpioPin)
     m_state = FastADCState::k_adcStarting;
     m_adcChannel = k_gpioToAdc1Channel.at(gpioPin);
     
+    m_adcPreviousDataInvertEnabled = SYSCON.saradc_ctrl2.sar1_inv;//Save previous value asap
+
     esp_err_t err = i2s_set_adc_mode(k_adcUnit, m_adcChannel);
     if(err != ESP_OK)
     {
@@ -116,7 +118,7 @@ FastADCState FastADC::StartADCSampling(int8_t gpioPin)
     }
 
     adc_ll_digi_convert_limit_disable();
-    
+
     err = i2s_adc_enable(I2S_NUM_0);
     if(err != ESP_OK)
     {
@@ -135,7 +137,9 @@ FastADCState FastADC::StartADCSampling(int8_t gpioPin)
     // Enable continuous adc sampling
     //See https://github.com/espressif/esp-idf/pull/1991#issuecomment-1157404298
     adc_ll_digi_convert_limit_disable();
-
+    
+    adc_ll_digi_output_invert(k_adcLowLevelUnit, !invertData); // Inverted is actually non inverted haha
+    
     // ADC setting
     adc_digi_pattern_config_t adcDigiPattern{
         .atten = k_adcAttenuation,
@@ -147,6 +151,7 @@ FastADCState FastADC::StartADCSampling(int8_t gpioPin)
     adc_ll_digi_clear_pattern_table(k_adcLowLevelUnit);
     adc_ll_digi_set_pattern_table_len(k_adcLowLevelUnit, 1);
     adc_ll_digi_set_pattern_table(k_adcLowLevelUnit, m_adcChannel, adcDigiPattern);
+    
     
     // reduce sample time  
     adc_set_clk_div(k_adcAPBClockDiv);
@@ -164,6 +169,8 @@ FastADCState FastADC::StartADCSampling(int8_t gpioPin)
     
     i2s_ll_rx_set_bck_div_num(&I2S0, k_i2sRxBckDiv);//Bit clock configuration bits. if data_bits == 8 { 2 } else { 1 };
 
+
+    //Settings done.
     //Calling i2s_zero_dma_buffer to erase data that was sampled with default clock settings.
     err = i2s_zero_dma_buffer(I2S_NUM_0);
     if(err != ESP_OK)
@@ -191,7 +198,12 @@ FastADCState FastADC::StopADCSampling()
         return m_state;
     } 
 
+    //restore settings
+    adc_ll_digi_output_invert(k_adcLowLevelUnit, m_adcPreviousDataInvertEnabled); // Enable data invert for ADC1
+
     adc_ll_digi_clear_pattern_table(k_adcLowLevelUnit);
+
+    adc_ll_digi_convert_limit_enable();
 
     m_state = FastADCState::k_initializedAdcStopped;
     return m_state;
@@ -199,7 +211,7 @@ FastADCState FastADC::StopADCSampling()
 
 #define TAG "I2S"
 
-size_t FastADC::ReadSamplesBlocking()
+size_t FastADC::ReadAndPrintSamples()
 {
     static uint16_t buf[k_dmaBufLenSamples];
     int samples = 0;
@@ -208,8 +220,8 @@ size_t FastADC::ReadSamplesBlocking()
 
     for(int run=0;run<5;run++)
     {
-        if (i2s_read(I2S_NUM_0, buf, k_dmaBufLenSamples * sizeof(uint16_t), &bytes_read, portMAX_DELAY) != ESP_OK) {
-            printf("i2s_read() fail");
+        if (i2s_read(I2S_NUM_0, buf, k_dmaBufLenSamples * sizeof(uint16_t), &bytes_read, k_dmaReadTimeout) != ESP_OK) {
+            CVBS_ANALYZER_LOG("i2s_read() fail");
             continue;
         }
         //StopADCSampling();
@@ -222,20 +234,20 @@ size_t FastADC::ReadSamplesBlocking()
             
             // output only 256 samples
     	    for (i = 0; i < bytes_read / 2; i++) {
-                printf("%d\n", buf[i] & 0x0fff);
+                CVBS_ANALYZER_LOG("%d\n", buf[i] & 0x0fff);
 	        }
-            printf("%d samples printed.(run %d) ----------------\n", bytes_read / 2, run);
+            CVBS_ANALYZER_LOG("%d samples printed.(run %d) ----------------\n", bytes_read / 2, run);
             //break;
         }
     }
     return bytes_read;
 }
 
-size_t FastADC::ReadSamplesBlockingTo(int16_t *outBuf, size_t bufSizeBytes)
+size_t FastADC::ReadSamplesBlockingTo(uint16_t *outBuf, size_t bufSizeBytes)
 {
     size_t bytes_read;
-    if (i2s_read(I2S_NUM_0, outBuf, bufSizeBytes, &bytes_read, portMAX_DELAY) != ESP_OK) {
-            printf("i2s_read() fail");
+    if (i2s_read(I2S_NUM_0, outBuf, bufSizeBytes, &bytes_read, k_dmaReadTimeout) != ESP_OK) {
+            CVBS_ANALYZER_LOG("i2s_read() fail");
         }
     return bytes_read;
 }

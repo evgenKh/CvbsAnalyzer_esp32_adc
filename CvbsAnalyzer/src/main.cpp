@@ -8,19 +8,19 @@ CvbsAnalyzer g_cvbsAnalyzer;
 void setup()
 {
   Serial.begin(1000000);
-  delay(100);
-  Serial.printf("Initing CvbsAnalyzer for gpio %d...", k_gpioPin);
-  FastADCState fastAdcState = g_cvbsAnalyzer.m_fastAdc.Initialize();
-  if (fastAdcState != FastADCState::k_initializedAdcStopped)
+  delay(500);
+
+  CvbsAnalyzerState state = g_cvbsAnalyzer.InitializeFastADC();
+
+  if (state != CvbsAnalyzerState::k_initializedAndIdle)
   {
-    Serial.printf("FastADC::Initialize() failed with state %d!", (int)fastAdcState);
-  }
-  else
-  {
-    Serial.printf("FastADC Initialized.");
+    CVBS_ANALYZER_LOG("CvbsAnalyzer initialization failed with state %d!\n", (int)state);
+    return;
   }
 
-  g_cvbsAnalyzer.AnalyzePin(k_gpioPin);
+  state = g_cvbsAnalyzer.AnalyzePin(k_gpioPin);
+  delay(10);
+  CVBS_ANALYZER_LOG("CvbsAnalyzer finished with state %d.\n", (int)state);
 
 }
 

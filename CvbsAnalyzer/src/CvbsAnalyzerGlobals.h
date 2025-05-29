@@ -1,0 +1,44 @@
+#ifndef CvbsAnalyzerGlobals_H
+#define CvbsAnalyzerGlobals_H
+#include "Arduino.h"
+
+#define CVBS_ANALYZER_LOG(...) Serial.printf(__VA_ARGS__);
+//#define CVBS_ANALYZER_LOG(...)
+
+#define FAST_ADC_2Mhz 0
+#define FAST_ADC_1Mhz 1
+
+#if FAST_ADC_2Mhz
+    constexpr uint32_t k_i2sSampleRate = 2*1000*1000;
+    constexpr uint32_t k_oversamplingMultiplier = 1;
+    constexpr size_t k_adcDataStrideSamples = 1; //1 sample per read, no stride
+#elif FAST_ADC_1Mhz
+    //This one gives the most smooth data.
+
+    constexpr uint32_t k_i2sSampleRate = 1*1000*1000;
+    //This is not real oversampling, but for some reason each sample repeated twice with this settings.
+    //I2S feeds us 2Msamples, but every sample repeats twice
+    constexpr uint32_t k_oversamplingMultiplier = 2;
+    constexpr size_t k_adcDataStrideSamples = 2; //1 good sample, 1 possibly corrupted sample
+#endif
+
+    constexpr uint32_t k_dmaBufLenSamples = 1024;//Min 2 TV lines(2*64us). Align to 4. 
+                                                //Not too smal, otherwise we'll spend to much time swapping buffers.
+                                                //k_dmaBufLenSamples*channels*(sampleSizeBits/8) not higher than 4096 
+                                                //For 16bit*1chan max=1024
+
+    static constexpr uint8_t k_dmaBufsCount = 8;//increase if we want to print values since print is slow
+
+    constexpr uint32_t k_sampleRate = k_i2sSampleRate * k_oversamplingMultiplier / k_adcDataStrideSamples;
+    constexpr uint32_t k_sampleRateWithSkippedOversamples = k_i2sSampleRate;
+    constexpr bool k_skipLeadingZeroSamples = true;
+    constexpr uint16_t k_adcDataMask = 0x0fff; //12 bit width, 0x0fff = 4095, max value for 12 bit ADC
+    constexpr uint16_t k_adcDataXorMaskForInvert = 0x0fff;// apply to data via ^ operato to invert it.(4095-data)
+
+    //inline uint16_t PreProcessSample(const uint16_t sample, const uint16_t invertMask = 0x00)
+    //{
+    //    return (sample & k_adcDataMask) ^ invertMask;
+    //}
+    inline bool IsErrorState(signed char state){ return (state < 0); }
+
+#endif // CvbsAnalyzerGlobals_H
