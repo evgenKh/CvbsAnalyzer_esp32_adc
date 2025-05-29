@@ -6,7 +6,7 @@
 
 void AmplitudeCaclulator::Reset()
 {    
-    m_state = AmplitudeCaclulatorState::k_noSamples;
+    m_state = AmplitudeCaclulatorState::k_needMoreSamples;
 
     m_syncValue = INVALID_VALUE;
     m_syncTreshold = INVALID_VALUE;

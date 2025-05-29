@@ -9,7 +9,7 @@
 
 enum class AmplitudeCaclulatorState : signed char
 {
-    k_noSamples = 0,
+    //k_noSamples = 0,
     k_needMoreSamples = 1,
     k_readyForCalculation = 2,
     k_calculation = 2,
@@ -65,7 +65,7 @@ private:
     constexpr static float k_syncTresholdDefault = 0.15f; // Fallbak. Let's assume 15% of full signal amplitude
     // constexpr static float k_syncTresholdMax = 0.5f;//
 
-    AmplitudeCaclulatorState m_state = AmplitudeCaclulatorState::k_noSamples;
+    AmplitudeCaclulatorState m_state;
     Histogram<uint32_t, int16_t, k_binsCount> m_amplitudeHistogram;
 };
 

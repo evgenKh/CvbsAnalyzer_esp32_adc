@@ -22,9 +22,9 @@ void CvbsAnalyzer::AnalyzePin(int gpioPin)
         for(int run=0;run<5;run++)
         {
             size_t bytesRead = m_fastAdc.ReadSamplesBlockingTo(buf, sizeof(buf));
-            if(bytesRead > 100)
+            if(bytesRead > 0)
             {
-                if(m_amplitudeCaclulator.GetState() != AmplitudeCaclulatorState::k_readyForCalculation)
+                if(m_amplitudeCaclulator.GetState() == AmplitudeCaclulatorState::k_needMoreSamples)
                 {
                     m_amplitudeCaclulator.PushSamples(buf, bytesRead/sizeof(int16_t));
                 }
@@ -32,20 +32,20 @@ void CvbsAnalyzer::AnalyzePin(int gpioPin)
                 if(m_amplitudeCaclulator.GetState() == AmplitudeCaclulatorState::k_readyForCalculation)
                 {
                     m_amplitudeCaclulator.Calculate();
-                    if(m_amplitudeCaclulator.GetState() == AmplitudeCaclulatorState::k_finished)
+                }
+
+                if(m_amplitudeCaclulator.GetState() == AmplitudeCaclulatorState::k_finished)
+                {
+                    if(m_syncIntervalsCalculator.GetState() == SyncIntervalsCalculatorState::k_needMoreSamples)
                     {
                         m_syncIntervalsCalculator.PushSamples(buf, bytesRead/sizeof(int16_t), m_amplitudeCaclulator.m_syncTreshold);
-                    }
-                    else
-                    {
-                        Serial.printf("m_amplitudeCaclulator.GetState() != k_finished, state = %d\n", (int)m_amplitudeCaclulator.GetState());
                     }
                 }
 
                 for (int i = 0; i < bytesRead / 2; i++) {
-                    printf("%d\n", buf[i] & 0x0fff);
+                    //printf("%d\n", buf[i] & 0x0fff);
                 }
-                printf("%d samples printed.(run %d) ----------------\n", bytesRead / 2, run);
+                //printf("%d samples printed.(run %d) ----------------\n", bytesRead / 2, run);
             }
         }
     }
