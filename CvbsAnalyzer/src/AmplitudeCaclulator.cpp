@@ -21,65 +21,60 @@ void AmplitudeCaclulator::Reset()
 
 AmplitudeCaclulatorState AmplitudeCaclulator::PushSamples(const int16_t *newData, size_t newDataLen)
 {
-    if(!newDataLen)
+    //Due to ADC hacks and calling zeroDma after ADC start, some datasets may have many zero samples at start.    
+    size_t firstNonZeroSampleIndex = 0;
+    for(firstNonZeroSampleIndex = 0; firstNonZeroSampleIndex < newDataLen; )
     {
-        return AmplitudeCaclulatorState::k_noSamples;
+        if(newData[firstNonZeroSampleIndex] != 0)
+        {
+            break;
+        }
+        firstNonZeroSampleIndex++;
+    }
+    const size_t newDataLenNoZeroes = newDataLen - firstNonZeroSampleIndex;
+
+    if(newDataLenNoZeroes)
+    {
+        Histogram<uint32_t, int16_t, k_binsCount> newDataHistogram(0, MAX_UINT_12BIT);        
+        
+        for (size_t i = firstNonZeroSampleIndex; i < newDataLen; i++)
+        {
+            //TODO: try skip repeated samples
+            newDataHistogram.PushSample(newData[i]);
+        }
+
+        if(newDataHistogram.GetSamplesCount() != newDataLen - firstNonZeroSampleIndex)
+        {
+            //Some samples were not pushed, probably out of bins range.
+            //Could be an assert...
+            m_state = AmplitudeCaclulatorState::k_samplesAccumulatedCountMismatch;
+            return m_state;
+        }
+
+        if(newDataHistogram.GetSamplesCount() > 0)
+        {
+            //Merge local histogram to main one.
+            m_amplitudeHistogram.Extent(newDataHistogram);
+        }
     }
 
-    int16_t newDataMinValue = MAX_UINT_12BIT;
-    int16_t newDataMaxValue = 0;
-    for (size_t i = 0; i < newDataLen; i++)
+    if(m_amplitudeHistogram[m_amplitudeHistogram.size()-1] > static_cast<uint32_t>(m_amplitudeHistogram.GetSamplesCount() * k_highestBinMaxWeight))
     {
-        int16_t value = newData[i];
-        if (value > newDataMaxValue)
-            newDataMaxValue = value;
-        if (value < newDataMinValue)
-            newDataMinValue = value;
+        //Don't skip this dataSet, but 
+        //TODO: advise user to increase attenuation
+        //m_state = AmplitudeCaclulatorState::k_badAmplitudeTooHigh;
+        //return m_state;
     }
-    int16_t newDataRange = (newDataMaxValue - newDataMinValue);
-    if(newDataRange < k_minRange)
+
+    if((m_amplitudeHistogram.m_sampleValuesRange.second - m_amplitudeHistogram.m_sampleValuesRange.first) < k_minRange)
     {
         //Skip this dataSet
-        return AmplitudeCaclulatorState::k_badAmplitudeTooLow;
-    }
-
-    //Resetting min, max, range to standard values for easier merge of multiple sampleSets into one histogram
-    newDataMinValue = 0;
-    newDataMaxValue = MAX_UINT_12BIT;
-    newDataRange = newDataMaxValue - newDataMinValue;
-
-    // Calculate bin width
-    const float binWidth = static_cast<float>(newDataRange + 1) / k_binsCount;
-
-    Histogram<uint32_t, int16_t, k_binsCount> newDataHistogram(0, MAX_UINT_12BIT);
-    
-    for (size_t i = 0; i < newDataLen; i++)
-    {
-        newDataHistogram.PushSample(newData[i]);
-    }
-
-    if(newDataHistogram[k_binsCount-1] > static_cast<uint32_t>(newDataLen * k_highestBinMaxWeight))
-    {
-        //Skip this dataSet
-        return AmplitudeCaclulatorState::k_badAmplitudeTooHigh;
-    }
-
-    if(newDataHistogram.m_totalCount != newDataLen)
-    {
-        m_state = AmplitudeCaclulatorState::k_samplesAccumulatedCountMismatch;
+        //TODO: advise user to decrease attenuation
+        m_state = AmplitudeCaclulatorState::k_badAmplitudeTooLow;
         return m_state;
     }
 
-    //Merge local histogram to main one.
-    assert(m_amplitudeHistogram.m_binsRangeMin == newDataHistogram.m_binsRangeMin);
-    assert(m_amplitudeHistogram.m_binsRangeMax == newDataHistogram.m_binsRangeMax);
-    for(size_t bin = 0; bin < k_binsCount; bin++)
-    {
-        m_amplitudeHistogram[bin] += newDataHistogram[bin];
-    }
-    m_amplitudeHistogram.m_totalCount += newDataHistogram.m_totalCount;
-
-    if(m_amplitudeHistogram.m_totalCount >= k_minSamplesForCalculation)
+    if(m_amplitudeHistogram.GetSamplesCount() >= k_minSamplesForCalculation)
     {
         //Change to k_readyForCalculation after test calculation, or just compare with k_minSamplesForCalculation ?
         m_state = AmplitudeCaclulatorState::k_readyForCalculation;
@@ -87,6 +82,8 @@ AmplitudeCaclulatorState AmplitudeCaclulator::PushSamples(const int16_t *newData
         m_state = AmplitudeCaclulatorState::k_needMoreSamples;
         return m_state;
     }
+
+    //Enough samples collected. Do calculations
 
     //Find first rising edge in left half of histogram.
     constexpr int16_t k_histogramFallingEdgeMinDelta = 1;
@@ -115,7 +112,10 @@ AmplitudeCaclulatorState AmplitudeCaclulator::PushSamples(const int16_t *newData
     {
         //Falling enge not found.
         //Ask for more samples, and after more failes, give up and set fallback value?
-        m_syncTreshold = m_amplitudeHistogram.m_sampleMin + (m_amplitudeHistogram.m_sampleMax - m_amplitudeHistogram.m_sampleMin)*k_syncTresholdDefault; 
+        //Doing lerp
+        m_syncTreshold = m_amplitudeHistogram.m_sampleValuesRange.first + 
+                (m_amplitudeHistogram.m_sampleValuesRange.second - m_amplitudeHistogram.m_sampleValuesRange.first)
+                *k_syncTresholdDefault; 
     }
 
      //Find rising edge in right half of histogram.
