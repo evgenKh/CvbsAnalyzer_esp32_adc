@@ -24,18 +24,19 @@ enum class AmplitudeCaclulatorState : signed char
 
 class AmplitudeCaclulator
 {
-    public:
-    AmplitudeCaclulator():   
-        m_amplitudeHistogram(0, MAX_UINT_12BIT)
+public:
+    AmplitudeCaclulator() : m_amplitudeHistogram(0, MAX_UINT_12BIT)
     {
         Reset();
     }
 
     void Reset();
 
-    AmplitudeCaclulatorState PushSamples(const int16_t* newData, size_t newDataLen);
+    AmplitudeCaclulatorState PushSamples(const int16_t *newData, size_t newDataLen);
+    AmplitudeCaclulatorState Calculate();
 
-    AmplitudeCaclulatorState m_state = AmplitudeCaclulatorState::k_noSamples;
+    inline AmplitudeCaclulatorState GetState() const { return m_state; }
+
 
     int16_t m_syncValue;
     int16_t m_syncTreshold;
@@ -45,26 +46,27 @@ class AmplitudeCaclulator
     int16_t m_whiteValue;
     int16_t m_colorMaxValue;
 
+private:
 
-    private:
     constexpr static size_t k_binsCount = 30;
-    constexpr static int16_t k_minRange = k_binsCount; //Condition for k_badAmplitudeTooLow
-    constexpr static float k_highestBinMaxWeight = 0.55f; //Condition for k_badAmplitudeTooHigh
-    constexpr static size_t k_minSamplesForCalculation = 400;//200us*2Msample
-    
-    Histogram<uint32_t, int16_t, k_binsCount> m_amplitudeHistogram;
+    constexpr static int16_t k_minRange = k_binsCount;        // Condition for k_badAmplitudeTooLow
+    constexpr static float k_highestBinMaxWeight = 0.90f;     // Condition for k_badAmplitudeTooHigh
+    constexpr static size_t k_minSamplesForCalculation = 400; // 200us*2Msample
 
-    //constexpr static float k_syncPulseOnlyAmplitudeColorbarsNtscM = 17.0f/170.0f;
-    //constexpr static float k_syncPulseOnlyAmplitudeBlackNtscMWithColorBurst = 20.0f/60.0f;
-    //constexpr static float k_syncPulseOnlyAmplitudeBlackNtscMBW = 40.0f/47.0f;
-    //constexpr static float k_syncPulseOnlyAmplitudeColorbarsNtscJ = 7.0f/173.0f;
-    //constexpr static float k_syncPulseOnlyAmplitudeColorbarsPal = 10.0f/176.0f;
+    // constexpr static float k_syncPulseOnlyAmplitudeColorbarsNtscM = 17.0f/170.0f;
+    // constexpr static float k_syncPulseOnlyAmplitudeBlackNtscMWithColorBurst = 20.0f/60.0f;
+    // constexpr static float k_syncPulseOnlyAmplitudeBlackNtscMBW = 40.0f/47.0f;
+    // constexpr static float k_syncPulseOnlyAmplitudeColorbarsNtscJ = 7.0f/173.0f;
+    // constexpr static float k_syncPulseOnlyAmplitudeColorbarsPal = 10.0f/176.0f;
     //
-    //constexpr static float k_syncPulseMinWidthNtsc = 4.7f/63.5f;
-    //constexpr static float k_syncPulseMinWidthPal = 4.7f/64.0f;//7%, byt can be ~5% in practice
+    // constexpr static float k_syncPulseMinWidthNtsc = 4.7f/63.5f;
+    // constexpr static float k_syncPulseMinWidthPal = 4.7f/64.0f;//7%, byt can be ~5% in practice
 
-    constexpr static float k_syncTresholdDefault = 0.15f;//Fallbak. Let's assume 15% of full signal amplitude
-    //constexpr static float k_syncTresholdMax = 0.5f;//
+    constexpr static float k_syncTresholdDefault = 0.15f; // Fallbak. Let's assume 15% of full signal amplitude
+    // constexpr static float k_syncTresholdMax = 0.5f;//
+
+    AmplitudeCaclulatorState m_state = AmplitudeCaclulatorState::k_noSamples;
+    Histogram<uint32_t, int16_t, k_binsCount> m_amplitudeHistogram;
 };
 
 #endif

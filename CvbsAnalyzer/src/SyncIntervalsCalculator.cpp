@@ -3,7 +3,20 @@
 
 SyncIntervalsCalculatorState SyncIntervalsCalculator::PushSamples(const int16_t *newData, size_t newDataLen, int16_t syncTreshold)
 {
-    if(!newDataLen)
+
+    //Due to ADC hacks and calling zeroDma after ADC start, some datasets may have many zero samples at start.    
+    size_t firstNonZeroSampleIndex = 0;
+    for(firstNonZeroSampleIndex = 0; firstNonZeroSampleIndex < newDataLen; )
+    {
+        if(newData[firstNonZeroSampleIndex] != 0)
+        {
+            break;
+        }
+        firstNonZeroSampleIndex++;
+    }
+    const size_t newDataLenNoZeroes = newDataLen - firstNonZeroSampleIndex;
+
+    if(!newDataLenNoZeroes)
     {
         return SyncIntervalsCalculatorState::k_noSamples;
     }
@@ -11,7 +24,7 @@ SyncIntervalsCalculatorState SyncIntervalsCalculator::PushSamples(const int16_t 
     bool lastSampleWasSync = (newData[0] < syncTreshold);
     uint32_t samplesSinceLastChange = 1;
     
-    for (size_t i = 0; i < newDataLen; i++)
+    for (size_t i = firstNonZeroSampleIndex; i < newDataLenNoZeroes; i++)
     {
         auto& histogram = (lastSampleWasSync ? m_syncSequenceLengthHistogram : m_notSyncSequenceLengthHistogram);
         bool currentSampleIsSync = (newData[i] < syncTreshold);

@@ -24,14 +24,22 @@ void CvbsAnalyzer::AnalyzePin(int gpioPin)
             size_t bytesRead = m_fastAdc.ReadSamplesBlockingTo(buf, sizeof(buf));
             if(bytesRead > 100)
             {
-                if(m_amplitudeCaclulator.m_state != AmplitudeCaclulatorState::k_finished)
+                if(m_amplitudeCaclulator.GetState() != AmplitudeCaclulatorState::k_readyForCalculation)
                 {
                     m_amplitudeCaclulator.PushSamples(buf, bytesRead/sizeof(int16_t));
                 }
 
-                if(m_amplitudeCaclulator.m_state == AmplitudeCaclulatorState::k_finished)
+                if(m_amplitudeCaclulator.GetState() == AmplitudeCaclulatorState::k_readyForCalculation)
                 {
-                    m_syncIntervalsCalculator.PushSamples(buf, bytesRead/sizeof(int16_t), m_amplitudeCaclulator.m_syncTreshold);
+                    m_amplitudeCaclulator.Calculate();
+                    if(m_amplitudeCaclulator.GetState() == AmplitudeCaclulatorState::k_finished)
+                    {
+                        m_syncIntervalsCalculator.PushSamples(buf, bytesRead/sizeof(int16_t), m_amplitudeCaclulator.m_syncTreshold);
+                    }
+                    else
+                    {
+                        Serial.printf("m_amplitudeCaclulator.GetState() != k_finished, state = %d\n", (int)m_amplitudeCaclulator.GetState());
+                    }
                 }
 
                 for (int i = 0; i < bytesRead / 2; i++) {

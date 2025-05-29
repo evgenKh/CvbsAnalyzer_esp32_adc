@@ -83,7 +83,16 @@ AmplitudeCaclulatorState AmplitudeCaclulator::PushSamples(const int16_t *newData
         return m_state;
     }
 
-    //Enough samples collected. Do calculations
+    return m_state;
+}
+
+AmplitudeCaclulatorState AmplitudeCaclulator::Calculate()
+{
+    if(m_state != AmplitudeCaclulatorState::k_readyForCalculation)
+    {
+        //In wrong state.
+        return m_state;
+    }
 
     //Find first rising edge in left half of histogram.
     constexpr int16_t k_histogramFallingEdgeMinDelta = 1;
