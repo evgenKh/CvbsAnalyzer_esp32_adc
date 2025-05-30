@@ -1,6 +1,9 @@
 #ifndef FastADC_H
 #define FastADC_H
 
+#define ADC_DISABLE_HAL
+#define ADC_DISABLE_NEW_DRIVER
+
 //Uses old ADC+I2S drivers, since arduino framework in platformio is old.
 
 //Tested on:
@@ -16,6 +19,12 @@
 //#include "hal/i2s_types.h"
 #include "driver/adc.h"
 #include "CvbsAnalyzerGlobals.h"
+
+#if !PLATFORMIO
+typedef adc_unit_t adc_ll_num_t;
+#define ADC_NUM_1 ADC_UNIT_1
+
+#endif // !PLATFORMIO
 
 enum class FastADCState : signed char{
     k_notInitialized = 0,

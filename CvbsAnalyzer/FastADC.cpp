@@ -1,6 +1,7 @@
 #include "FastADC.h"
 #include <map>
 #include "hal/adc_ll.h"
+#include "hal/adc_types.h"
 
 #include "soc/i2s_struct.h"
 #include "driver/i2s.h"
@@ -21,6 +22,26 @@ const std::map<int8_t, adc1_channel_t> k_gpioToAdc1Channel = {
 };
 constexpr adc_ll_num_t k_adcLowLevelUnit = ADC_NUM_1;
 
+#if !PLATFORMIO
+static inline void adc_ll_digi_convert_limit_enable(void)
+{
+    adc_ll_digi_convert_limit_enable(true);
+}
+static inline void adc_ll_digi_convert_limit_disable(void)
+{
+    adc_ll_digi_convert_limit_enable(false);
+}
+typedef struct {
+    uint16_t mclk_div; // I2S module clock devider, Fmclk = Fsclk /(mclk_div+b/a)
+    uint16_t a;
+    uint16_t b;        // The decimal part of module clock devider, the decimal is: b/a
+} i2s_ll_mclk_div_t;
+
+static inline void i2s_ll_rx_set_clk(i2s_dev_t *hw, i2s_ll_mclk_div_t *set){
+    i2s_ll_set_raw_mclk_div(hw, set->mclk_div, set->a, set->b);
+}
+
+#endif // !PLATFORMIO
 
 FastADC::FastADC()
 {
@@ -53,8 +74,8 @@ FastADCState FastADC::Initialize()
 	    .use_apll = false,
         .tx_desc_auto_clear = false,
         .fixed_mclk = 0,//used only with apll,
-        .mclk_multiple = I2S_MCLK_MULTIPLE_DEFAULT,//mclk = sample_rate * 256
-        .bits_per_chan = I2S_BITS_PER_CHAN_DEFAULT//equals to data bit-width
+        //.mclk_multiple = I2S_MCLK_MULTIPLE_DEFAULT,//mclk = sample_rate * 256
+        //.bits_per_chan = I2S_BITS_PER_CHAN_DEFAULT//equals to data bit-width
     };
 
     esp_err_t err = i2s_driver_install(I2S_NUM_0, &i2s_conf, k_i2sEventQueueSize, (k_i2sEventQueueSize ? &m_i2sEventQueue : nullptr));
@@ -117,7 +138,8 @@ FastADCState FastADC::StartADCSampling(int8_t gpioPin, bool invertData)
         return m_state;
     }
 
-    adc_ll_digi_convert_limit_disable();
+    //adc_ll_digi_convert_limit_disable();
+    SYSCON.saradc_ctrl2.meas_num_limit = 0;
 
     err = i2s_adc_enable(I2S_NUM_0);
     if(err != ESP_OK)
@@ -138,8 +160,10 @@ FastADCState FastADC::StartADCSampling(int8_t gpioPin, bool invertData)
     //See https://github.com/espressif/esp-idf/pull/1991#issuecomment-1157404298
     adc_ll_digi_convert_limit_disable();
     
-    adc_ll_digi_output_invert(k_adcLowLevelUnit, !invertData); // Inverted is actually non inverted haha
+    //adc_ll_digi_output_invert(k_adcLowLevelUnit, !invertData); // Inverted is actually non inverted haha
+    SYSCON.saradc_ctrl2.sar1_inv = !invertData;
     
+
     // ADC setting
     adc_digi_pattern_config_t adcDigiPattern{
         .atten = k_adcAttenuation,
@@ -199,7 +223,8 @@ FastADCState FastADC::StopADCSampling()
     } 
 
     //restore settings
-    adc_ll_digi_output_invert(k_adcLowLevelUnit, m_adcPreviousDataInvertEnabled); // Enable data invert for ADC1
+    //adc_ll_digi_output_invert(k_adcLowLevelUnit, m_adcPreviousDataInvertEnabled); // Enable data invert for ADC1
+    SYSCON.saradc_ctrl2.sar1_inv = m_adcPreviousDataInvertEnabled;
 
     adc_ll_digi_clear_pattern_table(k_adcLowLevelUnit);
 
