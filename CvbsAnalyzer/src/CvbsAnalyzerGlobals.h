@@ -5,6 +5,8 @@
 #define CVBS_ANALYZER_LOG(...) Serial.printf(__VA_ARGS__);
 //#define CVBS_ANALYZER_LOG(...)
 
+#define CVBS_ANALYZER_PROFILER 1
+
 #define FAST_ADC_2Mhz 0
 #define FAST_ADC_1Mhz 1
 
@@ -39,6 +41,8 @@
     //{
     //    return (sample & k_adcDataMask) ^ invertMask;
     //}
-    inline bool IsErrorState(signed char state){ return (state < 0); }
+    //inline bool IsErrorState(signed char state){ return (state < 0); }
+
+
 
 #endif // CvbsAnalyzerGlobals_H

@@ -1,22 +1,70 @@
 #include "CvbsAnalyzer.h"
 
+
+#if CVBS_ANALYZER_PROFILER
+#   define TO_STR(x) #x
+void CvbsAnalyzerProfiler::Start()
+{
+    if(!m_started)
+    {
+        m_started = true;            
+        m_startTime = esp_timer_get_time();
+    }
+}
+void CvbsAnalyzerProfiler::Stop()
+{
+    if(m_started)
+    {
+        m_microsecondsAccumulator += (esp_timer_get_time() - m_startTime);
+        m_started = false;
+    }
+}
+
+#endif // CVBS_ANALYZER_PROFILER
+
+CvbsAnalyzer::CvbsAnalyzer()
+{
+#if CVBS_ANALYZER_PROFILER
+    m_stateProfilers = {
+        { CvbsAnalyzerState::k_notInitialized, CvbsAnalyzerProfiler( TO_STR(k_notInitialized) ) },
+        { CvbsAnalyzerState::k_initializing, CvbsAnalyzerProfiler( TO_STR(k_initializing) ) },
+        { CvbsAnalyzerState::k_initializedAndIdle, CvbsAnalyzerProfiler( TO_STR(k_initializedAndIdle) ) },
+        { CvbsAnalyzerState::k_amplitudeSampling, CvbsAnalyzerProfiler( TO_STR(k_amplitudeSampling) ) },
+        { CvbsAnalyzerState::k_amplitudeCalculation, CvbsAnalyzerProfiler( TO_STR(k_amplitudeCalculation) ) },
+        { CvbsAnalyzerState::k_syncIntervalsSampling, CvbsAnalyzerProfiler( TO_STR(k_syncIntervalsSampling) ) },
+        { CvbsAnalyzerState::k_syncIntervalsCalculation, CvbsAnalyzerProfiler( TO_STR(k_syncIntervalsCalculation) ) },
+        { CvbsAnalyzerState::k_videoScoreCalculation, CvbsAnalyzerProfiler( TO_STR(k_videoScoreCalculation) ) },
+        { CvbsAnalyzerState::k_restartInverted, CvbsAnalyzerProfiler( TO_STR(k_restartInverted) ) },
+        { CvbsAnalyzerState::k_stopADC, CvbsAnalyzerProfiler( TO_STR(k_stopADC) ) },
+        { CvbsAnalyzerState::k_finished, CvbsAnalyzerProfiler( TO_STR(k_finished) ) },
+        { CvbsAnalyzerState::k_failedBadState, CvbsAnalyzerProfiler( TO_STR(k_failedBadState) ) },
+        { CvbsAnalyzerState::k_failedFastADCInitialization, CvbsAnalyzerProfiler( TO_STR(k_failedFastADCInitialization) ) },
+        { CvbsAnalyzerState::k_failedSampling, CvbsAnalyzerProfiler( TO_STR(k_failedSampling) ) },
+        { CvbsAnalyzerState::k_failedAmplitude, CvbsAnalyzerProfiler( TO_STR(k_failedAmplitude) ) },
+        { CvbsAnalyzerState::k_failedSyncIntervals, CvbsAnalyzerProfiler( TO_STR(k_failedSyncIntervals) ) },
+        { CvbsAnalyzerState::k_failedVideoScore, CvbsAnalyzerProfiler( TO_STR(k_failedVideoScore) ) },
+        { CvbsAnalyzerState::k_failedFastADCStop, CvbsAnalyzerProfiler( TO_STR(k_failedFastADCStop) ) },
+        { CvbsAnalyzerState::k_failedUnknownError, CvbsAnalyzerProfiler( TO_STR(k_failedUnknownError) ) },
+        { CvbsAnalyzerState::k_totalAnalyzeTime, CvbsAnalyzerProfiler( TO_STR(k_totalAnalyzeTime) ) }
+    };
+    #endif // CVBS_ANALYZER_PROFILER
+}
+
 CvbsAnalyzerState CvbsAnalyzer::InitializeFastADC()
 {
     if(m_state != CvbsAnalyzerState::k_notInitialized)
     {
-        m_state = CvbsAnalyzerState::k_failedBadState;
-        return  m_state;
+        return SetState(CvbsAnalyzerState::k_failedBadState);
     }
 
     const FastADCState fastAdcState = m_fastAdc.Initialize();
     if (fastAdcState != FastADCState::k_initializedAdcStopped)
     {
-        m_state = CvbsAnalyzerState::k_failedFastADCInitialization;
-        return m_state;
+        return SetState(CvbsAnalyzerState::k_failedFastADCInitialization);
     }
     else
     {
-        m_state = CvbsAnalyzerState::k_initializedAndIdle;
+        SetState(CvbsAnalyzerState::k_initializedAndIdle);
     }
 
     return m_state;        
@@ -25,7 +73,7 @@ CvbsAnalyzerState CvbsAnalyzer::InitializeFastADC()
 CvbsAnalyzerState CvbsAnalyzer::DeinitializeFastADC()
 {
     m_fastAdc.Deinitialize();
-    m_state = CvbsAnalyzerState::k_notInitialized;
+    SetState(CvbsAnalyzerState::k_notInitialized);
     return m_state;
 }
 
@@ -82,28 +130,38 @@ CvbsAnalyzerState CvbsAnalyzer::AnalyzePin(int gpioPin)
 {
     if (m_state != CvbsAnalyzerState::k_initializedAndIdle && m_state != CvbsAnalyzerState::k_finished)
     {
-        m_state = CvbsAnalyzerState::k_failedBadState;
-        return m_state;
+        return SetState(CvbsAnalyzerState::k_failedBadState);
     }
 
     m_amplitudeCaclulator.Reset();
     m_syncIntervalsCalculator.Reset();
+
+#if CVBS_ANALYZER_PROFILER
+    for(auto& pair: m_stateProfilers)
+    {
+        pair.second.Stop();
+        pair.second.m_microsecondsAccumulator = 0;
+    }
+#endif // CVBS_ANALYZER_PROFILER
 
     bool invertByHardware = false;
     bool invertBySoftware = false;
 
     CVBS_ANALYZER_LOG("Starting AnalyzePin for gpioPin %d, invertByHardware=%d, invertBySoftware=%d...\n", 
                                     (int)gpioPin, (invertByHardware ? 1 : 0), (invertBySoftware ? 1 : 0));
+    
+#if CVBS_ANALYZER_PROFILER
+    m_stateProfilers[CvbsAnalyzerState::k_totalAnalyzeTime].Start();
+#endif // CVBS_ANALYZER_PROFILER    
 
     FastADCState fastAdcState = m_fastAdc.StartADCSampling(gpioPin, invertByHardware);
     if (fastAdcState != FastADCState::k_adcStarted)
     {
         CVBS_ANALYZER_LOG("FastADC::StartADCSampling() for gpioPin %d failed with state %d!\n", (int)gpioPin, (int)fastAdcState);
-        m_state = CvbsAnalyzerState::k_failedSampling;
-        return m_state;
+        return SetState(CvbsAnalyzerState::k_failedSampling);
     }
 
-    m_state = CvbsAnalyzerState::k_amplitudeSampling;
+    SetState(CvbsAnalyzerState::k_amplitudeSampling);
 
     static uint16_t buf[k_dmaBufLenSamples];//align to 4 bytes!
     size_t samplesRead = 0;
@@ -140,11 +198,11 @@ CvbsAnalyzerState CvbsAnalyzer::AnalyzePin(int gpioPin)
             // no else if
             if (m_amplitudeCaclulator.GetState() == AmplitudeCaclulatorState::k_readyForCalculation)
             {
-                m_state = CvbsAnalyzerState::k_amplitudeCalculation;                
+                SetState(CvbsAnalyzerState::k_amplitudeCalculation);                
             }
             if(m_amplitudeCaclulator.IsInErrorState())
             {
-                m_state = CvbsAnalyzerState::k_failedAmplitude;
+                SetState(CvbsAnalyzerState::k_failedAmplitude);
             }
         } // CvbsAnalyzerState::k_amplitudeSampling
 
@@ -154,11 +212,11 @@ CvbsAnalyzerState CvbsAnalyzer::AnalyzePin(int gpioPin)
             m_amplitudeCaclulator.Calculate();
             if(m_amplitudeCaclulator.GetState() == AmplitudeCaclulatorState::k_finished)
             {
-                m_state = CvbsAnalyzerState::k_syncIntervalsSampling;
+                SetState(CvbsAnalyzerState::k_syncIntervalsSampling);
             }
             if(m_amplitudeCaclulator.IsInErrorState())
             {
-                m_state = CvbsAnalyzerState::k_failedAmplitude;
+                SetState(CvbsAnalyzerState::k_failedAmplitude);
             }
         } // CvbsAnalyzerState::k_amplitudeCalculation
 
@@ -175,11 +233,11 @@ CvbsAnalyzerState CvbsAnalyzer::AnalyzePin(int gpioPin)
             if(m_syncIntervalsCalculator.GetState() == SyncIntervalsCalculatorState::k_finished )
             {
                 //Actually calculation done by this moment, but using this state to get back to sampling if needed
-                m_state = CvbsAnalyzerState::k_syncIntervalsCalculation;
+                SetState(CvbsAnalyzerState::k_syncIntervalsCalculation);
             }
             if(m_syncIntervalsCalculator.IsInErrorState())
             {
-                m_state = CvbsAnalyzerState::k_failedSyncIntervals;
+                SetState(CvbsAnalyzerState::k_failedSyncIntervals);
                 CVBS_ANALYZER_LOG("SyncIntervalsCalculator in error state %d\n", (int)m_syncIntervalsCalculator.GetState());
             }            
         } // CvbsAnalyzerState::k_syncIntervalsSampling
@@ -190,10 +248,10 @@ CvbsAnalyzerState CvbsAnalyzer::AnalyzePin(int gpioPin)
             if(k_syncIntervalsCalculatorConsumeMaxDmaReads && run < k_maxDmaReadsPerAnalyzePin-1)
             {
                 //Actually calculation done by this moment, but we can afford more sampling for precision
-                m_state = CvbsAnalyzerState::k_syncIntervalsSampling;
+                SetState(CvbsAnalyzerState::k_syncIntervalsSampling);
                 continue;
             }
-            m_state = CvbsAnalyzerState::k_videoScoreCalculation;
+            SetState(CvbsAnalyzerState::k_videoScoreCalculation);
         } // CvbsAnalyzerState::k_syncIntervalsCalculation
 
         if(m_state == CvbsAnalyzerState::k_videoScoreCalculation)
@@ -203,9 +261,9 @@ CvbsAnalyzerState CvbsAnalyzer::AnalyzePin(int gpioPin)
             bool shouldTryInverted = false;
             if(shouldTryInverted)
             {
-                m_state = CvbsAnalyzerState::k_restartInverted;
+                SetState(CvbsAnalyzerState::k_restartInverted);
             }else{
-                m_state = CvbsAnalyzerState::k_stopADC;
+                SetState(CvbsAnalyzerState::k_stopADC);
             }
             //TODO: handle score errors
         } // CvbsAnalyzerState::k_videoScoreCalculation
@@ -231,22 +289,27 @@ CvbsAnalyzerState CvbsAnalyzer::AnalyzePin(int gpioPin)
 
     if(!samplesReadTotal)
     {
-        m_state = CvbsAnalyzerState::k_failedSampling;
+        SetState(CvbsAnalyzerState::k_failedSampling);
     }
 
     //Stop ADC unconditionally from any state.
     fastAdcState = m_fastAdc.StopADCSampling();
+
+#if CVBS_ANALYZER_PROFILER
+    m_stateProfilers[CvbsAnalyzerState::k_totalAnalyzeTime].Stop();
+#endif // CVBS_ANALYZER_PROFILER    
+
     CVBS_ANALYZER_LOG("Stopping ADC sampling for gpioPin %d, samplesReadTotal = %d, CvbsAnalyzerState = %d\n", 
                       (int)gpioPin, (int)samplesReadTotal, (int)m_state);
 
     if (fastAdcState == FastADCState::k_initializedAdcStopped)
     {
-        m_state = CvbsAnalyzerState::k_finished;
+        SetState(CvbsAnalyzerState::k_finished);
     }
     else
     {
         CVBS_ANALYZER_LOG("FastADC::StopADCSampling() for gpioPin %d failed with state %d!", (int)gpioPin, (int)fastAdcState);
-        m_state = CvbsAnalyzerState::k_failedFastADCStop;
+        SetState(CvbsAnalyzerState::k_failedFastADCStop);
     }
 
     Print();
@@ -272,6 +335,16 @@ void CvbsAnalyzer::Print()
     CVBS_ANALYZER_LOG("\t\"k_dmaBufLenSamples\": %d,\n", k_dmaBufLenSamples);
     CVBS_ANALYZER_LOG("\t\"k_dmaBufsCount\": %d,\n", k_dmaBufsCount);
     CVBS_ANALYZER_LOG("\t},\n");
+#if CVBS_ANALYZER_PROFILER
+    CVBS_ANALYZER_LOG("\"m_stateProfilers\": {\n");
+    for(auto& pair: m_stateProfilers)
+    {
+        pair.second.Stop();
+        if(pair.second.m_microsecondsAccumulator)
+            CVBS_ANALYZER_LOG("\t\"%s\": %lld,\n", pair.second.m_name, pair.second.m_microsecondsAccumulator);
+    }
+    CVBS_ANALYZER_LOG("},\n");
+#endif // CVBS_ANALYZER_PROFILER
     CVBS_ANALYZER_LOG("\"FastADC\": { \"state\": %d, \"m_adcChannel\": %d },\n", (int)m_fastAdc.GetState(), (int)m_fastAdc.GetAdcChannel());
     m_amplitudeCaclulator.Print();
     m_syncIntervalsCalculator.Print();
