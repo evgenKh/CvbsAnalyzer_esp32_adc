@@ -19,11 +19,16 @@ void CvbsAnalyzerProfiler::Stop()
         m_started = false;
     }
 }
-
 #endif // CVBS_ANALYZER_PROFILER
 
-CvbsAnalyzer::CvbsAnalyzer()
+void CvbsAnalyzer::Reset()
 {
+    m_amplitudeCaclulator.Reset();
+    m_syncIntervalsCalculator.Reset();
+    m_videoScore.Reset();
+    m_samplesReadTotal = 0;
+    m_invertDataCurrentValue = false;
+
 #if CVBS_ANALYZER_PROFILER
     m_stateProfilers = {
         { CvbsAnalyzerState::k_notInitialized, CvbsAnalyzerProfiler( TO_STR(k_notInitialized) ) },
@@ -48,6 +53,21 @@ CvbsAnalyzer::CvbsAnalyzer()
         { CvbsAnalyzerState::k_totalAnalyzeTime, CvbsAnalyzerProfiler( TO_STR(k_totalAnalyzeTime) ) }
     };
     #endif // CVBS_ANALYZER_PROFILER
+    
+    //Or deinitialize FastADC?
+    switch(m_fastAdc.GetState())
+    {
+        case FastADCState::k_notInitialized:
+            SetState(CvbsAnalyzerState::k_notInitialized);
+            break;
+        case FastADCState::k_initializedAdcStopped:
+            SetState(CvbsAnalyzerState::k_initializedAndIdle);
+            break;
+        default:
+            SetState(CvbsAnalyzerState::k_failedBadFastADCState);
+            CVBS_ANALYZER_LOG_INFO("FastADC is in unexpected state %d, cannot reset CvbsAnalyzer!\n", (int)m_fastAdc.GetState());
+            break;
+    }
 }
 
 CvbsAnalyzerState CvbsAnalyzer::InitializeFastADC()
@@ -138,7 +158,7 @@ CvbsAnalyzerState CvbsAnalyzer::AnalyzePin(int gpioPin, bool invertData)
     m_syncIntervalsCalculator.Reset();
     m_samplesReadTotal = 0;
 
-    const bool invertByHardware = false;
+    const bool invertByHardware = false;//Use for test purposes
     m_invertDataCurrentValue = invertData;//Will use software
 
 #if CVBS_ANALYZER_PROFILER
@@ -274,11 +294,13 @@ CvbsAnalyzerState CvbsAnalyzer::AnalyzePin(int gpioPin, bool invertData)
     if(m_state == CvbsAnalyzerState::k_videoScoreCalculation || IsInErrorState())
     {
         //We still can score the failure as valid no-video result.
+        m_videoScore.Reset();
+        m_videoScore.CalculateFromSyncIntervals(m_syncIntervalsCalculator,
+                                                m_amplitudeCaclulator.GetState(),
+                                                //k_sampleRate,
+                                                m_invertDataCurrentValue);
 
-        //TODO: score logic        
-        
-        bool shouldTryFlipInvertFlag = true;   //TODO: more logic to skip invert if no sense to do it?
-
+        bool shouldTryFlipInvertFlag = false;   //TODO: more logic to skip invert if no sense to do it?
         if(shouldTryFlipInvertFlag){
             SetState(CvbsAnalyzerState::k_restartInverted);
         }else{
@@ -305,7 +327,7 @@ CvbsAnalyzerState CvbsAnalyzer::AnalyzePin(int gpioPin, bool invertData)
 #endif // CVBS_ANALYZER_PROFILER    
 
     CVBS_ANALYZER_LOG("Stopped ADC sampling for gpioPin %d, samplesReadTotal = %d, CvbsAnalyzerState = %d\n", 
-                      (int)gpioPin, (int)samplesReadTotal, (int)m_state);
+                      (int)gpioPin, (int)m_samplesReadTotal, (int)m_state);
 
     if (fastAdcState == FastADCState::k_initializedAdcStopped)
     {
@@ -364,9 +386,11 @@ void CvbsAnalyzer::PrintCsv()
     static bool headerPrinted = false;
     if(!headerPrinted)
     {
-        CVBS_ANALYZER_LOG_INFO("_Comment,_IsVideo,\
+        CVBS_ANALYZER_LOG_INFO("_Comment,_IsVideoLearning,\
             m_invertDataCurrentValue,\
             CvbsAnalyzerState,\
+            m_videoScore.m_isVideo,\
+            m_videoScore.m_isInvertedVideo,\
             m_samplesReadTotal,\
             k_sampleRate,\
             m_syncTreshold,\
@@ -386,13 +410,22 @@ void CvbsAnalyzer::PrintCsv()
         for(int i=0; i<m_syncIntervalsCalculator.m_notSyncSequenceLengthHistogram.size();i++)
             CVBS_ANALYZER_LOG_INFO("N%d,", m_syncIntervalsCalculator.m_notSyncSequenceLengthHistogram.GetBinCenter(i));
         
+        
+#if CVBS_ANALYZER_PROFILER
+        for(auto& pair: m_stateProfilers)
+        {
+            CVBS_ANALYZER_LOG_INFO("m_stateProfilers.%s,", pair.second.m_name);
+        }
+#endif // CVBS_ANALYZER_PROFILER
         CVBS_ANALYZER_LOG_INFO("\n");
         headerPrinted = true;
     }
 
-    CVBS_ANALYZER_LOG_INFO(",,%d,%d,%d,%d,%d,%d,%d,%d,%d,,",
+    CVBS_ANALYZER_LOG_INFO(",,%d,%d,%f,%f,%d,%d,%d,%d,%d,%d,%d,,",
         m_invertDataCurrentValue ? 1 : 0, 
         (int)m_state, 
+        m_videoScore.m_isVideo,
+        m_videoScore.m_isInvertedVideo,
         (int)m_samplesReadTotal,
         (int)k_sampleRate, 
         (int)m_amplitudeCaclulator.m_syncTreshold,
@@ -421,6 +454,14 @@ void CvbsAnalyzer::PrintCsv()
         CVBS_ANALYZER_LOG_INFO("%f,", binWeight);
         //CVBS_ANALYZER_LOG_INFO("%d,", (int)m_syncIntervalsCalculator.m_notSyncSequenceLengthHistogram[i]);
     }
+
+    
+#if CVBS_ANALYZER_PROFILER
+    for(auto& pair: m_stateProfilers)
+    {
+        CVBS_ANALYZER_LOG_INFO("%lld,", pair.second.m_microsecondsAccumulator);
+    }
+#endif // CVBS_ANALYZER_PROFILER
     
     CVBS_ANALYZER_LOG_INFO("\n");
 }

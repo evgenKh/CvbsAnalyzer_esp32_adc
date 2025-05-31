@@ -6,6 +6,7 @@
 #include "FastADC.h"
 #include "AmplitudeCaclulator.h"
 #include "SyncIntervalsCalculator.h"
+#include "VideoScore.h"
 #include <map>
 
 enum class CvbsAnalyzerState : signed char
@@ -25,6 +26,7 @@ enum class CvbsAnalyzerState : signed char
     k_finished,
 
     k_failedBadState = -127,
+    k_failedBadFastADCState,
     k_failedFastADCInitialization,
     k_failedSampling,
     k_failedAmplitude,
@@ -53,25 +55,25 @@ struct CvbsAnalyzerProfiler
 class CvbsAnalyzer
 {
     public:
-    CvbsAnalyzer();
+    CvbsAnalyzer()
+    {
+        Reset();
+    }
 
-    FastADC m_fastAdc;
-    AmplitudeCaclulator m_amplitudeCaclulator;
-    SyncIntervalsCalculator m_syncIntervalsCalculator;
-
-    AmplitudeCaclulator m_invertedAmplitudeCaclulator;
-    SyncIntervalsCalculator m_invertedIntervalsCalculator;
+    void Reset();
 
     CvbsAnalyzerState InitializeFastADC();
     CvbsAnalyzerState DeinitializeFastADC();
     CvbsAnalyzerState AnalyzePin(int gpioPin, bool invertData);
+
+    const VideoScore& GetVideoScore() const { return m_videoScore; }
 
     inline CvbsAnalyzerState GetState() const { return m_state; }
     inline bool IsInErrorState() const { return ((signed char)m_state < 0); }
     void PrintJson();
     void PrintCsv();
 
-    private:
+private:
     inline CvbsAnalyzerState SetState(CvbsAnalyzerState state)
     {
         if(m_state != state)
@@ -101,6 +103,16 @@ class CvbsAnalyzer
     bool m_invertDataCurrentValue;
     size_t m_samplesReadTotal = 0;
     uint16_t buf[k_dmaBufLenSamples];//align to 4 bytes!
+
+    
+    FastADC m_fastAdc;
+    AmplitudeCaclulator m_amplitudeCaclulator;
+    SyncIntervalsCalculator m_syncIntervalsCalculator;
+    VideoScore m_videoScore;
+
+    //AmplitudeCaclulator m_invertedAmplitudeCaclulator;
+    //SyncIntervalsCalculator m_invertedIntervalsCalculator;
+
 
 };
 

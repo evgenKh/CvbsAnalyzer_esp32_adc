@@ -45,6 +45,31 @@
     //    return (sample & k_adcDataMask) ^ invertMask;
     //}
     //inline bool IsErrorState(signed char state){ return (state < 0); }
+    inline int32_t UsToSamples(const int32_t microseconds)
+    {
+        static_assert(k_sampleRate == 1000000 || k_sampleRate == 2000000);
+        //k_sampleRate is 1Mhz or 2Mhz, so we can use integer math.
+        return (microseconds * (k_sampleRate / 1000000));
+    }
+    constexpr int32_t UsToSamplesContexpr(const int32_t microseconds)
+    {
+        static_assert(k_sampleRate == 1000000 || k_sampleRate == 2000000);
+        //k_sampleRate is 1Mhz or 2Mhz, so we can use integer math.
+        return (microseconds * (k_sampleRate / 1000000));
+    }
+
+    //Use in case k_sampleRate is not 1Mhz or 2Mhz.
+    //inline int32_t UsToSamples(const int32_t microseconds)
+    //{
+    //    //0.5f is for rounding
+    //    return (int32_t)(microseconds * ((float)k_sampleRate / 1000000.0f) + 0.5f);
+    //}
+    //constexpr int32_t UsToSamplesContexpr(const int32_t microseconds)
+    //{
+    //    //0.5f is for rounding
+    //    return (int32_t)(microseconds * ((float)k_sampleRate / 1000000.0f) + 0.5f);
+    //}
+
 
 
 
