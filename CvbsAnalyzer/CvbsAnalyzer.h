@@ -67,7 +67,8 @@ class CvbsAnalyzer
     CvbsAnalyzerState AnalyzePin(int gpioPin);
     inline CvbsAnalyzerState GetState() const { return m_state; }
     inline bool IsInErrorState() const { return ((signed char)m_state < 0); }
-    void Print();
+    void PrintJson();
+    void PrintCsv();
 
     private:
     inline CvbsAnalyzerState SetState(CvbsAnalyzerState state)

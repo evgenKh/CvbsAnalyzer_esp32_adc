@@ -312,7 +312,8 @@ CvbsAnalyzerState CvbsAnalyzer::AnalyzePin(int gpioPin)
         SetState(CvbsAnalyzerState::k_failedFastADCStop);
     }
 
-    Print();
+    //PrintJson();
+    PrintCsv();
 
     //CVBS_ANALYZER_LOG("Printing last page of %d samples ----------------\n", samplesRead);
     //for (int i = 0; i < samplesRead; i+=k_adcDataStrideSamples)
@@ -322,7 +323,7 @@ CvbsAnalyzerState CvbsAnalyzer::AnalyzePin(int gpioPin)
     return m_state;
 }
 
-void CvbsAnalyzer::Print()
+void CvbsAnalyzer::PrintJson()
 {
     CVBS_ANALYZER_LOG("{\n");
     CVBS_ANALYZER_LOG("\"CvbsAnalyzer\": {\n");
@@ -349,4 +350,65 @@ void CvbsAnalyzer::Print()
     m_amplitudeCaclulator.Print();
     m_syncIntervalsCalculator.Print();
     CVBS_ANALYZER_LOG("}\n");
+}
+
+void CvbsAnalyzer::PrintCsv()
+{
+    static bool headerPrinted = false;
+    if(!headerPrinted)
+    {
+        CVBS_ANALYZER_LOG_INFO("_Comment,_IsVideo,CvbsAnalyzerState,\
+            k_sampleRate,\
+            m_syncTreshold,\
+            m_syncSequenceLengthHistogram.m_binsRange.min,\
+            m_syncSequenceLengthHistogram.m_binsRange.max,\
+            m_syncSequenceLengthHistogram.k_binsCount,\
+            m_syncSequenceLengthHistogram.m_samplesCount,\
+            m_syncSequenceLengthHistogram.bins_weights,");
+        for(int i=0; i<m_syncIntervalsCalculator.m_syncSequenceLengthHistogram.size();i++)
+            CVBS_ANALYZER_LOG_INFO("S%d,", m_syncIntervalsCalculator.m_syncSequenceLengthHistogram.GetBinCenter(i));
+        
+        CVBS_ANALYZER_LOG_INFO("m_notSyncSequenceLengthHistogram.m_binsRange.min,\
+            m_notSyncSequenceLengthHistogram.m_binsRange.max,\
+            m_notSyncSequenceLengthHistogram.k_binsCount,\
+            m_notSyncSequenceLengthHistogram.m_samplesCount,\
+            m_notSyncSequenceLengthHistogram.bins_weights,");
+        for(int i=0; i<m_syncIntervalsCalculator.m_notSyncSequenceLengthHistogram.size();i++)
+            CVBS_ANALYZER_LOG_INFO("N%d,", m_syncIntervalsCalculator.m_notSyncSequenceLengthHistogram.GetBinCenter(i));
+        
+        CVBS_ANALYZER_LOG_INFO("\n");
+        headerPrinted = true;
+    }
+
+    CVBS_ANALYZER_LOG_INFO(",,%d,%d,%d,%d,%d,%d,%d,,", 
+        (int)m_state, 
+        (int)k_sampleRate, 
+        (int)m_amplitudeCaclulator.m_syncTreshold,
+        (int)m_syncIntervalsCalculator.m_syncSequenceLengthHistogram.m_binsRange.first,
+        (int)m_syncIntervalsCalculator.m_syncSequenceLengthHistogram.m_binsRange.second,
+        (int)m_syncIntervalsCalculator.m_syncSequenceLengthHistogram.size(),
+        (int)m_syncIntervalsCalculator.m_syncSequenceLengthHistogram.GetSamplesCount());
+    for(int i=0; i<m_syncIntervalsCalculator.m_syncSequenceLengthHistogram.size();i++)
+    {
+        const float samplesCountF = std::max(1u, m_syncIntervalsCalculator.m_syncSequenceLengthHistogram.GetSamplesCount());
+        const float binWeight = m_syncIntervalsCalculator.m_syncSequenceLengthHistogram[i] / samplesCountF;
+        CVBS_ANALYZER_LOG_INFO("%f,", binWeight);
+        //CVBS_ANALYZER_LOG_INFO("%d,", (int)m_syncIntervalsCalculator.m_syncSequenceLengthHistogram[i]);
+    }\
+
+    CVBS_ANALYZER_LOG_INFO("%d,%d,%d,%d,,",
+        (int)m_syncIntervalsCalculator.m_notSyncSequenceLengthHistogram.m_binsRange.first,
+        (int)m_syncIntervalsCalculator.m_notSyncSequenceLengthHistogram.m_binsRange.second,
+        (int)m_syncIntervalsCalculator.m_notSyncSequenceLengthHistogram.size(),
+        (int)m_syncIntervalsCalculator.m_notSyncSequenceLengthHistogram.GetSamplesCount());
+
+    for(int i=0; i<m_syncIntervalsCalculator.m_notSyncSequenceLengthHistogram.size();i++)
+    {
+        const float samplesCountF = std::max(1u, m_syncIntervalsCalculator.m_notSyncSequenceLengthHistogram.GetSamplesCount());
+        const float binWeight = m_syncIntervalsCalculator.m_notSyncSequenceLengthHistogram[i] / samplesCountF;
+        CVBS_ANALYZER_LOG_INFO("%f,", binWeight);
+        //CVBS_ANALYZER_LOG_INFO("%d,", (int)m_syncIntervalsCalculator.m_notSyncSequenceLengthHistogram[i]);
+    }
+    
+    CVBS_ANALYZER_LOG_INFO("\n");
 }
