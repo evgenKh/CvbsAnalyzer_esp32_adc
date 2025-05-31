@@ -78,7 +78,7 @@ private:
     {
         if(m_state != state)
         {
-            CVBS_ANALYZER_LOG_DEBUG("CvbsAnalyzer state changed from %d to %d\n", (int)m_state, (int)state);
+            CVBS_ANALYZER_LOG("CvbsAnalyzer state changed from %d to %d\n", (int)m_state, (int)state);
 #if CVBS_ANALYZER_PROFILER
             m_stateProfilers[m_state].Stop();
 #endif
@@ -96,9 +96,12 @@ private:
     std::map<CvbsAnalyzerState, CvbsAnalyzerProfiler> m_stateProfilers;
 #endif // CVBS_ANALYZER_PROFILER
 
-    constexpr static size_t k_maxDmaReadsPerAnalyzePin = 8;//k_dmaBufsCount;//Each has timeout of k_dmaReadTimeoutMs and size of k_dmaBufLenSamples
+    constexpr static size_t k_maxDmaReadsPerAnalyzePin = k_dmaBufsCount;//Each has timeout of k_dmaReadTimeoutMs and size of k_dmaBufLenSamples
     constexpr static bool k_syncIntervalsCalculatorConsumeMaxDmaReads = true; 
-    constexpr static bool k_printRawAdcData = false; //May add delays!
+
+    constexpr static bool k_printRawAdcData = false; //Slow!
+    constexpr static bool k_printCsvLearningData = false;
+    constexpr static bool k_printVideoScore = true;
 
     bool m_invertDataCurrentValue;
     size_t m_samplesReadTotal = 0;

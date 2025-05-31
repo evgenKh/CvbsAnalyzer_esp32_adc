@@ -27,12 +27,12 @@
     constexpr size_t k_adcDataStrideSamples = 2; //1 good sample, 1 possibly corrupted sample
 #endif
 
-    constexpr uint32_t k_dmaBufLenSamples = 1024;//Min 2 TV lines(2*64us). Align to 4. 
+    constexpr uint32_t k_dmaBufLenSamples = 800;//Min 2 TV lines(2*64us). Align to 4. 
                                                 //Not too smal, otherwise we'll spend to much time swapping buffers.
                                                 //k_dmaBufLenSamples*channels*(sampleSizeBits/8) not higher than 4096 
                                                 //For 16bit*1chan max=1024
 
-    static constexpr uint8_t k_dmaBufsCount = 8;//increase if we want to print values since print is slow
+    constexpr uint8_t k_dmaBufsCount = 12;//increase if we want to print values since print is slow
 
     constexpr uint32_t k_sampleRate = k_i2sSampleRate * k_oversamplingMultiplier / k_adcDataStrideSamples;
     constexpr uint32_t k_sampleRateWithSkippedOversamples = k_i2sSampleRate;

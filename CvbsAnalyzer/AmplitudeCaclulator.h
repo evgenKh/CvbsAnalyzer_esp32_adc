@@ -53,14 +53,17 @@ public:
     //int16_t m_blackValue;
     //int16_t m_colorMaxValue;
 
-    constexpr static size_t k_binsCount = 30;
+    constexpr static size_t k_binsCount = 100;//Do not lower! 30 it loo low.
     typedef Histogram<uint32_t, uint16_t, k_binsCount> HistogramType;
+    HistogramType m_amplitudeHistogram;
 private:
 
     constexpr static int16_t k_minRange = 3;//k_binsCount;        // Condition for k_badAmplitudeTooLow
     constexpr static float k_highestBinMaxWeight = 0.90f;     // Condition for k_badAmplitudeTooHigh
-    constexpr static size_t k_minSamplesForCalculationUs = 140;
+
+    constexpr static size_t k_minSamplesForCalculationUs = 1200;
     constexpr static size_t k_minSamplesForCalculation = UsToSamplesContexpr(k_minSamplesForCalculationUs);
+    //Important, if stride>1, we consume more samples 
 
     // constexpr static float k_syncPulseOnlyAmplitudeColorbarsNtscM = 17.0f/170.0f;
     // constexpr static float k_syncPulseOnlyAmplitudeBlackNtscMWithColorBurst = 20.0f/60.0f;
@@ -75,7 +78,6 @@ private:
     // constexpr static float k_syncTresholdMax = 0.5f;//
 
     AmplitudeCaclulatorState m_state;
-    HistogramType m_amplitudeHistogram;
 };
 
 #endif

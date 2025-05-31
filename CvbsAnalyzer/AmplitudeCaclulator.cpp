@@ -36,15 +36,16 @@ AmplitudeCaclulatorState AmplitudeCaclulator::PushSamples(const uint16_t *newDat
 
     if(newDataLenNoZeroes)
     {
-        Histogram<uint32_t, uint16_t, k_binsCount> newDataHistogram(0u, MAX_UINT_12BIT);        
+        const size_t samplesInHistogramBeforePush = m_amplitudeHistogram.GetSamplesCount();
+        //Histogram<uint32_t, uint16_t, k_binsCount> newDataHistogram(0u, MAX_UINT_12BIT);        
         
         for (size_t i = firstNonZeroSampleIndex; i < newDataLen; i += dataStrideSamples)
         {
             //TODO: try skip repeated samples
-            newDataHistogram.PushSample(newData[i]);
+            m_amplitudeHistogram.PushSample(newData[i]);
         }
 
-        if(newDataHistogram.GetSamplesCount() * dataStrideSamples != newDataLen - firstNonZeroSampleIndex)
+        if((m_amplitudeHistogram.GetSamplesCount()-samplesInHistogramBeforePush) * dataStrideSamples != newDataLen - firstNonZeroSampleIndex)
         {
             //Some samples were not pushed, probably out of bins range.
             //Could be an assert...
@@ -52,11 +53,11 @@ AmplitudeCaclulatorState AmplitudeCaclulator::PushSamples(const uint16_t *newDat
             return m_state;
         }
 
-        if(newDataHistogram.GetSamplesCount() > 0)
-        {
-            //Merge local histogram to main one.
-            m_amplitudeHistogram.Extend(newDataHistogram);
-        }
+        //if(newDataHistogram.GetSamplesCount() > 0)
+        //{
+        //    //Merge local histogram to main one.
+        //    m_amplitudeHistogram.Extend(newDataHistogram);
+        //}
     }
 
     if(m_amplitudeHistogram[m_amplitudeHistogram.size()-1] > static_cast<uint32_t>(m_amplitudeHistogram.GetSamplesCount() * k_highestBinMaxWeight))
@@ -96,7 +97,7 @@ AmplitudeCaclulatorState AmplitudeCaclulator::Calculate()
     }
 
     CalculateSyncTreshold();
-    CalculateWhiteLevel();
+    //CalculateWhiteLevel();
     //CalculateBlankingLevel();
 
 
@@ -108,26 +109,37 @@ AmplitudeCaclulatorState AmplitudeCaclulator::Calculate()
 void AmplitudeCaclulator::CalculateSyncTreshold()
 {    
     //Find first first reversed peak in histogram.
-    constexpr uint32_t k_edgesMinDelta = 1;
-    int16_t syncTresholdBin = INVALID_VALUE;
+    const uint32_t k_syncLevelSpikeRisingEdgeMinDelta = std::max(1.0f, std::ceil(m_amplitudeHistogram.GetSamplesCount() * 0.015f)); //2.5% of histogram amplitude;
+    const uint32_t k_syncLevelSpikeFallingEdgeMinDelta = std::max(1.0f, std::ceil(m_amplitudeHistogram.GetSamplesCount() * 0.005f)); //2.5% of histogram amplitude;
+    const uint32_t k_nextEdgeMinDelta = 2;
 
-    auto firstRisingAfterFallingIt = m_amplitudeHistogram.end();
+    std::array<HistogramType::iterator, 3> edgeIterators;
+    std::array<size_t, 3> edgeBins;
+    edgeIterators.fill(m_amplitudeHistogram.end());
 
-    auto firstLeftFallingEdgeIt = m_amplitudeHistogram.FindFallingEdge(
-        m_amplitudeHistogram.begin(), m_amplitudeHistogram.end(), k_edgesMinDelta);
+    edgeIterators[0] = m_amplitudeHistogram.FindRisingEdge(
+        m_amplitudeHistogram.begin(), m_amplitudeHistogram.end(), k_syncLevelSpikeRisingEdgeMinDelta);
 
-
-    if(firstLeftFallingEdgeIt != m_amplitudeHistogram.end())
-    {        
-        assert(std::next(firstLeftFallingEdgeIt) != m_amplitudeHistogram.end()); 
-
-        firstRisingAfterFallingIt = m_amplitudeHistogram.FindRisingEdge(
-            std::next(firstLeftFallingEdgeIt), m_amplitudeHistogram.end(), k_edgesMinDelta);
-    }
-    if(firstRisingAfterFallingIt != m_amplitudeHistogram.end())
+    if(edgeIterators[0] != m_amplitudeHistogram.end())
     {
-        syncTresholdBin = std::distance(m_amplitudeHistogram.begin(), firstRisingAfterFallingIt);
-        m_syncTreshold = m_amplitudeHistogram.GetBinCenter(syncTresholdBin);
+        edgeIterators[1] = m_amplitudeHistogram.FindFallingEdge(
+            std::next(edgeIterators[0]), m_amplitudeHistogram.end(), k_syncLevelSpikeFallingEdgeMinDelta);
+    }
+    
+    if(edgeIterators[1] != m_amplitudeHistogram.end())
+    {
+        edgeIterators[2] = m_amplitudeHistogram.FindRisingEdge(
+            std::next(edgeIterators[1]), m_amplitudeHistogram.end(), k_nextEdgeMinDelta);
+    }
+
+    if(edgeIterators[2] != m_amplitudeHistogram.end())
+    {
+        edgeBins[0] = std::distance(m_amplitudeHistogram.begin(), edgeIterators[0]);
+        edgeBins[1] = std::distance(m_amplitudeHistogram.begin(), edgeIterators[1]);
+        edgeBins[2] = std::distance(m_amplitudeHistogram.begin(), edgeIterators[2]);
+        //CVBS_ANALYZER_LOG_INFO("Sync bins in m_amplitudeHistogram: %d, %d, %d\n", edgeBins[0], edgeBins[1], edgeBins[2]);
+        m_syncTreshold = ((float)m_amplitudeHistogram.GetBinCenter(edgeBins[1]) + (float)m_amplitudeHistogram.GetBinCenter(edgeBins[2]) ) / 2.0f;
+        //m_syncTreshold = m_amplitudeHistogram.GetBinCenter(edgeBins[1]);
     }
     else
     {

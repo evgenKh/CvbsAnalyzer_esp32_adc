@@ -1,8 +1,6 @@
 #include <Arduino.h>
 #include "CvbsAnalyzer.h"
 
-const int k_gpioPin = 36;
-const int k_gpioPin1 = 39;
 CvbsAnalyzer g_cvbsAnalyzer;
 
 void setup()
@@ -23,8 +21,26 @@ void loop()
 {
   static int loopNum = 0;
   CVBS_ANALYZER_LOG("Running loop # %d.\n", loopNum);
-  CvbsAnalyzerState state = g_cvbsAnalyzer.AnalyzePin(k_gpioPin, false);
-  CVBS_ANALYZER_LOG("CvbsAnalyzer finished with state %d.\n", (int)state);
+  CvbsAnalyzerState state;
+  
+  auto pin35 = 35;
+  auto pin36 = 36;
+  CVBS_ANALYZER_LOG_INFO("Reading pin %d\t\t: ", pin35);
+  state = g_cvbsAnalyzer.AnalyzePin(pin35, false);
+  delay(5);
+  CVBS_ANALYZER_LOG_INFO("Reading pin %d Inverted: ", pin35);
+  state = g_cvbsAnalyzer.AnalyzePin(pin35, true);
+  delay(5);
+
+  CVBS_ANALYZER_LOG_INFO("Reading pin %d\t\t: ", pin36);
+  state = g_cvbsAnalyzer.AnalyzePin(pin36, false);
+  delay(5);
+  CVBS_ANALYZER_LOG_INFO("Reading pin %d Inverted: ", pin36);
+  state = g_cvbsAnalyzer.AnalyzePin(pin36, true);
+  delay(5);
+
+  CVBS_ANALYZER_LOG_INFO("\n");
+  //CVBS_ANALYZER_LOG("CvbsAnalyzer finished with state %d.\n", (int)state);
 
   delay(1000);
   loopNum++;

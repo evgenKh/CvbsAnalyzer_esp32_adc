@@ -78,9 +78,7 @@ SyncIntervalsCalculatorState SyncIntervalsCalculator::PushSamples(const uint16_t
         m_state = SyncIntervalsCalculatorState::k_needMoreSamples;
     }
     else
-    {
-        
-
+    {    
         m_state = SyncIntervalsCalculatorState::k_finished;
     }
     return m_state;

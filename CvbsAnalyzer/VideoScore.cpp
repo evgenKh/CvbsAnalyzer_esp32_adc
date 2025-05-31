@@ -16,26 +16,44 @@ void VideoScore::CalculateFromSyncIntervals(const SyncIntervalsCalculator &syncI
         m_isInvertedVideo = 0.0f;
         return;
     }
+  
 
-    assert(k_notSyncIntervalGoodDeviationUs < k_notSyncIntervalGoodUs);    
-
-    // 80-100% notSyncIntervals are 57-63us -> notSyncGoodSamplesScore=1
-    const float notSyncGoodSamplesWeight = GetWeightOfIntervalsWithLength(
+    // 80-100% notSyncIntervals are 57-63us 
+    const float notSync60usGoodSamplesWeight = GetWeightOfIntervalsWithLength(
         syncIntervalsCalculator.m_notSyncSequenceLengthHistogram,
-        k_notSyncIntervalGoodUs - k_notSyncIntervalGoodDeviationUs,
-        k_notSyncIntervalGoodUs + k_notSyncIntervalGoodDeviationUs);
+        57, 63);        
+    const float notSync60usGoodSamplesScore = notSync60usGoodSamplesWeight / 0.8f;
 
-    const float notSyncGoodSamplesScore = std::min(1.0f, notSyncGoodSamplesWeight / 0.8f);
+    // 80-100% notSyncIntervals are 5-7us
+    const float notSync5usGoodSamplesWeight = GetWeightOfIntervalsWithLength(
+        syncIntervalsCalculator.m_notSyncSequenceLengthHistogram,
+        5, 7);        
+    const float notSync5usGoodSamplesScore = notSync5usGoodSamplesWeight / 0.2f;
 
-    const float notSyncGoodSamplesScoreWeight = 1.0f; // 100% of m_isVideo score consists of notSyncGoodSamplesScore
-    m_isVideo = notSyncGoodSamplesScore * notSyncGoodSamplesScoreWeight;
+    // 80-100% notSyncIntervals are 29-33us
+    const float notSync30usGoodSamplesWeight = GetWeightOfIntervalsWithLength(
+        syncIntervalsCalculator.m_notSyncSequenceLengthHistogram,
+        29, 33);        
+    const float notSync30usGoodSamplesScore = notSync30usGoodSamplesWeight / 0.2f;
+
+    // 70-100% syncIntervals are 5-7us -> notSyncGoodSamplesScore=1
+    const float sync5usGoodSamplesWeight = GetWeightOfIntervalsWithLength(
+        syncIntervalsCalculator.m_syncSequenceLengthHistogram,
+        5, 7);        
+    const float sync5usGoodSamplesScore = sync5usGoodSamplesWeight / 0.6f;
+
+    m_isVideo = 0.0f;
+    m_isVideo += std::max(-1.0f,std::min(1.0f, notSync60usGoodSamplesScore)) * 0.7f;//70% decision weight from 60us not-sync sequences
+    m_isVideo += std::max(-1.0f,std::min(1.0f, sync5usGoodSamplesScore)) * 0.2f;//20% decision weight from 5us sync sequences
+    m_isVideo += std::max(-1.0f,std::min(1.0f, notSync5usGoodSamplesScore)) * 0.05f;//5% decision weight from 5us sync sequences
+    m_isVideo += std::max(-1.0f,std::min(1.0f, notSync30usGoodSamplesScore)) * 0.05f;//5% decision weight from 5us sync sequences
 }
 
 float VideoScore::GetWeightOfIntervalsWithLength(const SyncIntervalsCalculator::HistogramType &histogram,
      const size_t minIntervalLengthUs, const size_t maxIntervalLengthUs) const
 {
-    const size_t samplesMin = UsToSamples(k_notSyncIntervalGoodUs - k_notSyncIntervalGoodDeviationUs);
-    const size_t samplesMax = UsToSamples(k_notSyncIntervalGoodUs + k_notSyncIntervalGoodDeviationUs);
+    const size_t samplesMin = UsToSamples(minIntervalLengthUs);
+    const size_t samplesMax = UsToSamples(maxIntervalLengthUs);
 
     assert(samplesMin >= histogram.m_binsRange.first);
     assert(samplesMax <= histogram.m_binsRange.second);

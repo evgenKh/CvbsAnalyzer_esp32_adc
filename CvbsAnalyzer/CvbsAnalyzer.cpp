@@ -1,5 +1,5 @@
 #include "CvbsAnalyzer.h"
-
+#include <math.h>
 
 #if CVBS_ANALYZER_PROFILER
 #   define TO_STR(x) #x
@@ -187,26 +187,30 @@ CvbsAnalyzerState CvbsAnalyzer::AnalyzePin(int gpioPin, bool invertData)
     SetState(CvbsAnalyzerState::k_amplitudeSampling);
 
     size_t samplesRead = 0;    
-
-    for (int run = 0; run < k_maxDmaReadsPerAnalyzePin; run++)
+    
+    int run;
+    for (run = 0; run < k_maxDmaReadsPerAnalyzePin; run++)
     {
         size_t bytesRead = m_fastAdc.ReadSamplesBlockingTo(buf, sizeof(buf));
         samplesRead = bytesRead / sizeof(uint16_t);
         m_samplesReadTotal += samplesRead;
 
-        if (samplesRead == 0)
+        if (samplesRead < 100)
+        {            
+            CVBS_ANALYZER_LOG("Little amount of samples read from FastADC, run %d, samplesRead=%d!\n", run, (int)gpioPin, samplesRead);
             continue;
+        }
 
         PreProcessBuf(buf, samplesRead, m_invertDataCurrentValue, k_adcDataStrideSamples);
 
         if(k_printRawAdcData)
         {
-            CVBS_ANALYZER_LOG("Printing %d samples from run #%d ----\n", samplesRead, run);
+            CVBS_ANALYZER_LOG_INFO("Printing %d samples from run #%d ----\n", samplesRead, run);
             for (int i = 0; i < samplesRead; i+=k_adcDataStrideSamples)
             {
-                CVBS_ANALYZER_LOG("%d\n", buf[i]);
+                CVBS_ANALYZER_LOG_INFO("%d,", buf[i]);
             }
-            CVBS_ANALYZER_LOG("%d samples printed.(run %d) ----\n", samplesRead);
+            CVBS_ANALYZER_LOG_INFO("%d samples printed.(run %d) ----\n", samplesRead);
         }
 
         //handling non-error states
@@ -290,6 +294,14 @@ CvbsAnalyzerState CvbsAnalyzer::AnalyzePin(int gpioPin, bool invertData)
     {
         SetState(CvbsAnalyzerState::k_failedSampling);
     }
+    if(m_syncIntervalsCalculator.GetState() != SyncIntervalsCalculatorState::k_finished)
+    {
+        CVBS_ANALYZER_LOG("SyncIntervalsCalculator in state %d, not finished! m_samplesProcessed=%d, run=%d\n",
+             (int)m_syncIntervalsCalculator.GetState(),
+            m_syncIntervalsCalculator.GetSamplesProcessed(),
+        run);
+        SetState(CvbsAnalyzerState::k_failedSyncIntervals);
+    }
 
     if(m_state == CvbsAnalyzerState::k_videoScoreCalculation || IsInErrorState())
     {
@@ -340,13 +352,16 @@ CvbsAnalyzerState CvbsAnalyzer::AnalyzePin(int gpioPin, bool invertData)
     }
 
     //PrintJson();
-    PrintCsv();
+    if(k_printCsvLearningData)
+    {
+        PrintCsv();
+    }
+    if(k_printVideoScore)
+    {
+        CVBS_ANALYZER_LOG_INFO("VideoScore: isVideo=%f\n",  m_videoScore.m_isVideo);
+    }
 
-    //CVBS_ANALYZER_LOG("Printing last page of %d samples ----------------\n", samplesRead);
-    //for (int i = 0; i < samplesRead; i+=k_adcDataStrideSamples)
-    //{
-    //    CVBS_ANALYZER_LOG("%d\n", buf[i]);
-    //}
+
     return m_state;
 }
 
@@ -410,6 +425,10 @@ void CvbsAnalyzer::PrintCsv()
         for(int i=0; i<m_syncIntervalsCalculator.m_notSyncSequenceLengthHistogram.size();i++)
             CVBS_ANALYZER_LOG_INFO("N%d,", m_syncIntervalsCalculator.m_notSyncSequenceLengthHistogram.GetBinCenter(i));
         
+        for(int i = 0; i < m_amplitudeCaclulator.m_amplitudeHistogram.size();i++)
+        {
+            CVBS_ANALYZER_LOG_INFO("m_amplitudeHistogram.%d,", i);
+        }
         
 #if CVBS_ANALYZER_PROFILER
         for(auto& pair: m_stateProfilers)
@@ -417,6 +436,7 @@ void CvbsAnalyzer::PrintCsv()
             CVBS_ANALYZER_LOG_INFO("m_stateProfilers.%s,", pair.second.m_name);
         }
 #endif // CVBS_ANALYZER_PROFILER
+
         CVBS_ANALYZER_LOG_INFO("\n");
         headerPrinted = true;
     }
@@ -435,7 +455,7 @@ void CvbsAnalyzer::PrintCsv()
         (int)m_syncIntervalsCalculator.m_syncSequenceLengthHistogram.GetSamplesCount());
     for(int i=0; i<m_syncIntervalsCalculator.m_syncSequenceLengthHistogram.size();i++)
     {
-        const float samplesCountF = std::max(1u, m_syncIntervalsCalculator.m_syncSequenceLengthHistogram.GetSamplesCount());
+        const float samplesCountF = std::max((uint32_t)1u, m_syncIntervalsCalculator.m_syncSequenceLengthHistogram.GetSamplesCount());
         const float binWeight = m_syncIntervalsCalculator.m_syncSequenceLengthHistogram[i] / samplesCountF;
         CVBS_ANALYZER_LOG_INFO("%f,", binWeight);
         //CVBS_ANALYZER_LOG_INFO("%d,", (int)m_syncIntervalsCalculator.m_syncSequenceLengthHistogram[i]);
@@ -449,12 +469,17 @@ void CvbsAnalyzer::PrintCsv()
 
     for(int i=0; i<m_syncIntervalsCalculator.m_notSyncSequenceLengthHistogram.size();i++)
     {
-        const float samplesCountF = std::max(1u, m_syncIntervalsCalculator.m_notSyncSequenceLengthHistogram.GetSamplesCount());
+        const float samplesCountF = std::max((uint32_t)1u, m_syncIntervalsCalculator.m_notSyncSequenceLengthHistogram.GetSamplesCount());
         const float binWeight = m_syncIntervalsCalculator.m_notSyncSequenceLengthHistogram[i] / samplesCountF;
         CVBS_ANALYZER_LOG_INFO("%f,", binWeight);
         //CVBS_ANALYZER_LOG_INFO("%d,", (int)m_syncIntervalsCalculator.m_notSyncSequenceLengthHistogram[i]);
     }
 
+    const float amplitudeHistogramDivider = std::max((uint32_t)1u, m_amplitudeCaclulator.m_amplitudeHistogram.GetSamplesCount());
+    for(int i = 0; i < m_amplitudeCaclulator.m_amplitudeHistogram.size();i++)
+    {
+        CVBS_ANALYZER_LOG_INFO("%f,", (float)m_amplitudeCaclulator.m_amplitudeHistogram[i]/amplitudeHistogramDivider);
+    }
     
 #if CVBS_ANALYZER_PROFILER
     for(auto& pair: m_stateProfilers)

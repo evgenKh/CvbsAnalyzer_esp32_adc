@@ -32,8 +32,6 @@ private:
     float GetWeightOfIntervalsWithLength(const SyncIntervalsCalculator::HistogramType &histogram,
                                          const size_t minIntervalLengthUs, const size_t maxIntervalLengthUs) const;
                                         
-    constexpr static size_t k_notSyncIntervalGoodUs = 60;
-    constexpr static size_t k_notSyncIntervalGoodDeviationUs = 3;//57-63us
 };
 
 #endif // VideoScore_H

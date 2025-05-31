@@ -29,6 +29,7 @@ public:
     SyncIntervalsCalculatorState PushSamples(const uint16_t *newData, size_t newDataLen, int16_t syncTreshold, size_t dataStrideSamples);
     inline SyncIntervalsCalculatorState GetState() const { return m_state; }
     inline bool IsInErrorState() const { return ((signed char)m_state < 0); }
+    inline size_t GetSamplesProcessed() const { return m_samplesProcessed; }
 
     void Print() const;
 
