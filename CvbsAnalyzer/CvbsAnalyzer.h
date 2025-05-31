@@ -64,7 +64,8 @@ class CvbsAnalyzer
 
     CvbsAnalyzerState InitializeFastADC();
     CvbsAnalyzerState DeinitializeFastADC();
-    CvbsAnalyzerState AnalyzePin(int gpioPin);
+    CvbsAnalyzerState AnalyzePin(int gpioPin, bool invertData);
+
     inline CvbsAnalyzerState GetState() const { return m_state; }
     inline bool IsInErrorState() const { return ((signed char)m_state < 0); }
     void PrintJson();
@@ -75,6 +76,7 @@ class CvbsAnalyzer
     {
         if(m_state != state)
         {
+            CVBS_ANALYZER_LOG_DEBUG("CvbsAnalyzer state changed from %d to %d\n", (int)m_state, (int)state);
 #if CVBS_ANALYZER_PROFILER
             m_stateProfilers[m_state].Stop();
 #endif
@@ -95,6 +97,11 @@ class CvbsAnalyzer
     constexpr static size_t k_maxDmaReadsPerAnalyzePin = 8;//k_dmaBufsCount;//Each has timeout of k_dmaReadTimeoutMs and size of k_dmaBufLenSamples
     constexpr static bool k_syncIntervalsCalculatorConsumeMaxDmaReads = true; 
     constexpr static bool k_printRawAdcData = false; //May add delays!
+
+    bool m_invertDataCurrentValue;
+    size_t m_samplesReadTotal = 0;
+    uint16_t buf[k_dmaBufLenSamples];//align to 4 bytes!
+
 };
 
 #endif // CvbsAnalyzer_H

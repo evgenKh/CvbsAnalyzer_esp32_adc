@@ -126,15 +126,20 @@ void PreProcessBuf(uint16_t* samples, size_t samplesCount, bool invertData, size
     }
 }
 
-CvbsAnalyzerState CvbsAnalyzer::AnalyzePin(int gpioPin)
+CvbsAnalyzerState CvbsAnalyzer::AnalyzePin(int gpioPin, bool invertData)
 {
     if (m_state != CvbsAnalyzerState::k_initializedAndIdle && m_state != CvbsAnalyzerState::k_finished)
     {
         return SetState(CvbsAnalyzerState::k_failedBadState);
     }
 
+    //Reset state vars and members
     m_amplitudeCaclulator.Reset();
     m_syncIntervalsCalculator.Reset();
+    m_samplesReadTotal = 0;
+
+    const bool invertByHardware = false;
+    m_invertDataCurrentValue = invertData;//Will use software
 
 #if CVBS_ANALYZER_PROFILER
     for(auto& pair: m_stateProfilers)
@@ -144,11 +149,9 @@ CvbsAnalyzerState CvbsAnalyzer::AnalyzePin(int gpioPin)
     }
 #endif // CVBS_ANALYZER_PROFILER
 
-    bool invertByHardware = false;
-    bool invertBySoftware = false;
 
     CVBS_ANALYZER_LOG("Starting AnalyzePin for gpioPin %d, invertByHardware=%d, invertBySoftware=%d...\n", 
-                                    (int)gpioPin, (invertByHardware ? 1 : 0), (invertBySoftware ? 1 : 0));
+                                    (int)gpioPin, (invertByHardware ? 1 : 0), (m_invertDataCurrentValue ? 1 : 0));
     
 #if CVBS_ANALYZER_PROFILER
     m_stateProfilers[CvbsAnalyzerState::k_totalAnalyzeTime].Start();
@@ -163,20 +166,18 @@ CvbsAnalyzerState CvbsAnalyzer::AnalyzePin(int gpioPin)
 
     SetState(CvbsAnalyzerState::k_amplitudeSampling);
 
-    static uint16_t buf[k_dmaBufLenSamples];//align to 4 bytes!
-    size_t samplesRead = 0;
-    size_t samplesReadTotal = 0;
+    size_t samplesRead = 0;    
 
     for (int run = 0; run < k_maxDmaReadsPerAnalyzePin; run++)
     {
         size_t bytesRead = m_fastAdc.ReadSamplesBlockingTo(buf, sizeof(buf));
         samplesRead = bytesRead / sizeof(uint16_t);
-        samplesReadTotal += samplesRead;
+        m_samplesReadTotal += samplesRead;
 
         if (samplesRead == 0)
             continue;
 
-        PreProcessBuf(buf, samplesRead, invertBySoftware, k_adcDataStrideSamples);
+        PreProcessBuf(buf, samplesRead, m_invertDataCurrentValue, k_adcDataStrideSamples);
 
         if(k_printRawAdcData)
         {
@@ -244,6 +245,7 @@ CvbsAnalyzerState CvbsAnalyzer::AnalyzePin(int gpioPin)
 
         if(m_state == CvbsAnalyzerState::k_syncIntervalsCalculation)
         {
+            //Maybe some fails are ok?
             assert(m_syncIntervalsCalculator.GetState() == SyncIntervalsCalculatorState::k_finished);
             if(k_syncIntervalsCalculatorConsumeMaxDmaReads && run < k_maxDmaReadsPerAnalyzePin-1)
             {
@@ -254,52 +256,55 @@ CvbsAnalyzerState CvbsAnalyzer::AnalyzePin(int gpioPin)
             SetState(CvbsAnalyzerState::k_videoScoreCalculation);
         } // CvbsAnalyzerState::k_syncIntervalsCalculation
 
-        if(m_state == CvbsAnalyzerState::k_videoScoreCalculation)
-        {
-            assert(m_syncIntervalsCalculator.GetState() == SyncIntervalsCalculatorState::k_finished);
-            //TODO:
-            bool shouldTryInverted = false;
-            if(shouldTryInverted)
-            {
-                SetState(CvbsAnalyzerState::k_restartInverted);
-            }else{
-                SetState(CvbsAnalyzerState::k_stopADC);
-            }
-            //TODO: handle score errors
-        } // CvbsAnalyzerState::k_videoScoreCalculation
-
-        if(m_state == CvbsAnalyzerState::k_restartInverted)
-        {
-            //TODO:
-        } // CvbsAnalyzerState::k_restartInverted
-
-        if(m_state == CvbsAnalyzerState::k_stopADC)
-        {
-            //Will do it out of cycle.
-            break;
-        } // CvbsAnalyzerState::k_stopADC
-
-        //Error states handling
-        if(IsInErrorState())
-        {
-            CVBS_ANALYZER_LOG("CvbsAnalyzer in error state %d\n", (int)m_state);
-            break;
+        //All other states to be processed outside of loop
+        if(m_state == CvbsAnalyzerState::k_videoScoreCalculation || IsInErrorState()){
+                break;
         }
+        assert(m_state != CvbsAnalyzerState::k_stopADC &&
+               m_state != CvbsAnalyzerState::k_finished &&
+               m_state != CvbsAnalyzerState::k_restartInverted &&
+               m_state != CvbsAnalyzerState::k_stopADC);
     } // for
 
-    if(!samplesReadTotal)
+    if(!m_samplesReadTotal)
     {
         SetState(CvbsAnalyzerState::k_failedSampling);
     }
 
-    //Stop ADC unconditionally from any state.
-    fastAdcState = m_fastAdc.StopADCSampling();
+    if(m_state == CvbsAnalyzerState::k_videoScoreCalculation || IsInErrorState())
+    {
+        //We still can score the failure as valid no-video result.
+
+        //TODO: score logic        
+        
+        bool shouldTryFlipInvertFlag = true;   //TODO: more logic to skip invert if no sense to do it?
+
+        if(shouldTryFlipInvertFlag){
+            SetState(CvbsAnalyzerState::k_restartInverted);
+        }else{
+            SetState(CvbsAnalyzerState::k_stopADC);
+        }
+    } // CvbsAnalyzerState::k_videoScoreCalculation
+
+    if(m_state == CvbsAnalyzerState::k_restartInverted)
+    {
+        //No! do it outside of CvbsAlalyzer state machine.
+        //Use this state just to request restart from outside.Maybe without stipping ADC.
+        //TODO:Save results of non-inverted analysis
+
+    } // CvbsAnalyzerState::k_restartInverted
+
+    //if(m_state == CvbsAnalyzerState::k_stopADC)
+    {
+        //Stop ADC unconditionally from any state. Except k_restartInverted ??
+        fastAdcState = m_fastAdc.StopADCSampling();
+    } // CvbsAnalyzerState::k_stopADC
 
 #if CVBS_ANALYZER_PROFILER
     m_stateProfilers[CvbsAnalyzerState::k_totalAnalyzeTime].Stop();
 #endif // CVBS_ANALYZER_PROFILER    
 
-    CVBS_ANALYZER_LOG("Stopping ADC sampling for gpioPin %d, samplesReadTotal = %d, CvbsAnalyzerState = %d\n", 
+    CVBS_ANALYZER_LOG("Stopped ADC sampling for gpioPin %d, samplesReadTotal = %d, CvbsAnalyzerState = %d\n", 
                       (int)gpioPin, (int)samplesReadTotal, (int)m_state);
 
     if (fastAdcState == FastADCState::k_initializedAdcStopped)
@@ -327,7 +332,9 @@ void CvbsAnalyzer::PrintJson()
 {
     CVBS_ANALYZER_LOG("{\n");
     CVBS_ANALYZER_LOG("\"CvbsAnalyzer\": {\n");
-    CVBS_ANALYZER_LOG("\t\"state\": %d,\n", (int)m_state);
+    CVBS_ANALYZER_LOG("\t\"m_invertDataCurrentValue\": %d,\n", m_invertDataCurrentValue ? 1 : 0);
+    CVBS_ANALYZER_LOG("\t\"m_state\": %d,\n", (int)m_state);
+    CVBS_ANALYZER_LOG("\t\"m_samplesReadTotal\": %d,\n", m_samplesReadTotal);
     CVBS_ANALYZER_LOG("\t\"k_sampleRate\": %d,\n", k_sampleRate);
     CVBS_ANALYZER_LOG("\t\"k_sampleRateWithSkippedOversamples\": %d,\n", k_sampleRateWithSkippedOversamples);
     CVBS_ANALYZER_LOG("\t\"k_adcDataStrideSamples\": %d,\n", k_adcDataStrideSamples);
@@ -357,7 +364,10 @@ void CvbsAnalyzer::PrintCsv()
     static bool headerPrinted = false;
     if(!headerPrinted)
     {
-        CVBS_ANALYZER_LOG_INFO("_Comment,_IsVideo,CvbsAnalyzerState,\
+        CVBS_ANALYZER_LOG_INFO("_Comment,_IsVideo,\
+            m_invertDataCurrentValue,\
+            CvbsAnalyzerState,\
+            m_samplesReadTotal,\
             k_sampleRate,\
             m_syncTreshold,\
             m_syncSequenceLengthHistogram.m_binsRange.min,\
@@ -380,8 +390,10 @@ void CvbsAnalyzer::PrintCsv()
         headerPrinted = true;
     }
 
-    CVBS_ANALYZER_LOG_INFO(",,%d,%d,%d,%d,%d,%d,%d,,", 
+    CVBS_ANALYZER_LOG_INFO(",,%d,%d,%d,%d,%d,%d,%d,%d,%d,,",
+        m_invertDataCurrentValue ? 1 : 0, 
         (int)m_state, 
+        (int)m_samplesReadTotal,
         (int)k_sampleRate, 
         (int)m_amplitudeCaclulator.m_syncTreshold,
         (int)m_syncIntervalsCalculator.m_syncSequenceLengthHistogram.m_binsRange.first,

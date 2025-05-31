@@ -19,16 +19,14 @@ SyncIntervalsCalculatorState SyncIntervalsCalculator::PushSamples(const uint16_t
                                                                     int16_t syncTreshold,
                                                                     size_t dataStrideSamples )
 {
-    //Due to ADC hacks and calling zeroDma after ADC start, some datasets may have many zero samples at start.    
+    //Due to ADC hacks and calling zeroDma after ADC start, some datasets may have many zero samples at start.  
+    //Move it outside of this class.  
     size_t firstNonZeroSampleIndex = 0;
     if(k_skipLeadingZeroSamples)
     {
         for(firstNonZeroSampleIndex = 0; firstNonZeroSampleIndex < newDataLen; )
         {
-            if(newData[firstNonZeroSampleIndex]!= 0)
-            {
-                break;
-            }
+            if(newData[firstNonZeroSampleIndex]!= 0 && newData[firstNonZeroSampleIndex] != 4095) break;
             firstNonZeroSampleIndex += dataStrideSamples;
         }
     }

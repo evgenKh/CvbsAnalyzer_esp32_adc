@@ -23,7 +23,7 @@ void loop()
 {
   static int loopNum = 0;
   CVBS_ANALYZER_LOG("Running loop # %d.\n", loopNum);
-  CvbsAnalyzerState state = g_cvbsAnalyzer.AnalyzePin(k_gpioPin);
+  CvbsAnalyzerState state = g_cvbsAnalyzer.AnalyzePin(k_gpioPin, false);
   CVBS_ANALYZER_LOG("CvbsAnalyzer finished with state %d.\n", (int)state);
 
   delay(1000);

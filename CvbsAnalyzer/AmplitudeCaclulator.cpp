@@ -22,15 +22,13 @@ void AmplitudeCaclulator::Reset()
 AmplitudeCaclulatorState AmplitudeCaclulator::PushSamples(const uint16_t *newData, size_t newDataLen, size_t dataStrideSamples)
 {
     //Due to ADC hacks and calling zeroDma after ADC start, some datasets may have many zero samples at start.    
+    //TODO: also clean 4095. And move it outside of this class.
     size_t firstNonZeroSampleIndex = 0;
     if(k_skipLeadingZeroSamples)
     {
         for(firstNonZeroSampleIndex = 0; firstNonZeroSampleIndex < newDataLen; )
         {
-            if(newData[firstNonZeroSampleIndex]!= 0)
-            {
-                break;
-            }
+            if(newData[firstNonZeroSampleIndex]!= 0 && newData[firstNonZeroSampleIndex] != 4095) break;
             firstNonZeroSampleIndex += dataStrideSamples;
         }
     }
