@@ -1,6 +1,11 @@
 #ifndef FastADC_H
 #define FastADC_H
 
+
+#if USE_FAST_ADC_CONTINUOUS
+#   include "FastAdcContinuous.h"
+#else
+
 #define ADC_DISABLE_HAL
 #define ADC_DISABLE_NEW_DRIVER
 
@@ -99,5 +104,7 @@ class FastADC
 #endif
 
 };
+
+#endif // USE_FAST_ADC_CONTINUOUS
 
 #endif // FastADC_H

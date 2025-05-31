@@ -2,13 +2,18 @@
 #define CvbsAnalyzerGlobals_H
 #include "Arduino.h"
 
+
 #define CVBS_ANALYZER_LOG_INFO(...) Serial.printf(__VA_ARGS__);
 //#define CVBS_ANALYZER_LOG_INFO(...)
-//#define CVBS_ANALYZER_LOG_DEBUG(...) Serial.printf(__VA_ARGS__);
-#define CVBS_ANALYZER_LOG_DEBUG(...)
+#define CVBS_ANALYZER_LOG_DEBUG(...) Serial.printf(__VA_ARGS__);
+//#define CVBS_ANALYZER_LOG_DEBUG(...)
 #define CVBS_ANALYZER_LOG(...) CVBS_ANALYZER_LOG_DEBUG(__VA_ARGS__);
 
 #define CVBS_ANALYZER_PROFILER 1
+
+#if !PLATFORMIO
+#   define USE_FAST_ADC_CONTINUOUS 1
+#endif
 
 #define FAST_ADC_2Mhz 0
 #define FAST_ADC_1Mhz 1

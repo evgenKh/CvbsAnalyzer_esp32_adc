@@ -1,4 +1,7 @@
 #include "FastADC.h"
+
+#if !USE_FAST_ADC_CONTINUOUS
+
 #include <map>
 #include "hal/adc_ll.h"
 #include "hal/adc_types.h"
@@ -276,3 +279,5 @@ size_t FastADC::ReadSamplesBlockingTo(uint16_t *outBuf, size_t bufSizeBytes)
         }
     return bytes_read;
 }
+
+#endif // !USE_FAST_ADC_CONTINUOUS
