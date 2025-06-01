@@ -1,6 +1,6 @@
 #include "FastADC.h"
 #include "CvbsAnalyzerGlobals.h"
-#include "core_version.h"
+#include "esp_arduino_version.h"
 
 #if !USE_FAST_ADC_CONTINUOUS
 
@@ -44,25 +44,22 @@ const std::map<int8_t, adc1_channel_t> k_gpioToAdc1Channel = {
     static constexpr adc_unit_t k_adcLowLevelUnit = ADC_UNIT_1;// =0 in pltformio, in arduinoIDE use adc_unit_t instead adc_ll_num_t!    
 #endif
 
-#if defined(ARDUINO_ESP32_RELEASE_2_0_17)
-    //nothing
-#elif defined(ARDUINO_ESP32_RELEASE_3_0_0)
+    void FastADC::SetClkDiv(uint16_t integer, uint16_t denominator, uint16_t numerator)
+    {
+#if (ESP_ARDUINO_VERSION_MAJOR <= 2 && ESP_ARDUINO_VERSION_PATCH <= 17)
+    //2.0.17        
+    i2s_ll_mclk_div_t i2sLowLevelClkConfig{ .mclk_div = integer, .a = denominator, .b = numerator };
+    i2s_ll_rx_set_clk(&I2S0, &i2sLowLevelClkConfig);//Fmclk = Fsclk /(mclk_div+b/a)
 
-    static inline void i2s_ll_rx_set_clk(i2s_dev_t *hw, i2s_ll_mclk_div_t *set){
-        i2s_ll_rx_set_mclk(hw, set);
-    }
-#else // newer versions
-
-    typedef struct {
-        uint16_t mclk_div; // I2S module clock devider, Fmclk = Fsclk /(mclk_div+b/a)
-        uint16_t a;
-        uint16_t b;        // The decimal part of module clock devider, the decimal is: b/a
-    } i2s_ll_mclk_div_t;
-
-    static inline void i2s_ll_rx_set_clk(i2s_dev_t *hw, i2s_ll_mclk_div_t *set){
-        i2s_ll_set_raw_mclk_div(hw, set->mclk_div, set->a, set->b);
-    }
+#elif (ESP_ARDUINO_VERSION_MAJOR <= 3 && ESP_ARDUINO_VERSION_MINOR <= 0 && ESP_ARDUINO_VERSION_PATCH <= 0)
+    //3.0.0
+    i2s_ll_mclk_div_t i2sLowLevelClkConfig{ .mclk_div = integer, .a = denominator, .b = numerator };
+    i2s_ll_rx_set_mclk(&I2S0, set);
+#else 
+    // newer versions
+    i2s_ll_set_raw_mclk_div(&I2S0, integer, denominator, numerator);
 #endif 
+    }
 
 
 FastADC::FastADC()
@@ -146,12 +143,8 @@ FastADCState FastADC::StartADCSampling(int8_t gpioPin, bool invertData)
     
     m_adcPreviousDataInvertEnabled = SYSCON.saradc_ctrl2.sar1_inv;//Save previous value asap
 
-    i2s_ll_mclk_div_t i2sLowLevelClkConfig_5{
-        5,// I2S module clock devider, Fmclk = Fsclk /(mclk_div+b/a)
-        1,
-        0
-    };
-    i2s_ll_rx_set_clk(&I2S0, &i2sLowLevelClkConfig_5);//Doing this to set'a' to 1 early.
+    SetClkDiv(5, 1, 0);//Doing this to set'a' to 1 early.
+
     i2s_ll_rx_force_enable_fifo_mod(&I2S0, false);//Was true on old versions of Arduino, but false on newer ones.
     adc_ll_digi_set_data_source(false);//initial value of .data_to_i2s was 0 in pltformio, but becomes 1 later anyway.
 
@@ -211,7 +204,7 @@ FastADCState FastADC::StartADCSampling(int8_t gpioPin, bool invertData)
     adc_digi_pattern_config_t adcDigiPattern{
         .atten = k_adcAttenuation,
         .channel = m_adcChannel,
-        .unit = 1,
+        .unit = 1,// 0 or 1 ??????????????
         .bit_width = k_adcWidthBits,
     };
 
@@ -228,12 +221,8 @@ FastADCState FastADC::StartADCSampling(int8_t gpioPin, bool invertData)
     // sampling rate 2Msps setting
     // see https://esp32.com/viewtopic.php?t=1988
 
-    i2s_ll_mclk_div_t i2sLowLevelClkConfig_20{
-        k_i2sMclkDiv,// I2S module clock devider, Fmclk = Fsclk /(mclk_div+b/a)
-        1,//a
-        0//b
-    };
-    i2s_ll_rx_set_clk(&I2S0, &i2sLowLevelClkConfig_20);
+    
+    SetClkDiv(k_i2sMclkDiv, 1, 0);// I2S module clock devider, Fmclk = Fsclk /(mclk_div+b/a)
     
     i2s_ll_rx_set_bck_div_num(&I2S0, k_i2sRxBckDiv);//Bit clock configuration bits. if data_bits == 8 { 2 } else { 1 };
     if(k_printRegisters)

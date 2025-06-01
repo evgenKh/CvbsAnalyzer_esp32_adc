@@ -66,6 +66,8 @@ class FastADC
 
 
     private:
+    void SetClkDiv(uint16_t integer, uint16_t denominator, uint16_t numerator);
+
     FastADCState m_state = FastADCState::k_notInitialized;
     //int8_t m_gpioPin = -1;
     adc1_channel_t m_adcChannel = adc1_channel_t::ADC1_CHANNEL_MAX;
