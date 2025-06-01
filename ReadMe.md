@@ -8,9 +8,8 @@
         - Contains Arduino support - v2.0.17 (based on IDF v4.4.7)
         - Contains ESP-IDF support(without arduino) - v5.4.0
 - Arduino IDE 2.3.6
-    - **не працює, результати рандомні** новий драйвер adc_continuous (файли FastADCContinuous.cpp/h)
-    - **не працює, результати рандомні** esp32 3.2.0 , 3.0.0
-	- працює якщо в arduino IDE завантажений пакет esp версії **2.0.17** і в ньому руками заглушен варнінг збірки в \AppData\Local\Arduino15\packages\esp32\hardware\esp32\2.0.17\tools\sdk\esp32\include\hal\esp32\include\hal\i2s_ll.h:766
+    - esp-Arduino 3.0.0-3.2.0 **працює, але не ідеально - плутається інфа з різних ADC каналів** новий драйвер adc_continuous (файли FastADCContinuous.cpp/h)
+	- також працює в не-continuous режимі якщо в arduino IDE завантажений пакет esp версії **2.0.17** і в ньому руками заглушен варнінг збірки в \AppData\Local\Arduino15\packages\esp32\hardware\esp32\2.0.17\tools\sdk\esp32\include\hal\esp32\include\hal\i2s_ll.h:766
 		
 		![arduino_esp32_v2.0.17.png](arduino_esp32_v2.0.17.png)	
 		
@@ -92,37 +91,40 @@ m_stateProfilers.k_totalAnalyzeTime	13339us
     Reading pin 36 Inverted: VideoScore: isVideo=0.000000
 	```
 
-- Зібрано в Arduino IDE з пакетом esp32 3.0.0 - 3.2.0 ,без використання FastADCContinuous. Тобто налаштування ідентичні як для platformio. Можна бачити що результат нестабільний.
+- Зібрано в Arduino IDE з пакетом esp32 3.0.0 - 3.2.0,з FastADCContinuous. Відео лише на 36 піні, але проргама чомусь зчитає то з одного, то з іншого.
 
-    ```Reading pin 35		: VideoScore: isVideo=0.053079
-    Reading pin 35 Inverted: VideoScore: isVideo=0.000000
-    Reading pin 36		: VideoScore: isVideo=0.000000
-    Reading pin 36 Inverted: VideoScore: isVideo=0.000000
+    ```
+	Reading pin 35          : VideoScore: isVideo=0.700000
+	Reading pin 35 Inverted: VideoScore: isVideo=0.000000
+	Reading pin 36          : VideoScore: isVideo=0.000000
+	Reading pin 36 Inverted: VideoScore: isVideo=0.000000
 
-    Reading pin 35		: VideoScore: isVideo=0.000000
-    Reading pin 35 Inverted: VideoScore: isVideo=0.085565
-    Reading pin 36		: VideoScore: isVideo=0.000000
-    Reading pin 36 Inverted: VideoScore: isVideo=0.000000
+	Reading pin 35          : VideoScore: isVideo=0.000000
+	Reading pin 35 Inverted: VideoScore: isVideo=0.000000
+	Reading pin 36          : VideoScore: isVideo=0.904630
+	Reading pin 36 Inverted: VideoScore: isVideo=0.050000
 
-    Reading pin 35		: VideoScore: isVideo=0.000000
-    Reading pin 35 Inverted: VideoScore: isVideo=0.000000
-    Reading pin 36		: VideoScore: isVideo=0.000000
-    Reading pin 36 Inverted: VideoScore: isVideo=0.000000
+	Reading pin 35          : VideoScore: isVideo=0.000000
+	Reading pin 35 Inverted: VideoScore: isVideo=0.000000
+	Reading pin 36          : VideoScore: isVideo=0.000000
+	Reading pin 36 Inverted: VideoScore: isVideo=0.050000
 
-    Reading pin 35		: VideoScore: isVideo=0.944355
-    Reading pin 35 Inverted: VideoScore: isVideo=0.043196
-    Reading pin 36		: VideoScore: isVideo=0.000000
-    Reading pin 36 Inverted: VideoScore: isVideo=0.000000
+	Reading pin 35          : VideoScore: isVideo=0.000000
+	Reading pin 35 Inverted: VideoScore: isVideo=0.000000
+	Reading pin 36          : VideoScore: isVideo=0.739552
+	Reading pin 36 Inverted: VideoScore: isVideo=0.050000
 
-    Reading pin 35		: VideoScore: isVideo=0.000000
-    Reading pin 35 Inverted: VideoScore: isVideo=0.000000
-    Reading pin 36		: VideoScore: isVideo=0.000000
-    Reading pin 36 Inverted: VideoScore: isVideo=0.000000
+	Reading pin 35          : VideoScore: isVideo=0.900000
+	Reading pin 35 Inverted: VideoScore: isVideo=0.000000
+	Reading pin 36          : VideoScore: isVideo=0.000000
+	Reading pin 36 Inverted: VideoScore: isVideo=0.000000
 
-    Reading pin 35		: VideoScore: isVideo=0.700000
-    Reading pin 35 Inverted: VideoScore: isVideo=0.020795
-    Reading pin 36		: VideoScore: isVideo=0.000000
-    Reading pin 36 Inverted: VideoScore: isVideo=0.000000
+	Reading pin 35          : VideoScore: isVideo=0.000000
+	Reading pin 35 Inverted: VideoScore: isVideo=0.000000
+	Reading pin 36          : VideoScore: isVideo=0.811111
 	```
 
-- З FastADCContinuous поки ацп зчитує зовсім сміття.
+Необроблені дані з platformio зі старим драйвером, і arduino з новим:
+
+
+![continuous_non-continuous_freq_drift.png](continuous_non-continuous_freq_drift.png)

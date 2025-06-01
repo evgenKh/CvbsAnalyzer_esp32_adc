@@ -2,11 +2,14 @@
 
 #if USE_FAST_ADC_CONTINUOUS
 #include "driver/adc.h"
+#include "driver/i2s.h"
 #include "hal/adc_hal.h"
 #include "esp32-hal-adc.h"
 #include "esp_adc/adc_continuous.h"
 #include <map>
 
+#define ADC_CONVERT_LIMIT_DISABLE do{ SYSCON.saradc_ctrl2.meas_num_limit=0; }while(false)
+#define ADC_CONVERT_LIMIT_ENABLE do{ SYSCON.saradc_ctrl2.meas_num_limit=1; }while(false)
 
 const std::map<int8_t, adc1_channel_t> k_gpioToAdc1Channel = {
     {36, ADC1_CHANNEL_0},
@@ -68,6 +71,26 @@ FastADCState FastADC::Deinitialize()
     ESP_ERROR_CHECK(adc_continuous_deinit(m_handle));
     return m_state;
 }
+
+
+void FastADC::SetClkDiv(uint16_t integer, uint16_t denominator, uint16_t numerator)
+{
+#if (ESP_ARDUINO_VERSION_MAJOR <= 2 && ESP_ARDUINO_VERSION_PATCH <= 17)
+    //2.0.17        
+    i2s_ll_mclk_div_t i2sLowLevelClkConfig{ .mclk_div = integer, .a = denominator, .b = numerator };
+    i2s_ll_rx_set_clk(&I2S0, &i2sLowLevelClkConfig);//Fmclk = Fsclk /(mclk_div+b/a)
+
+#elif (ESP_ARDUINO_VERSION_MAJOR <= 3 && ESP_ARDUINO_VERSION_MINOR <= 0 && ESP_ARDUINO_VERSION_PATCH <= 0)
+    //3.0.0
+    i2s_ll_mclk_div_t i2sLowLevelClkConfig{ .mclk_div = integer, .a = denominator, .b = numerator };
+    i2s_ll_rx_set_mclk(&I2S0, set);
+#else 
+    // newer versions
+    i2s_ll_set_raw_mclk_div(&I2S0, integer, denominator, numerator);
+#endif 
+}
+
+
 FastADCState FastADC::StartADCSampling(int8_t gpioPin, bool invertData)
 {
 
@@ -94,7 +117,7 @@ FastADCState FastADC::StartADCSampling(int8_t gpioPin, bool invertData)
         adc_pattern[i].atten = k_adcAttenuation;
         adc_pattern[i].channel = m_adcChannel & 0x7;
         adc_pattern[i].unit = k_adcUnit;
-        adc_pattern[i].bit_width = k_adcWidth;
+        adc_pattern[i].bit_width = k_adcWidthBits;
 
         ESP_LOGI(TAG, "adc_pattern[%d].atten is :%"PRIx8, i, adc_pattern[i].atten);
         ESP_LOGI(TAG, "adc_pattern[%d].channel is :%"PRIx8, i, adc_pattern[i].channel);
@@ -102,8 +125,33 @@ FastADCState FastADC::StartADCSampling(int8_t gpioPin, bool invertData)
     }
     dig_cfg.adc_pattern = adc_pattern;
     ESP_ERROR_CHECK(adc_continuous_config(m_handle, &dig_cfg));
-    ESP_ERROR_CHECK(adc_continuous_start(m_handle));
+    //ADC_CONVERT_LIMIT_DISABLE;
 
+    adc_set_data_inv(k_adcUnit, invertData);
+    adc_set_clk_div(2);
+    adc_ll_set_sample_cycle(k_adcSampleCycle);   
+    SetClkDiv(k_i2sMclkDiv, 1, 0);// I2S module clock devider, Fmclk = Fsclk /(mclk_div+b/a)
+    i2s_ll_rx_set_bck_div_num(&I2S0, k_i2sRxBckDiv);//Bit clock configuration bits. if data_bits == 8 { 2 } else { 1 };
+    adc_ll_digi_set_convert_limit_num(255);//Maybe not needed idk
+
+
+    ESP_ERROR_CHECK(adc_continuous_start(m_handle));
+    
+    adc_set_clk_div(2);
+    adc_ll_set_sample_cycle(k_adcSampleCycle);   
+    SetClkDiv(k_i2sMclkDiv, 1, 0);// I2S module clock devider, Fmclk = Fsclk /(mclk_div+b/a)
+    i2s_ll_rx_set_bck_div_num(&I2S0, k_i2sRxBckDiv);//Bit clock configuration bits. if data_bits == 8 { 2 } else { 1 };
+    adc_ll_digi_set_convert_limit_num(255);//Maybe not needed idk
+
+
+    //Settings done.
+    //Calling i2s_zero_dma_buffer to erase data that was sampled with default clock settings.
+    //esp_err_t err = i2s_zero_dma_buffer(I2S_NUM_0);
+    //if(err != ESP_OK)
+    //{
+    //    m_state = FastADCState::k_startFailedZeroDma;
+    //    return m_state;
+    //}
     m_state = FastADCState::k_adcStarted;
     return m_state;
 }

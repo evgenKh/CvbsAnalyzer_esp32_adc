@@ -50,6 +50,8 @@ class FastADC
 
 
     private:
+    void SetClkDiv(uint16_t integer, uint16_t denominator, uint16_t numerator);
+    
     FastADCState m_state = FastADCState::k_notInitialized;
     adc_continuous_handle_t m_handle = NULL;
     //int8_t m_gpioPin = -1;
@@ -62,9 +64,15 @@ class FastADC
     static constexpr adc_atten_t k_adcAttenuation = ADC_ATTEN_DB_12;
 
     static constexpr adc_bits_width_t k_adcWidth = ADC_WIDTH_BIT_12;
+    static constexpr uint8_t k_adcWidthBits = 12;
 
     static constexpr TickType_t k_dmaReadTimeoutMs = 1;
     static constexpr TickType_t k_dmaReadTimeout = k_dmaReadTimeoutMs * portTICK_PERIOD_MS; //default: portMAX_DELAY
+
+    //static constexpr uint16_t k_adcMeasNum = 255;//This was 255 on old versions of Arduino, but 10 on newer. Keep it 255
+    static constexpr uint16_t k_i2sMclkDiv = 20;// I2S module clock devider, Fmclk = Fsclk /(mclk_div+b/a)
+    static constexpr uint32_t k_adcSampleCycle = 4;//The number of ADC sampling cycles. Range: 1 ~ 7.
+    static constexpr uint16_t k_i2sRxBckDiv = 2;//Bit clock configuration bits. I don't know what this means.
 
 #if FAST_ADC_2Mhz
 

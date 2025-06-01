@@ -28,14 +28,16 @@ void loop()
   CVBS_ANALYZER_LOG_INFO("Reading pin %d\t\t: ", pin35);
   state = g_cvbsAnalyzer.AnalyzePin(pin35, false);
   delay(5);
-  //CVBS_ANALYZER_LOG_INFO("Reading pin %d Inverted: ", pin35);
-  //state = g_cvbsAnalyzer.AnalyzePin(pin35, true);
-  //delay(5);
 
-  if(false){
+  CVBS_ANALYZER_LOG_INFO("Reading pin %d Inverted: ", pin35);
+  state = g_cvbsAnalyzer.AnalyzePin(pin35, true);
+  delay(5);
+
+  if(true){
     CVBS_ANALYZER_LOG_INFO("Reading pin %d\t\t: ", pin36);
     state = g_cvbsAnalyzer.AnalyzePin(pin36, false);
     delay(5);
+
     CVBS_ANALYZER_LOG_INFO("Reading pin %d Inverted: ", pin36);
     state = g_cvbsAnalyzer.AnalyzePin(pin36, true);
     delay(5);

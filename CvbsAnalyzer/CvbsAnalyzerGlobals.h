@@ -22,7 +22,7 @@
     #define FAST_ADC_1Mhz 1
 #else
     //in newer sdk use contnuous driver
-    #define USE_FAST_ADC_CONTINUOUS 0
+    #define USE_FAST_ADC_CONTINUOUS 1
     #define FAST_ADC_2Mhz 0
     #define FAST_ADC_1Mhz 1
 #endif
