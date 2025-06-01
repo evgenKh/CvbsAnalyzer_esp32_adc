@@ -1,6 +1,6 @@
-Код для оцінки сигналу який поступає на АЦП esp32, чи є він аналоговим відео, чи ні.
+# Код для оцінки сигналу який поступає на АЦП esp32, чи є він аналоговим відео, чи ні.
 
-Підтримка версій IDE IDE:
+## Підтримка версій IDE IDE:
 - Platformio+VSCode:
     - Використовується старий драйвер ADC, ще без continuous mode, через I2S. (файли FastADC.cpp/h)
     - Platform espressif32 @ 6.10.0
@@ -10,9 +10,20 @@
 - Arduino IDE 2.3.6
     - **не працює, результати рандомні** новий драйвер adc_continuous (файли FastADCContinuous.cpp/h)
     - **не працює, результати рандомні** esp32 3.2.0 , 3.0.0
-	- працює якщо в arduino IDE завантажений пакет esp версії 2.0.17 і в ньому руками заглушен варнінг збірки в <user>\AppData\Local\Arduino15\packages\esp32\hardware\esp32\2.0.17\tools\sdk\esp32\include\hal\esp32\include\hal\i2s_ll.h:766
+	- працює якщо в arduino IDE завантажений пакет esp версії **2.0.17** і в ньому руками заглушен варнінг збірки в \AppData\Local\Arduino15\packages\esp32\hardware\esp32\2.0.17\tools\sdk\esp32\include\hal\esp32\include\hal\i2s_ll.h:766
+		
+		![arduino_esp32_v2.0.17.png](arduino_esp32_v2.0.17.png)	
+		
+		```
+		static inline void i2s_ll_rx_get_pdm_dsr(i2s_dev_t *hw, i2s_pdm_dsr_t *dsr)
+		{
+			//to silence build error
+			//*dsr = hw->pdm_conf.rx_sinc_dsr_16_en;
+			*dsr = (i2s_pdm_dsr_t)hw->pdm_conf.rx_sinc_dsr_16_en;
+		}
+		```
 
-Підключення: 
+## Підключення: 
 
 - Тільки ADC1 входи!
 
@@ -20,7 +31,7 @@
 Для цьго можна задіяти просту схему:
 ![image](Схема_підключення.png)
 
-Алгоритм:
+## Алгоритм:
 
 - З частотою 1-2МГц зчитуємо напругу з АЦП. Масивами по 400-1000 семплів.
 - в PreProcessBuf відкидаємо 4 біта з 16-бітної змінної, бо роздільна здатність АЦП 12біт. Тут же за потреби інвертуємо по формулі y=4095-x
@@ -40,9 +51,25 @@
 - В ідеалі усі ці коефіціенти мав би підбирати ШІ, але мені не вдалось його нормально задіяти, тож підібрав такі. Кожен з елементів алгоритма є state-machine, усі датасети друкуються в форматі CSV, тому мало б бути хоч всю систему повністю перетворити в нейронку.
 - Якщо будь-який з компонентів зафейлився, наприклад недостатньо семплів, не вдалось знайти порогове значення, і т.д. то оцінка доразу виставляється 0.0
 
-Приклад результату роботи
+## Швидкодія:
 
-- Зібрано platformio, на пін 35 підключено якісне не-інвертоване відео. Пін 36 висить в повітрі:
+Наразі це 12-13мс на прохід одного канала АЦП без інверсії. Тобто х2 якщо перевіряти також з інверсієй. Можна пробувати знижувати, наприклад k_minSamplesForCalculationUs, і вкластить в <10мс.
+```
+m_stateProfilers.k_amplitudeSampling	5715us
+m_stateProfilers.k_amplitudeCalculation	171us
+m_stateProfilers.k_syncIntervalsSampling	3276us
+m_stateProfilers.k_syncIntervalsCalculation	3045us
+m_stateProfilers.k_videoScoreCalculation	195us
+m_stateProfilers.k_restartInverted	0us
+m_stateProfilers.k_stopADC	1498us
+m_stateProfilers.k_finished	0us
+m_stateProfilers.k_totalAnalyzeTime	13339us
+```
+
+
+## Приклад результату роботи
+
+- Зібрано platformio(або Arduino IDE з пакетом esp32 2.0.17), на пін 35 підключено якісне не-інвертоване відео. Пін 36 висить в повітрі:
     ```
     Reading pin 35          : VideoScore: isVideo=0.807143
     Reading pin 35 Inverted: VideoScore: isVideo=0.041454
@@ -62,9 +89,10 @@
     Reading pin 35          : VideoScore: isVideo=0.700000
     Reading pin 35 Inverted: VideoScore: isVideo=0.032908
     Reading pin 36          : VideoScore: isVideo=0.000000
-    Reading pin 36 Inverted: VideoScore: isVideo=0.000000```
+    Reading pin 36 Inverted: VideoScore: isVideo=0.000000
+	```
 
-- Зібрано в Arduino IDE, **без використання FastADCContinuous**. Тобто налаштування ідентичні як для platformio. Можна бачити що результат нестабільний.
+- Зібрано в Arduino IDE з пакетом esp32 3.0.0 - 3.2.0 ,без використання FastADCContinuous. Тобто налаштування ідентичні як для platformio. Можна бачити що результат нестабільний.
 
     ```Reading pin 35		: VideoScore: isVideo=0.053079
     Reading pin 35 Inverted: VideoScore: isVideo=0.000000
@@ -94,6 +122,7 @@
     Reading pin 35		: VideoScore: isVideo=0.700000
     Reading pin 35 Inverted: VideoScore: isVideo=0.020795
     Reading pin 36		: VideoScore: isVideo=0.000000
-    Reading pin 36 Inverted: VideoScore: isVideo=0.000000```
+    Reading pin 36 Inverted: VideoScore: isVideo=0.000000
+	```
 
 - З FastADCContinuous поки ацп зчитує зовсім сміття.

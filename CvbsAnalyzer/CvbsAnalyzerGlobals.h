@@ -5,14 +5,14 @@
 
 #define CVBS_ANALYZER_LOG_INFO(...) Serial.printf(__VA_ARGS__);
 //#define CVBS_ANALYZER_LOG_INFO(...)
-//#define CVBS_ANALYZER_LOG_DEBUG(...) Serial.printf(__VA_ARGS__);
-#define CVBS_ANALYZER_LOG_DEBUG(...)
+#define CVBS_ANALYZER_LOG_DEBUG(...) Serial.printf(__VA_ARGS__);
+//#define CVBS_ANALYZER_LOG_DEBUG(...)
 #define CVBS_ANALYZER_LOG(...) CVBS_ANALYZER_LOG_DEBUG(__VA_ARGS__);
 
 #define CVBS_ANALYZER_PROFILER 1
 
 #ifndef ARDUINO_ESP32_RELEASE
-    #error Can't find esp32 core version, maybe core_version.h not included
+    #error "Can't find esp32 core version, maybe core_version.h not included"
 #endif
 
 #ifdef ARDUINO_ESP32_RELEASE_2_0_17

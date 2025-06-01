@@ -28,7 +28,7 @@ const std::map<int8_t, adc1_channel_t> k_gpioToAdc1Channel = {
 };
 
 #ifndef ARDUINO_ESP32_RELEASE
-    #error Can't find esp32 core version, maybe core_version.h not included
+    #error "Can't find esp32 core version, maybe core_version.h not included"
 #endif
 
 #define ADC_CONVERT_LIMIT_DISABLE do{ SYSCON.saradc_ctrl2.meas_num_limit=0; }while(false)

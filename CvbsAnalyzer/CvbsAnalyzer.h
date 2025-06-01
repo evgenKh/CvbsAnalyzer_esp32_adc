@@ -24,6 +24,7 @@ enum class CvbsAnalyzerState : signed char
     k_restartInverted,
     k_stopADC,
     k_finished,
+    k_totalAnalyzeTime,//not a state, just for profiling
 
     k_failedBadState = -127,
     k_failedBadFastADCState,
@@ -34,7 +35,6 @@ enum class CvbsAnalyzerState : signed char
     k_failedVideoScore,
     k_failedFastADCStop,
     k_failedUnknownError,
-    k_totalAnalyzeTime,//not a state, just for profiling
 };    
 
 #if CVBS_ANALYZER_PROFILER
