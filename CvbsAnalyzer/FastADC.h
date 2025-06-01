@@ -1,13 +1,13 @@
 #ifndef FastADC_H
 #define FastADC_H
 
+#include "Arduino.h"
+#include "CvbsAnalyzerGlobals.h"
 
 #if USE_FAST_ADC_CONTINUOUS
 #   include "FastAdcContinuous.h"
 #else
 
-#define ADC_DISABLE_HAL
-#define ADC_DISABLE_NEW_DRIVER
 
 //Uses old ADC+I2S drivers, since arduino framework in platformio is old.
 
@@ -19,11 +19,11 @@
 //  L Contains ESP-IDF support(without arduino) - v5.4.0
 
 
-#include "Arduino.h"
+#   define ADC_DISABLE_HAL
+#   define ADC_DISABLE_NEW_DRIVER
 //#include "hal/i2c_ll.h"
 //#include "hal/i2s_types.h"
 #include "driver/adc.h"
-#include "CvbsAnalyzerGlobals.h"
 
 #if !PLATFORMIO
 typedef adc_unit_t adc_ll_num_t;

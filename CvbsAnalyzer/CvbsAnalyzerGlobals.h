@@ -13,10 +13,12 @@
 
 #if !PLATFORMIO
 #   define USE_FAST_ADC_CONTINUOUS 1
+    #define FAST_ADC_2Mhz 0
+    #define FAST_ADC_1Mhz 1
+#else
+    #define FAST_ADC_2Mhz 0
+    #define FAST_ADC_1Mhz 1
 #endif
-
-#define FAST_ADC_2Mhz 0
-#define FAST_ADC_1Mhz 1
 
 #if FAST_ADC_2Mhz
     constexpr uint32_t k_i2sSampleRate = 2*1000*1000;

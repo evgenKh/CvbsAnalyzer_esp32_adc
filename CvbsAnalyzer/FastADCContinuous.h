@@ -1,13 +1,15 @@
 #ifndef FastAdcContinuous_H
 #define FastAdcContinuous_H
 
+#include "CvbsAnalyzerGlobals.h"
+
 #if USE_FAST_ADC_CONTINUOUS
 
 //Uses new driver included in ArduinoIDE
 
 #include "Arduino.h"
 #include "driver/adc.h"
-#include "CvbsAnalyzerGlobals.h"
+#include "esp_adc/adc_continuous.h"
 
 
 enum class FastADCState : signed char{
@@ -49,6 +51,7 @@ class FastADC
 
     private:
     FastADCState m_state = FastADCState::k_notInitialized;
+    adc_continuous_handle_t m_handle = NULL;
     //int8_t m_gpioPin = -1;
     adc1_channel_t m_adcChannel = adc1_channel_t::ADC1_CHANNEL_MAX;
 
