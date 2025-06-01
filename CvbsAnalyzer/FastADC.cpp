@@ -27,18 +27,19 @@ const std::map<int8_t, adc1_channel_t> k_gpioToAdc1Channel = {
     {35, ADC1_CHANNEL_7}
 };
 
-#ifndef ARDUINO_ESP32_RELEASE
-    #error "Can't find esp32 core version, maybe core_version.h not included"
+#ifndef ESP_ARDUINO_VERSION_MAJOR
+    #error "Can't find esp32 core version, maybe esp_arduino_version.h not included"
 #endif
 
 #define ADC_CONVERT_LIMIT_DISABLE do{ SYSCON.saradc_ctrl2.meas_num_limit=0; }while(false)
 #define ADC_CONVERT_LIMIT_ENABLE do{ SYSCON.saradc_ctrl2.meas_num_limit=1; }while(false)
 
-#if defined(ARDUINO_ESP32_RELEASE_2_0_17)
-    //ADC api changed a lot after 2.0.17!
+#if (ESP_ARDUINO_VERSION_MAJOR <= 2 && ESP_ARDUINO_VERSION_PATCH <= 17)
+    //2.0.17 and older
     static constexpr adc_unit_t k_adcUnit = ADC_UNIT_1;// =1 in pltformio, =0 i arduinoIDE!
     static constexpr adc_ll_num_t k_adcLowLevelUnit = ADC_NUM_1;// =0 in pltformio, in arduinoIDE use adc_unit_t instead adc_ll_num_t!
-#else // ARDUINO_ESP32_RELEASE_2_0_17
+#else 
+    //Newer
     static constexpr adc_unit_t k_adcUnit = ADC_UNIT_1;// =1 in pltformio, =0 i arduinoIDE!
     static constexpr adc_unit_t k_adcLowLevelUnit = ADC_UNIT_1;// =0 in pltformio, in arduinoIDE use adc_unit_t instead adc_ll_num_t!    
 #endif

@@ -1,25 +1,28 @@
 #ifndef CvbsAnalyzerGlobals_H
 #define CvbsAnalyzerGlobals_H
 #include "Arduino.h"
-#include "core_version.h"
+
+#include "esp_arduino_version.h"
 
 #define CVBS_ANALYZER_LOG_INFO(...) Serial.printf(__VA_ARGS__);
 //#define CVBS_ANALYZER_LOG_INFO(...)
-#define CVBS_ANALYZER_LOG_DEBUG(...) Serial.printf(__VA_ARGS__);
-//#define CVBS_ANALYZER_LOG_DEBUG(...)
+//#define CVBS_ANALYZER_LOG_DEBUG(...) Serial.printf(__VA_ARGS__);
+#define CVBS_ANALYZER_LOG_DEBUG(...)
 #define CVBS_ANALYZER_LOG(...) CVBS_ANALYZER_LOG_DEBUG(__VA_ARGS__);
 
 #define CVBS_ANALYZER_PROFILER 1
 
-#ifndef ARDUINO_ESP32_RELEASE
-    #error "Can't find esp32 core version, maybe core_version.h not included"
+#ifndef ESP_ARDUINO_VERSION_MAJOR
+    #error "Can't find esp32 core version, maybe esp_arduino_version.h not included"
 #endif
 
-#ifdef ARDUINO_ESP32_RELEASE_2_0_17
+#if (ESP_ARDUINO_VERSION_MAJOR <= 2 && ESP_ARDUINO_VERSION_PATCH <= 17)
     #define USE_FAST_ADC_CONTINUOUS 0
     #define FAST_ADC_2Mhz 0
     #define FAST_ADC_1Mhz 1
 #else
+    //in newer sdk use contnuous driver
+    #define USE_FAST_ADC_CONTINUOUS 0
     #define FAST_ADC_2Mhz 0
     #define FAST_ADC_1Mhz 1
 #endif

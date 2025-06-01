@@ -227,6 +227,7 @@ CvbsAnalyzerState CvbsAnalyzer::AnalyzePin(int gpioPin, bool invertData)
             }
             if(m_amplitudeCaclulator.IsInErrorState())
             {
+                CVBS_ANALYZER_LOG("AmplitudeCaclulator in error state %d\n", (int)m_amplitudeCaclulator.GetState());
                 SetState(CvbsAnalyzerState::k_failedAmplitude);
             }
         } // CvbsAnalyzerState::k_amplitudeSampling
@@ -241,6 +242,7 @@ CvbsAnalyzerState CvbsAnalyzer::AnalyzePin(int gpioPin, bool invertData)
             }
             if(m_amplitudeCaclulator.IsInErrorState())
             {
+                CVBS_ANALYZER_LOG("AmplitudeCaclulator in error state %d\n", (int)m_amplitudeCaclulator.GetState());
                 SetState(CvbsAnalyzerState::k_failedAmplitude);
             }
         } // CvbsAnalyzerState::k_amplitudeCalculation
