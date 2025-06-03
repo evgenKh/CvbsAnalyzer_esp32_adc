@@ -1,4 +1,7 @@
-#include "FastADCContinuous.h"
+
+#include "CvbsAnalyzerGlobals.h"
+
+#include "FastADC.h"
 
 #if USE_FAST_ADC_CONTINUOUS
 #include "driver/adc.h"
@@ -11,6 +14,7 @@
 #define ADC_CONVERT_LIMIT_DISABLE do{ SYSCON.saradc_ctrl2.meas_num_limit=0; }while(false)
 #define ADC_CONVERT_LIMIT_ENABLE do{ SYSCON.saradc_ctrl2.meas_num_limit=1; }while(false)
 
+static constexpr adc_unit_t k_adcUnit = ADC_UNIT_1;//esp32 suppors only ADC_UNIT_1
 const std::map<int8_t, adc1_channel_t> k_gpioToAdc1Channel = {
     {36, ADC1_CHANNEL_0},
     {37, ADC1_CHANNEL_1},
@@ -24,7 +28,6 @@ const std::map<int8_t, adc1_channel_t> k_gpioToAdc1Channel = {
 
 FastADC::FastADC()
 {
-
 }
 
 FastADCState FastADC::Initialize()
@@ -100,7 +103,7 @@ FastADCState FastADC::StartADCSampling(int8_t gpioPin, bool invertData)
         return m_state;
     }
     m_state = FastADCState::k_adcStarting;
-    m_adcChannel = k_gpioToAdc1Channel.at(gpioPin);
+    adc1_channel_t adcChannel = k_gpioToAdc1Channel.at(gpioPin);
 
     adc_digi_pattern_config_t adc_pattern[SOC_ADC_PATT_LEN_MAX] = {0};
     
@@ -115,7 +118,7 @@ FastADCState FastADC::StartADCSampling(int8_t gpioPin, bool invertData)
 
     for (int i = 0; i < 1; i++) {
         adc_pattern[i].atten = k_adcAttenuation;
-        adc_pattern[i].channel = m_adcChannel & 0x7;
+        adc_pattern[i].channel = adcChannel & 0x7;
         adc_pattern[i].unit = k_adcUnit;
         adc_pattern[i].bit_width = k_adcWidthBits;
 

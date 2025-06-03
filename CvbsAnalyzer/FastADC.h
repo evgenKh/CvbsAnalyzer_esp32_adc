@@ -4,9 +4,6 @@
 #include "Arduino.h"
 #include "CvbsAnalyzerGlobals.h"
 
-#if USE_FAST_ADC_CONTINUOUS
-#   include "FastAdcContinuous.h"
-#else
 
 
 //Uses old ADC+I2S drivers, since arduino framework in platformio is old.
@@ -18,11 +15,12 @@
 //  L Contains Arduino support - v2.0.17 (based on IDF v4.4.7)
 //  L Contains ESP-IDF support(without arduino) - v5.4.0
 
-#   include "hal/adc_ll.h"
-#   include "driver/adc.h"
+//#   include "hal/adc_ll.h"
+//#   include "driver/adc.h"
+#include "hal/adc_types.h" // for adc_atten_t
 
 //#pragma GCC diagnostic ignored "-fpermissive"
-#   include "driver/i2s.h"
+//#   include "driver/i2s.h"
 
 enum class FastADCState : signed char{
     k_notInitialized = 0,
@@ -43,9 +41,12 @@ enum class FastADCState : signed char{
     k_stopFailedAdcDisable,
 };
 
+struct adc_continuous_ctx_t;
+typedef struct adc_continuous_ctx_t *adc_continuous_handle_t;
+
 class FastADC
 {
-    public:
+public:
     FastADC();
 
     FastADCState Initialize();
@@ -60,18 +61,14 @@ class FastADC
 
     inline FastADCState GetState() const { return m_state; }
     inline bool IsInErrorState() const { return ((signed char)m_state < 0); }
-    adc1_channel_t GetAdcChannel() const { return m_adcChannel; }
 
     QueueHandle_t m_i2sEventQueue = nullptr;
 
-
-    private:
+private:
     void SetClkDiv(uint16_t integer, uint16_t denominator, uint16_t numerator);
 
     FastADCState m_state = FastADCState::k_notInitialized;
-    //int8_t m_gpioPin = -1;
-    adc1_channel_t m_adcChannel = adc1_channel_t::ADC1_CHANNEL_MAX;
-
+    adc_continuous_handle_t m_handle = nullptr;
     bool m_adcPreviousDataInvertEnabled;
 
     static constexpr bool k_printRegisters = false; 
@@ -85,7 +82,6 @@ class FastADC
     static constexpr TickType_t k_dmaReadTimeoutMs = 1;
     static constexpr TickType_t k_dmaReadTimeout = k_dmaReadTimeoutMs * portTICK_PERIOD_MS; //default: portMAX_DELAY
 
-    static constexpr i2s_port_t k_i2sPort = I2S_NUM_0; 
     static constexpr uint8_t k_i2sEventQueueSize = 0;
 
 #if FAST_ADC_2Mhz
@@ -108,7 +104,5 @@ class FastADC
 #endif
 
 };
-
-#endif // USE_FAST_ADC_CONTINUOUS
 
 #endif // FastADC_H

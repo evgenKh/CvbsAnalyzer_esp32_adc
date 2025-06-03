@@ -16,6 +16,21 @@
 
 //#include "hal/adc_hal_conf.h"
 
+#ifndef ESP_ARDUINO_VERSION_MAJOR
+    #error "Can't find esp32 core version, maybe esp_arduino_version.h not included"
+#endif
+
+#if (ESP_ARDUINO_VERSION_MAJOR <= 2 && ESP_ARDUINO_VERSION_PATCH <= 17)
+    //2.0.17 and older
+    static constexpr adc_unit_t k_adcUnit = ADC_UNIT_1;// =1 in pltformio, =0 i arduinoIDE!
+    static constexpr adc_ll_num_t k_adcLowLevelUnit = ADC_NUM_1;// =0 in pltformio, in arduinoIDE use adc_unit_t instead adc_ll_num_t!
+#else 
+    //Newer
+    static constexpr adc_unit_t k_adcUnit = ADC_UNIT_1;// =1 in pltformio, =0 i arduinoIDE!
+    static constexpr adc_unit_t k_adcLowLevelUnit = ADC_UNIT_1;// =0 in pltformio, in arduinoIDE use adc_unit_t instead adc_ll_num_t!    
+#endif
+    static constexpr i2s_port_t k_i2sPort = I2S_NUM_0; 
+
 const std::map<int8_t, adc1_channel_t> k_gpioToAdc1Channel = {
     {36, ADC1_CHANNEL_0},
     {37, ADC1_CHANNEL_1},
@@ -27,22 +42,10 @@ const std::map<int8_t, adc1_channel_t> k_gpioToAdc1Channel = {
     {35, ADC1_CHANNEL_7}
 };
 
-#ifndef ESP_ARDUINO_VERSION_MAJOR
-    #error "Can't find esp32 core version, maybe esp_arduino_version.h not included"
-#endif
 
 #define ADC_CONVERT_LIMIT_DISABLE do{ SYSCON.saradc_ctrl2.meas_num_limit=0; }while(false)
 #define ADC_CONVERT_LIMIT_ENABLE do{ SYSCON.saradc_ctrl2.meas_num_limit=1; }while(false)
 
-#if (ESP_ARDUINO_VERSION_MAJOR <= 2 && ESP_ARDUINO_VERSION_PATCH <= 17)
-    //2.0.17 and older
-    static constexpr adc_unit_t k_adcUnit = ADC_UNIT_1;// =1 in pltformio, =0 i arduinoIDE!
-    static constexpr adc_ll_num_t k_adcLowLevelUnit = ADC_NUM_1;// =0 in pltformio, in arduinoIDE use adc_unit_t instead adc_ll_num_t!
-#else 
-    //Newer
-    static constexpr adc_unit_t k_adcUnit = ADC_UNIT_1;// =1 in pltformio, =0 i arduinoIDE!
-    static constexpr adc_unit_t k_adcLowLevelUnit = ADC_UNIT_1;// =0 in pltformio, in arduinoIDE use adc_unit_t instead adc_ll_num_t!    
-#endif
 
     void FastADC::SetClkDiv(uint16_t integer, uint16_t denominator, uint16_t numerator)
     {
@@ -139,7 +142,8 @@ FastADCState FastADC::StartADCSampling(int8_t gpioPin, bool invertData)
         return m_state;
     }
     m_state = FastADCState::k_adcStarting;
-    m_adcChannel = k_gpioToAdc1Channel.at(gpioPin);
+    
+    adc1_channel_t adcChannel = k_gpioToAdc1Channel.at(gpioPin);
     
     m_adcPreviousDataInvertEnabled = SYSCON.saradc_ctrl2.sar1_inv;//Save previous value asap
 
@@ -154,7 +158,7 @@ FastADCState FastADC::StartADCSampling(int8_t gpioPin, bool invertData)
         PrintADCRegisters();
     }
 
-    esp_err_t err = i2s_set_adc_mode(k_adcUnit, m_adcChannel);
+    esp_err_t err = i2s_set_adc_mode(k_adcUnit, adcChannel);
     if(err != ESP_OK)
     {
         m_state = FastADCState::k_startFailedSetAdcMode;
@@ -203,14 +207,14 @@ FastADCState FastADC::StartADCSampling(int8_t gpioPin, bool invertData)
     // ADC setting
     adc_digi_pattern_config_t adcDigiPattern{
         .atten = k_adcAttenuation,
-        .channel = m_adcChannel,
-        .unit = 1,// 0 or 1 ??????????????
+        .channel = adcChannel,
+        .unit = k_adcUnit,// 0 or 1 ??????????????
         .bit_width = k_adcWidthBits,
     };
 
     adc_ll_digi_clear_pattern_table(k_adcLowLevelUnit);
     adc_ll_digi_set_pattern_table_len(k_adcLowLevelUnit, 1);
-    adc_ll_digi_set_pattern_table(k_adcLowLevelUnit, m_adcChannel, adcDigiPattern);
+    adc_ll_digi_set_pattern_table(k_adcLowLevelUnit, adcChannel, adcDigiPattern);
     
     
     // reduce sample time  
