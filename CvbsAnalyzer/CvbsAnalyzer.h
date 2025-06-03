@@ -7,35 +7,10 @@
 #include "AmplitudeCaclulator.h"
 #include "SyncIntervalsCalculator.h"
 #include "VideoScore.h"
+#include "AverageFilter.h"
+#include "CvbsAnalyzerJob.h"
 #include <map>
 
-enum class CvbsAnalyzerState : signed char
-{
-    k_notInitialized = 0,
-    k_initializing,
-    k_initializedAndIdle,
-
-    //k_sampling,
-    k_amplitudeSampling,
-    k_amplitudeCalculation,
-    k_syncIntervalsSampling,
-    k_syncIntervalsCalculation,
-    k_videoScoreCalculation,
-    k_restartInverted,
-    k_stopADC,
-    k_finished,
-    k_totalAnalyzeTime,//not a state, just for profiling
-
-    k_failedBadState = -127,
-    k_failedBadFastADCState,
-    k_failedFastADCInitialization,
-    k_failedSampling,
-    k_failedAmplitude,
-    k_failedSyncIntervals,
-    k_failedVideoScore,
-    k_failedFastADCStop,
-    k_failedUnknownError,
-};    
 
 #if CVBS_ANALYZER_PROFILER
 struct CvbsAnalyzerProfiler
@@ -64,9 +39,21 @@ class CvbsAnalyzer
 
     CvbsAnalyzerState InitializeFastADC();
     CvbsAnalyzerState DeinitializeFastADC();
-    CvbsAnalyzerState AnalyzePin(int gpioPin, bool invertData);
+
+    CvbsAnalyzerState AnalyzePin(int gpioPin, bool invertData)
+    {
+        return ExecuteJob(gpioPin, CvbsAnalyzerJobType::k_videoScore, invertData);
+    }
+    CvbsAnalyzerState AnalyzePinAverage(int gpioPin, bool invertData)
+    {
+        return ExecuteJob(gpioPin, CvbsAnalyzerJobType::k_averageRssi, invertData);
+    }
+
+    CvbsAnalyzerState ExecuteJob(int gpioPin, CvbsAnalyzerJobType jobType, bool invertData);
+    
 
     const VideoScore& GetVideoScore() const { return m_videoScore; }
+    uint16_t GetPinAverage() const { return m_pinAverage; }
 
     inline CvbsAnalyzerState GetState() const { return m_state; }
     inline bool IsInErrorState() const { return ((signed char)m_state < 0); }
@@ -102,16 +89,24 @@ private:
     constexpr static bool k_printRawAdcData = false; //Slow!
     constexpr static bool k_printCsvLearningData = false;
     constexpr static bool k_printVideoScore = false;
+    constexpr static size_t k_preFilteredSamplesBufLenSamples = k_dmaBufLenSamples * k_dmaBufsCount/ k_adcDataStrideSamples; 
+    
 
     bool m_invertDataCurrentValue;
     size_t m_samplesReadTotal = 0;
-    uint16_t buf[k_dmaBufLenSamples];//align to 4 bytes!
+    uint16_t m_rawAdcSamplesBuf[k_dmaBufLenSamples];//align to 4 bytes!
 
+    //uint16_t m_preFilteredSamplesBuf[k_preFilteredSamplesBufLenSamples];
+    //size_t m_preFilteredSamplesBufHead = 0;
     
     FastADC m_fastAdc;
     AmplitudeCaclulator m_amplitudeCaclulator;
     SyncIntervalsCalculator m_syncIntervalsCalculator;
+    AverageFilter m_rssiAverageFilter;
+    
+    //Results
     VideoScore m_videoScore;
+    uint16_t m_pinAverage;
 
     //AmplitudeCaclulator m_invertedAmplitudeCaclulator;
     //SyncIntervalsCalculator m_invertedIntervalsCalculator;

@@ -84,7 +84,35 @@
     //    return (int32_t)(microseconds * ((float)k_sampleRate / 1000000.0f) + 0.5f);
     //}
 
+enum class CvbsAnalyzerState : signed char
+{
+    k_notInitialized = 0,
+    k_initializing,
+    k_initializedAndIdle,
 
+    //k_sampling,
+    k_preFilteringSamples,
+    k_averageCalculation,
+    k_amplitudeSampling,
+    k_amplitudeCalculation,
+    k_syncIntervalsSampling,
+    k_syncIntervalsCalculation,
+    k_videoScoreCalculation,
+    k_restartInverted,
+    k_stopADC,
+    k_finished,
+    k_totalAnalyzeTime,//not a state, just for profiling
+
+    k_failedBadState = -127,
+    k_failedBadFastADCState,
+    k_failedFastADCInitialization,
+    k_failedSampling,
+    k_failedAmplitude,
+    k_failedSyncIntervals,
+    k_failedVideoScore,
+    k_failedFastADCStop,
+    k_failedUnknownError,
+};    
 
 
 #endif // CvbsAnalyzerGlobals_H

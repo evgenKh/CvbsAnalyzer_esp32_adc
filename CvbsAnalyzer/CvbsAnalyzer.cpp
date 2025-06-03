@@ -25,7 +25,9 @@ void CvbsAnalyzer::Reset()
 {
     m_amplitudeCaclulator.Reset();
     m_syncIntervalsCalculator.Reset();
+    m_rssiAverageFilter.Reset();
     m_videoScore.Reset();
+    m_pinAverage = 0;
     m_samplesReadTotal = 0;
     m_invertDataCurrentValue = false;
 
@@ -99,54 +101,25 @@ CvbsAnalyzerState CvbsAnalyzer::DeinitializeFastADC()
 
 void PreProcessBuf(uint16_t* samples, size_t samplesCount, bool invertData, size_t strideSamples)
 {
-#if OPT_PREPROCESS_BUF
-    if((samplesCount * sizeof(uint16_t)) % sizeof(uint32_t) == 0 && !strideSamples)
+    //Process 16bit a time
+    if(invertData)
     {
-        //Can process 32but a time
-        uint32_t* samples32 = reinterpret_cast<uint32_t*>(samples);
-        const uint32_t samples32Count = samplesCount * sizeof(uint16_t)/ sizeof(uint32_t);
-        constexpr uint32_t mask12bit = (uint32_t)k_adcDataMask | ((uint32_t)k_adcDataMask << 16);
-        constexpr uint32_t invertMask = (uint32_t)k_adcDataXorMaskForInvert|((uint32_t)k_adcDataXorMaskForInvert<<16);
-        
-        if(invertData)
+        for(size_t i = 0; i < samplesCount; i += strideSamples)
         {
-            //Process 32bit a time
-            for(size_t i = 0; i < samples32Count; i++)
-            {
-                samples32[i] = (samples32[i] ^ invertMask) & mask12bit;
-            }
-        }
-        else
-        {
-            //Process 32bit a time
-            for(size_t i = 0; i < samples32Count; i++)
-            {
-                samples32[i] &= mask12bit;
-            }
+            samples[i] = (samples[i] ^ k_adcDataXorMaskForInvert) & k_adcDataMask;
         }
     }
     else
-#endif
     {
-        //Process 16bit a time
-        if(invertData)
+        for(size_t i = 0; i < samplesCount; i += strideSamples)
         {
-            for(size_t i = 0; i < samplesCount; i += strideSamples)
-            {
-                samples[i] = (samples[i] ^ k_adcDataXorMaskForInvert) & k_adcDataMask;
-            }
+            samples[i] &= k_adcDataMask;
         }
-        else
-        {
-            for(size_t i = 0; i < samplesCount; i += strideSamples)
-            {
-                samples[i] &= k_adcDataMask;
-            }
-        }         
-    }
+    }     
 }
 
-CvbsAnalyzerState CvbsAnalyzer::AnalyzePin(int gpioPin, bool invertData)
+
+CvbsAnalyzerState CvbsAnalyzer::ExecuteJob(int gpioPin, CvbsAnalyzerJobType jobType, bool invertData)
 {
     if (m_state != CvbsAnalyzerState::k_initializedAndIdle && m_state != CvbsAnalyzerState::k_finished)
     {
@@ -191,7 +164,7 @@ CvbsAnalyzerState CvbsAnalyzer::AnalyzePin(int gpioPin, bool invertData)
     int run;
     for (run = 0; run < k_maxDmaReadsPerAnalyzePin; run++)
     {
-        size_t bytesRead = m_fastAdc.ReadSamplesBlockingTo(buf, sizeof(buf));
+        size_t bytesRead = m_fastAdc.ReadSamplesBlockingTo(m_rawAdcSamplesBuf, sizeof(m_rawAdcSamplesBuf));
         samplesRead = bytesRead / sizeof(uint16_t);
         m_samplesReadTotal += samplesRead;
 
@@ -201,14 +174,14 @@ CvbsAnalyzerState CvbsAnalyzer::AnalyzePin(int gpioPin, bool invertData)
             continue;
         }
 
-        PreProcessBuf(buf, samplesRead, m_invertDataCurrentValue, k_adcDataStrideSamples);
+        PreProcessBuf(m_rawAdcSamplesBuf, samplesRead, m_invertDataCurrentValue, k_adcDataStrideSamples);
 
         if(k_printRawAdcData)
         {
             CVBS_ANALYZER_LOG_INFO("Printing %d samples from run #%d ----\n", samplesRead, run);
             for (int i = 0; i < samplesRead; i+=k_adcDataStrideSamples)
             {
-                CVBS_ANALYZER_LOG_INFO("%d,", buf[i]);
+                CVBS_ANALYZER_LOG_INFO("%d,", m_rawAdcSamplesBuf[i]);
             }
             CVBS_ANALYZER_LOG_INFO("%d samples printed.(run %d) ----\n", samplesRead);
         }
@@ -218,7 +191,7 @@ CvbsAnalyzerState CvbsAnalyzer::AnalyzePin(int gpioPin, bool invertData)
         {
             if (m_amplitudeCaclulator.GetState() == AmplitudeCaclulatorState::k_needMoreSamples)
             {
-                m_amplitudeCaclulator.PushSamples(buf, samplesRead, k_adcDataStrideSamples);
+                m_amplitudeCaclulator.PushSamples(m_rawAdcSamplesBuf, samplesRead, k_adcDataStrideSamples);
             }
             // no else if
             if (m_amplitudeCaclulator.GetState() == AmplitudeCaclulatorState::k_readyForCalculation)
@@ -254,7 +227,7 @@ CvbsAnalyzerState CvbsAnalyzer::AnalyzePin(int gpioPin, bool invertData)
             if (m_syncIntervalsCalculator.GetState() == SyncIntervalsCalculatorState::k_needMoreSamples 
                 || m_syncIntervalsCalculator.GetState() == SyncIntervalsCalculatorState::k_finished)
             {
-                m_syncIntervalsCalculator.PushSamples(buf, samplesRead, m_amplitudeCaclulator.m_syncTreshold, k_adcDataStrideSamples);
+                m_syncIntervalsCalculator.PushSamples(m_rawAdcSamplesBuf, samplesRead, m_amplitudeCaclulator.m_syncTreshold, k_adcDataStrideSamples);
             }
 
             if(m_syncIntervalsCalculator.GetState() == SyncIntervalsCalculatorState::k_finished )
