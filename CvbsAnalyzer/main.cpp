@@ -1,7 +1,12 @@
 #include <Arduino.h>
 #include "CvbsAnalyzer.h"
+#include "CvbsAnalyzerDispatcher.h"
+#include "CvbsAnalyzerJob.h"
 
 CvbsAnalyzer g_cvbsAnalyzer;
+CvbsAnalyzerDispatcher g_cvbsAnalyzerDispatcher(&g_cvbsAnalyzer);
+CvbsAnalyzerJob g_pin35Job(CvbsAnalyzerJobType::k_videoScore, 35);
+CvbsAnalyzerJob g_pin36Job(CvbsAnalyzerJobType::k_videoScore, 36);
 
 void setup()
 {
@@ -15,6 +20,7 @@ void setup()
     CVBS_ANALYZER_LOG("CvbsAnalyzer initialization failed with state %d!\n", (int)state);
     return;
   }
+  g_cvbsAnalyzerDispatcher.StartWorkerThread();
 }
 
 void loop()
@@ -23,26 +29,28 @@ void loop()
   CVBS_ANALYZER_LOG("Running loop # %d.\n", loopNum);
   CvbsAnalyzerState state;
   
-  auto pin35 = 35;
-  auto pin36 = 36;
-  CVBS_ANALYZER_LOG_INFO("Reading pin %d\t\t: ", pin35);
-  state = g_cvbsAnalyzer.AnalyzePin(pin35, false);
-  delay(5);
+  if(true)
+  {
+    CVBS_ANALYZER_LOG_INFO("Reading pin %d\t\t: ", g_pin35Job.m_gpioPin);
+    g_cvbsAnalyzerDispatcher.RequestJob(&g_pin35Job);
+    g_pin35Job.WaitUntilDone();
+    CVBS_ANALYZER_LOG_INFO("m_videoScore.m_isVideo=%f m_videoScoreInverted.m_isVideo=%f\n",
+                            g_pin35Job.m_videoScore.m_isVideo,
+                            g_pin35Job.m_videoScoreInverted.m_isVideo);
 
-  CVBS_ANALYZER_LOG_INFO("Reading pin %d Inverted: ", pin35);
-  state = g_cvbsAnalyzer.AnalyzePin(pin35, true);
-  delay(5);
-
-  if(true){
-    CVBS_ANALYZER_LOG_INFO("Reading pin %d\t\t: ", pin36);
-    state = g_cvbsAnalyzer.AnalyzePin(pin36, false);
-    delay(5);
-
-    CVBS_ANALYZER_LOG_INFO("Reading pin %d Inverted: ", pin36);
-    state = g_cvbsAnalyzer.AnalyzePin(pin36, true);
     delay(5);
   }
 
+  if(true)
+  {
+    CVBS_ANALYZER_LOG_INFO("Reading pin %d\t\t: ", g_pin36Job.m_gpioPin);
+    g_cvbsAnalyzerDispatcher.RequestJob(&g_pin36Job);
+    g_pin36Job.WaitUntilDone();
+    CVBS_ANALYZER_LOG_INFO("m_videoScore.m_isVideo=%f m_videoScoreInverted.m_isVideo=%f\n",
+                            g_pin36Job.m_videoScore.m_isVideo,
+                            g_pin36Job.m_videoScoreInverted.m_isVideo);
+  }
+  
   CVBS_ANALYZER_LOG_INFO("\n");
   //CVBS_ANALYZER_LOG("CvbsAnalyzer finished with state %d.\n", (int)state);
 

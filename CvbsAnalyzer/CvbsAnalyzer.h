@@ -101,7 +101,7 @@ private:
 
     constexpr static bool k_printRawAdcData = false; //Slow!
     constexpr static bool k_printCsvLearningData = false;
-    constexpr static bool k_printVideoScore = true;
+    constexpr static bool k_printVideoScore = false;
 
     bool m_invertDataCurrentValue;
     size_t m_samplesReadTotal = 0;
