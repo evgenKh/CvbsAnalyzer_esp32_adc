@@ -34,6 +34,8 @@ void loop()
     CVBS_ANALYZER_LOG_INFO("Reading pin %d\t\t: ", g_pin35Job.m_gpioPin);
     g_cvbsAnalyzerDispatcher.RequestJob(&g_pin35Job);
     g_pin35Job.WaitUntilDone();
+    //while(!g_pin35Job.IsDone()) {}
+
     CVBS_ANALYZER_LOG_INFO("m_videoScore.m_isVideo=%f m_videoScoreInverted.m_isVideo=%f\n",
                             g_pin35Job.m_videoScore.m_isVideo,
                             g_pin35Job.m_videoScoreInverted.m_isVideo);

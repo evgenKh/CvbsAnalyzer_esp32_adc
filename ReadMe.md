@@ -8,7 +8,8 @@
         - Contains Arduino support - v2.0.17 (based on IDF v4.4.7)
         - Contains ESP-IDF support(without arduino) - v5.4.0
 - Arduino IDE 2.3.6
-    - esp-Arduino 3.0.0-3.2.0 **працює, але не ідеально - плутається інфа з різних ADC каналів** новий драйвер adc_continuous (файли FastADCContinuous.cpp/h)
+    - esp32 пакет 3.2.0 новий драйвер adc_continuous (файли FastADCContinuous.cpp/h)
+	- esp32 пакет 3.0.0 ймовірно теж але треба перевірити
 	- також працює в не-continuous режимі якщо в arduino IDE завантажений пакет esp версії **2.0.17** і в ньому руками заглушен варнінг збірки в \AppData\Local\Arduino15\packages\esp32\hardware\esp32\2.0.17\tools\sdk\esp32\include\hal\esp32\include\hal\i2s_ll.h:766
 		
 		![arduino_esp32_v2.0.17.png](arduino_esp32_v2.0.17.png)	
@@ -65,64 +66,51 @@ m_stateProfilers.k_finished	0us
 m_stateProfilers.k_totalAnalyzeTime	13339us
 ```
 
+Можлива асинхронна робота, приклад:
+```
+
+CvbsAnalyzer g_cvbsAnalyzer;
+CvbsAnalyzerDispatcher g_cvbsAnalyzerDispatcher(&g_cvbsAnalyzer);
+CvbsAnalyzerJob g_pin35Job(CvbsAnalyzerJobType::k_videoScore, 35);
+CvbsAnalyzerJob g_pin36Job(CvbsAnalyzerJobType::k_videoScore, 36);
+g_cvbsAnalyzer.InitializeFastADC();
+g_cvbsAnalyzerDispatcher.StartWorkerThread();
+
+g_cvbsAnalyzerDispatcher.RequestJob(&g_pin35Job);
+g_pin35Job.WaitUntilDone();
+CVBS_ANALYZER_LOG_INFO("m_videoScore.m_isVideo=%f\n", g_pin35Job.m_videoScore.m_isVideo);
+
+//або
+
+while(!g_pin35Job.IsDone()) {}
+CVBS_ANALYZER_LOG_INFO("m_videoScore.m_isVideo=%f\n", g_pin35Job.m_videoScore.m_isVideo);
+```
+
+
 
 ## Приклад результату роботи
 
-- Зібрано platformio(або Arduino IDE з пакетом esp32 2.0.17), на пін 35 підключено якісне не-інвертоване відео. Пін 36 висить в повітрі:
+- На пін 36 підключено якісне не-інвертоване відео. Пін 35 висить в повітрі:
     ```
-    Reading pin 35          : VideoScore: isVideo=0.807143
-    Reading pin 35 Inverted: VideoScore: isVideo=0.041454
-    Reading pin 36          : VideoScore: isVideo=0.000000
-    Reading pin 36 Inverted: VideoScore: isVideo=0.000000
+    Reading pin 35          : m_videoScore.m_isVideo=0.000000 m_videoScoreInverted.m_isVideo=0.000000
+	Reading pin 36          : m_videoScore.m_isVideo=0.420000 m_videoScoreInverted.m_isVideo=0.050000
 
-    Reading pin 35          : VideoScore: isVideo=0.900000
-    Reading pin 35 Inverted: VideoScore: isVideo=0.036408
-    Reading pin 36          : VideoScore: isVideo=0.000000
-    Reading pin 36 Inverted: VideoScore: isVideo=0.000000
+	Reading pin 35          : m_videoScore.m_isVideo=0.000000 m_videoScoreInverted.m_isVideo=0.000000
+	Reading pin 36          : m_videoScore.m_isVideo=0.909259 m_videoScoreInverted.m_isVideo=0.050000
 
-    Reading pin 35          : VideoScore: isVideo=0.700000
-    Reading pin 35 Inverted: VideoScore: isVideo=0.029010
-    Reading pin 36          : VideoScore: isVideo=0.000000
-    Reading pin 36 Inverted: VideoScore: isVideo=0.000000
+	Reading pin 35          : m_videoScore.m_isVideo=0.000000 m_videoScoreInverted.m_isVideo=0.000000
+	Reading pin 36          : m_videoScore.m_isVideo=0.700000 m_videoScoreInverted.m_isVideo=0.700000
 
-    Reading pin 35          : VideoScore: isVideo=0.700000
-    Reading pin 35 Inverted: VideoScore: isVideo=0.032908
-    Reading pin 36          : VideoScore: isVideo=0.000000
-    Reading pin 36 Inverted: VideoScore: isVideo=0.000000
+	Reading pin 35          : m_videoScore.m_isVideo=0.000000 m_videoScoreInverted.m_isVideo=0.000000
+	Reading pin 36          : m_videoScore.m_isVideo=0.704464 m_videoScoreInverted.m_isVideo=0.053115
+
+	Reading pin 35          : m_videoScore.m_isVideo=0.000000 m_videoScoreInverted.m_isVideo=0.000000
+	Reading pin 36          : m_videoScore.m_isVideo=0.866667 m_videoScoreInverted.m_isVideo=0.050000
+
+	Reading pin 35          : m_videoScore.m_isVideo=0.000000 m_videoScoreInverted.m_isVideo=0.000000
+	Reading pin 36          : m_videoScore.m_isVideo=0.700000 m_videoScoreInverted.m_isVideo=0.050000
 	```
 
-- Зібрано в Arduino IDE з пакетом esp32 3.0.0 - 3.2.0,з FastADCContinuous. Відео лише на 36 піні, але проргама чомусь зчитає то з одного, то з іншого.
-
-    ```
-	Reading pin 35          : VideoScore: isVideo=0.700000
-	Reading pin 35 Inverted: VideoScore: isVideo=0.000000
-	Reading pin 36          : VideoScore: isVideo=0.000000
-	Reading pin 36 Inverted: VideoScore: isVideo=0.000000
-
-	Reading pin 35          : VideoScore: isVideo=0.000000
-	Reading pin 35 Inverted: VideoScore: isVideo=0.000000
-	Reading pin 36          : VideoScore: isVideo=0.904630
-	Reading pin 36 Inverted: VideoScore: isVideo=0.050000
-
-	Reading pin 35          : VideoScore: isVideo=0.000000
-	Reading pin 35 Inverted: VideoScore: isVideo=0.000000
-	Reading pin 36          : VideoScore: isVideo=0.000000
-	Reading pin 36 Inverted: VideoScore: isVideo=0.050000
-
-	Reading pin 35          : VideoScore: isVideo=0.000000
-	Reading pin 35 Inverted: VideoScore: isVideo=0.000000
-	Reading pin 36          : VideoScore: isVideo=0.739552
-	Reading pin 36 Inverted: VideoScore: isVideo=0.050000
-
-	Reading pin 35          : VideoScore: isVideo=0.900000
-	Reading pin 35 Inverted: VideoScore: isVideo=0.000000
-	Reading pin 36          : VideoScore: isVideo=0.000000
-	Reading pin 36 Inverted: VideoScore: isVideo=0.000000
-
-	Reading pin 35          : VideoScore: isVideo=0.000000
-	Reading pin 35 Inverted: VideoScore: isVideo=0.000000
-	Reading pin 36          : VideoScore: isVideo=0.811111
-	```
 
 Необроблені дані з platformio зі старим драйвером, і arduino з новим:
 
