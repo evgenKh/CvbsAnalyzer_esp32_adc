@@ -149,12 +149,20 @@ FastADCState FastADC::StartADCSampling(int8_t gpioPin, bool invertData)
 
     //Settings done.
     //Calling i2s_zero_dma_buffer to erase data that was sampled with default clock settings.
-    //esp_err_t err = i2s_zero_dma_buffer(I2S_NUM_0);
-    //if(err != ESP_OK)
-    //{
-    //    m_state = FastADCState::k_startFailedZeroDma;
-    //    return m_state;
-    //}
+    //esp_err_t err = adc_continuous_flush_pool(m_handle);
+    constexpr static size_t k_dummyBufSize = 100;
+    constexpr static size_t k_readCycles = ((k_dmaBufsCount * k_dmaBufLenSamples * sizeof(uint16_t)) + (k_dummyBufSize - 1)) / k_dummyBufSize;
+    static uint8_t s_dummyBuf[k_dummyBufSize];
+    for(int i = 0; i < k_readCycles; i++)
+    {
+        //Drain all samples that could be read prior to settings update
+        uint32_t bytes_read = 0;
+        esp_err_t ret = adc_continuous_read(m_handle, s_dummyBuf, k_dummyBufSize, &bytes_read, 0);
+        if (ret != ESP_OK || bytes_read == 0){
+            break;
+        }
+    }
+    
     m_state = FastADCState::k_adcStarted;
     return m_state;
 }
