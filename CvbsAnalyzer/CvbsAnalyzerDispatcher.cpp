@@ -37,7 +37,7 @@ void CvbsAnalyzerDispatcher::StartWorkerThread()
             static_cast<CvbsAnalyzerDispatcher*>(arg)->WorkerThreadLoop();
         },
         "CvbsAnalyzerTh",
-        2000, //stackDepth
+        4000, //stackDepth
         this,
         1, //priority
         &m_workerThread,
@@ -75,9 +75,10 @@ void CvbsAnalyzerDispatcher::WorkerThreadLoop()
             assert(jobToExecuteToken.m_job);
             CvbsAnalyzerJob* jobToExecute = jobToExecuteToken.m_job;
             
-            m_analyzer->AnalyzePin(jobToExecute->m_gpioPin);
+            m_analyzer->ExecuteJob(*jobToExecute);
             jobToExecute->m_videoScore = m_analyzer->GetVideoScore();
-            jobToExecute->m_videoScoreInverted = m_analyzer->GetVideoScore();
+            jobToExecute->m_videoScoreInverted = m_analyzer->GetVideoScoreFromInverted();
+            jobToExecute->m_rssiAverage = m_analyzer->GetPinAverage();
 
             jobToExecute->ReturnToken(jobToExecuteToken); // Return the token back to the source queue
         }

@@ -27,9 +27,9 @@ public:
     }
 
     // Running average without buffer (exponential moving average)
-    AverageFilterState PushSamples(const uint16_t *newData, size_t newDataLen, size_t dataStrideSamples)
+    AverageFilterState PushSamples(const uint16_t *newData, size_t newDataLen)
     {
-        for (size_t i = 0; i < newDataLen; i += dataStrideSamples)
+        for (size_t i = 0; i < newDataLen; i++)
         {
             double sampleVal = static_cast<double>(newData[i]);
             if (m_samplesCount == 0)
@@ -54,6 +54,7 @@ public:
     inline double GetAverage() const { return m_average; }
     inline size_t GetSamplesCount() const { return m_samplesCount; }
     inline AverageFilterState GetState() const { return m_state; }
+    inline size_t GetMinSamplesForCalculation() const { return k_minSamplesForCalculation; }
 
 private:
     AverageFilterState m_state;

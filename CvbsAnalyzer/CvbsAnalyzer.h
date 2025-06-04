@@ -60,6 +60,7 @@ class CvbsAnalyzer
     
 
     const VideoScore& GetVideoScore() const { return m_videoScore; }
+    const VideoScore& GetVideoScoreFromInverted() const { return m_videoScoreFromInverted; }
     uint16_t GetPinAverage() const { return m_pinAverage; }
 
     inline CvbsAnalyzerState GetState() const { return m_state; }
@@ -95,11 +96,10 @@ private:
 
     constexpr static bool k_printRawAdcData = false; //Slow!
     constexpr static bool k_printCsvLearningData = false;
-    constexpr static bool k_printVideoScore = false;
     
 
     bool m_invertDataCurrentValue;
-    size_t m_rawSamplesRead = 0;
+    size_t m_rawSamplesReadTotal = 0;
     uint16_t m_rawAdcSamplesBuf[k_dmaBufLenSamples];//align to 4 bytes!
 
     
@@ -111,6 +111,7 @@ private:
     
     //Results
     VideoScore m_videoScore;
+    VideoScore m_videoScoreFromInverted;
     uint16_t m_pinAverage;
 
     //AmplitudeCaclulator m_invertedAmplitudeCaclulator;

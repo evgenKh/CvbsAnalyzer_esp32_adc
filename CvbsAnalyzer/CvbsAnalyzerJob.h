@@ -103,6 +103,7 @@ public:
 
     VideoScore m_videoScore;
     VideoScore m_videoScoreInverted;
+    uint16_t m_rssiAverage = 0;
     //TODO: some rssi result
     //TODO: some states of analyzers?
 private:

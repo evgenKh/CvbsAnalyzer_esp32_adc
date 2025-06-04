@@ -29,7 +29,7 @@ void CvbsAnalyzer::Reset()
     m_rssiAverageFilter.Reset();
     m_videoScore.Reset();
     m_pinAverage = 0;
-    m_rawSamplesRead = 0;
+    m_rawSamplesReadTotal = 0;
     m_invertDataCurrentValue = false;
 
 #if CVBS_ANALYZER_PROFILER
@@ -37,9 +37,11 @@ void CvbsAnalyzer::Reset()
         { CvbsAnalyzerState::k_notInitialized, CvbsAnalyzerProfiler( TO_STR(k_notInitialized) ) },
         { CvbsAnalyzerState::k_initializing, CvbsAnalyzerProfiler( TO_STR(k_initializing) ) },
         { CvbsAnalyzerState::k_initializedAndIdle, CvbsAnalyzerProfiler( TO_STR(k_initializedAndIdle) ) },
-        { CvbsAnalyzerState::k_amplitudeSampling, CvbsAnalyzerProfiler( TO_STR(k_amplitudeSampling) ) },
+        { CvbsAnalyzerState::k_samplingAndPreFiltering, CvbsAnalyzerProfiler( TO_STR(k_samplingAndPreFiltering) ) },
+        //{ CvbsAnalyzerState::k_amplitudeSampling, CvbsAnalyzerProfiler( TO_STR(k_amplitudeSampling) ) },
+        { CvbsAnalyzerState::k_averageCalculation, CvbsAnalyzerProfiler( TO_STR(k_averageCalculation) ) },
         { CvbsAnalyzerState::k_amplitudeCalculation, CvbsAnalyzerProfiler( TO_STR(k_amplitudeCalculation) ) },
-        { CvbsAnalyzerState::k_syncIntervalsSampling, CvbsAnalyzerProfiler( TO_STR(k_syncIntervalsSampling) ) },
+        //{ CvbsAnalyzerState::k_syncIntervalsSampling, CvbsAnalyzerProfiler( TO_STR(k_syncIntervalsSampling) ) },
         { CvbsAnalyzerState::k_syncIntervalsCalculation, CvbsAnalyzerProfiler( TO_STR(k_syncIntervalsCalculation) ) },
         { CvbsAnalyzerState::k_videoScoreCalculation, CvbsAnalyzerProfiler( TO_STR(k_videoScoreCalculation) ) },
         { CvbsAnalyzerState::k_restartInverted, CvbsAnalyzerProfiler( TO_STR(k_restartInverted) ) },
@@ -113,7 +115,9 @@ CvbsAnalyzerState CvbsAnalyzer::ExecuteJob(const CvbsAnalyzerJob& job)
     m_rssiAverageFilter.Reset();
     m_amplitudeCaclulator.Reset();
     m_syncIntervalsCalculator.Reset();
-    m_rawSamplesRead = 0;
+    m_videoScore.Reset();
+    m_videoScoreFromInverted.Reset();
+    m_rawSamplesReadTotal = 0;
 
     const bool invertByHardware = false;//Use for test purposes
     m_invertDataCurrentValue = false;//Will use software
@@ -133,9 +137,57 @@ CvbsAnalyzerState CvbsAnalyzer::ExecuteJob(const CvbsAnalyzerJob& job)
 
 
     CVBS_ANALYZER_LOG("Starting ExecuteJob for gpioPin %d, invertByHardware=%d, invertBySoftware=%d...\n", 
-                                    (int)gpioPin, (invertByHardware ? 1 : 0), (m_invertDataCurrentValue ? 1 : 0));
+                                    (int)job.m_gpioPin, (invertByHardware ? 1 : 0), (m_invertDataCurrentValue ? 1 : 0));
     
-#if CVBS_ANALYZER_PROFILER
+    
+    //Prepare calculation states list
+
+    std::vector<CvbsAnalyzerState> calculationStates;
+
+    if(job.m_type == CvbsAnalyzerJobType::k_videoScore)
+    {
+        calculationStates = { CvbsAnalyzerState::k_amplitudeCalculation, 
+                              CvbsAnalyzerState::k_syncIntervalsCalculation, 
+                              CvbsAnalyzerState::k_videoScoreCalculation };
+        if(job.m_inversionType == CvbsAnalyzerInversionType::k_nonInvertedThenInverted)
+        {
+            calculationStates.insert(calculationStates.end(), 
+                { CvbsAnalyzerState::k_restartInverted,
+                  CvbsAnalyzerState::k_amplitudeCalculation, 
+                  CvbsAnalyzerState::k_syncIntervalsCalculation, 
+                  CvbsAnalyzerState::k_videoScoreCalculation }
+            );
+        }
+    }
+    else if(job.m_type == CvbsAnalyzerJobType::k_averageRssi)
+    {
+        calculationStates = { CvbsAnalyzerState::k_averageCalculation };
+    }
+    
+    size_t minSamplesEnoughForCalculationStates = 0;
+    for(CvbsAnalyzerState calcState : calculationStates)
+    {
+        switch(calcState)
+        {
+            case CvbsAnalyzerState::k_amplitudeCalculation:
+                minSamplesEnoughForCalculationStates = std::max(m_amplitudeCaclulator.GetMinSamplesForCalculation(),
+                                                                 minSamplesEnoughForCalculationStates);
+                break;
+            case CvbsAnalyzerState::k_syncIntervalsCalculation:
+                minSamplesEnoughForCalculationStates = std::max(m_syncIntervalsCalculator.GetMinSamplesForCalculation(),
+                                                                 minSamplesEnoughForCalculationStates);
+                break;
+            case CvbsAnalyzerState::k_averageCalculation:
+                minSamplesEnoughForCalculationStates = std::max(m_rssiAverageFilter.GetMinSamplesForCalculation(),
+                                                                 minSamplesEnoughForCalculationStates);
+                break;
+        }
+    }
+
+    //Samples that cacl.states want, won't fint into pre-filter buffer!
+    assert(minSamplesEnoughForCalculationStates <= m_samplesPreFilter.k_preFilteredSamplesBufLenSamples);
+
+    #if CVBS_ANALYZER_PROFILER
     m_stateProfilers[CvbsAnalyzerState::k_totalAnalyzeTime].Start();
 #endif // CVBS_ANALYZER_PROFILER    
 
@@ -146,195 +198,167 @@ CvbsAnalyzerState CvbsAnalyzer::ExecuteJob(const CvbsAnalyzerJob& job)
         return SetState(CvbsAnalyzerState::k_failedSampling);
     }
 
-    SetState(CvbsAnalyzerState::k_amplitudeSampling);
+    SetState(CvbsAnalyzerState::k_samplingAndPreFiltering);
 
-    size_t samplesRead = 0;    
-    
+    size_t newRawSamplesRead = 0;
     int run;
     for (run = 0; run < k_maxDmaReadsPerAnalyzePin; run++)
     {
         size_t bytesRead = m_fastAdc.ReadSamplesBlockingTo(m_rawAdcSamplesBuf, sizeof(m_rawAdcSamplesBuf));
-        samplesRead = bytesRead / sizeof(uint16_t);
-        m_rawSamplesRead += samplesRead;
+        newRawSamplesRead = bytesRead / sizeof(uint16_t);
+        m_rawSamplesReadTotal += newRawSamplesRead;
 
-        if (samplesRead < 1)
+        if (newRawSamplesRead < 1)
         {            
-            CVBS_ANALYZER_LOG("Little amount of samples read from FastADC on run %d, samplesRead=%d!\n", run, (int)gpioPin, samplesRead);
+            CVBS_ANALYZER_LOG("Little amount of samples read from FastADC on run %d, samplesRead=%d!\n",
+                 run, job.m_gpioPin, newRawSamplesRead);
             continue;
         }
 
-        if(k_printRawAdcData)
-        {
-            CVBS_ANALYZER_LOG_INFO("Printing %d samples from run #%d ----\n", samplesRead, run);
-            for (int i = 0; i < samplesRead; i+=k_adcDataStrideSamples)
-            {
-                CVBS_ANALYZER_LOG_INFO("%d,", m_rawAdcSamplesBuf[i]);
-            }
-            CVBS_ANALYZER_LOG_INFO("%d samples printed.(run %d) ----\n", samplesRead);
-        }
-
         const size_t newPreFilteredSamples = m_samplesPreFilter.PushSamples(m_rawAdcSamplesBuf,
-                                                samplesRead,
+                                                newRawSamplesRead,
                                                 k_skipLeadingZeroSamples,
                                                 m_invertDataCurrentValue);
 
-        const uint16_t* newPreFilteredSamplesStart = m_samplesPreFilter.m_samplesBuf 
-                                                    + m_samplesPreFilter.m_samplesCount 
-                                                    - newPreFilteredSamples;
+        //const uint16_t* newPreFilteredSamplesStart = m_samplesPreFilter.m_samplesBuf 
+        //                                            + m_samplesPreFilter.m_samplesCount 
+        //                                            - newPreFilteredSamples;
 
-        //handling non-error states
-        if(m_state == CvbsAnalyzerState::k_amplitudeSampling)
+        if(m_samplesPreFilter.m_samplesCount >= minSamplesEnoughForCalculationStates)
         {
-            if (m_amplitudeCaclulator.GetState() == AmplitudeCaclulatorState::k_needMoreSamples)
-            {
-                m_amplitudeCaclulator.PushSamples(newPreFilteredSamplesStart, newPreFilteredSamples);
-            }
-            // no else if
-            if (m_amplitudeCaclulator.GetState() == AmplitudeCaclulatorState::k_readyForCalculation)
-            {
-                SetState(CvbsAnalyzerState::k_amplitudeCalculation);                
-            }
-            if(m_amplitudeCaclulator.IsInErrorState())
-            {
-                CVBS_ANALYZER_LOG("AmplitudeCaclulator in error state %d\n", (int)m_amplitudeCaclulator.GetState());
-                SetState(CvbsAnalyzerState::k_failedAmplitude);
-            }
-        } // CvbsAnalyzerState::k_amplitudeSampling
-
-        if(m_state == CvbsAnalyzerState::k_amplitudeCalculation)
-        {
-            assert(m_amplitudeCaclulator.GetState() == AmplitudeCaclulatorState::k_readyForCalculation);
-            m_amplitudeCaclulator.Calculate();
-            if(m_amplitudeCaclulator.GetState() == AmplitudeCaclulatorState::k_finished)
-            {
-                SetState(CvbsAnalyzerState::k_syncIntervalsSampling);
-            }
-            if(m_amplitudeCaclulator.IsInErrorState())
-            {
-                CVBS_ANALYZER_LOG("AmplitudeCaclulator in error state %d\n", (int)m_amplitudeCaclulator.GetState());
-                SetState(CvbsAnalyzerState::k_failedAmplitude);
-            }
-        } // CvbsAnalyzerState::k_amplitudeCalculation
-
-        if(m_state == CvbsAnalyzerState::k_syncIntervalsSampling)
-        {
-            assert(m_amplitudeCaclulator.GetState() == AmplitudeCaclulatorState::k_finished);
-
-            if (m_syncIntervalsCalculator.GetState() == SyncIntervalsCalculatorState::k_needMoreSamples 
-                || m_syncIntervalsCalculator.GetState() == SyncIntervalsCalculatorState::k_finished)
-            {
-                m_syncIntervalsCalculator.PushSamples(newPreFilteredSamplesStart,
-                                                        newPreFilteredSamples,
-                                                         m_amplitudeCaclulator.m_syncTreshold);
-            }
-
-            if(m_syncIntervalsCalculator.GetState() == SyncIntervalsCalculatorState::k_finished )
-            {
-                //Actually calculation done by this moment, but using this state to get back to sampling if needed
-                SetState(CvbsAnalyzerState::k_syncIntervalsCalculation);
-            }
-            if(m_syncIntervalsCalculator.IsInErrorState())
-            {
-                SetState(CvbsAnalyzerState::k_failedSyncIntervals);
-                CVBS_ANALYZER_LOG("SyncIntervalsCalculator in error state %d\n", (int)m_syncIntervalsCalculator.GetState());
-            }            
-        } // CvbsAnalyzerState::k_syncIntervalsSampling
-
-        if(m_state == CvbsAnalyzerState::k_syncIntervalsCalculation)
-        {
-            //Maybe some fails are ok?
-            assert(m_syncIntervalsCalculator.GetState() == SyncIntervalsCalculatorState::k_finished);
-            if(k_syncIntervalsCalculatorConsumeMaxDmaReads && run < k_maxDmaReadsPerAnalyzePin-1)
-            {
-                //Actually calculation done by this moment, but we can afford more sampling for precision
-                SetState(CvbsAnalyzerState::k_syncIntervalsSampling);
-                continue;
-            }
-            SetState(CvbsAnalyzerState::k_videoScoreCalculation);
-        } // CvbsAnalyzerState::k_syncIntervalsCalculation
-
-        //All other states to be processed outside of loop
-        if(m_state == CvbsAnalyzerState::k_videoScoreCalculation || IsInErrorState()){
-                break;
+            break; //We have enough samples for calculations
         }
-        assert(m_state != CvbsAnalyzerState::k_stopADC &&
-               m_state != CvbsAnalyzerState::k_finished &&
-               m_state != CvbsAnalyzerState::k_restartInverted &&
-               m_state != CvbsAnalyzerState::k_stopADC);
-    } // for
-
-    if(!m_rawSamplesRead)
-    {
-        SetState(CvbsAnalyzerState::k_failedSampling);
-    }
-    if(m_syncIntervalsCalculator.GetState() != SyncIntervalsCalculatorState::k_finished)
-    {
-        CVBS_ANALYZER_LOG("SyncIntervalsCalculator in state %d, not finished! m_samplesProcessed=%d, run=%d\n",
-             (int)m_syncIntervalsCalculator.GetState(),
-            m_syncIntervalsCalculator.GetSamplesProcessed(),
-        run);
-        SetState(CvbsAnalyzerState::k_failedSyncIntervals);
     }
 
-    if(m_state == CvbsAnalyzerState::k_videoScoreCalculation || IsInErrorState())
+    if(m_samplesPreFilter.m_samplesCount < minSamplesEnoughForCalculationStates)
     {
-        //We still can score the failure as valid no-video result.
-        m_videoScore.Reset();
-        m_videoScore.CalculateFromSyncIntervals(m_syncIntervalsCalculator,
-                                                m_amplitudeCaclulator.GetState(),
-                                                //k_sampleRate,
-                                                m_invertDataCurrentValue);
+        CVBS_ANALYZER_LOG("Not enough pre-filtered samples collected from FastADC!, expceted%d, has %d.\n", 
+                          minSamplesEnoughForCalculationStates, m_samplesPreFilter.m_samplesCount);
+        //SetState(CvbsAnalyzerState::
+        //This is not actually an error. Probably 0volts on pin.
+        //TODO: what state to go to?
+    }
 
-        bool shouldTryFlipInvertFlag = false;   //TODO: more logic to skip invert if no sense to do it?
-        if(shouldTryFlipInvertFlag){
-            SetState(CvbsAnalyzerState::k_restartInverted);
-        }else{
-            SetState(CvbsAnalyzerState::k_stopADC);
-        }
-    } // CvbsAnalyzerState::k_videoScoreCalculation
-
-    if(m_state == CvbsAnalyzerState::k_restartInverted)
-    {
-        //No! do it outside of CvbsAlalyzer state machine.
-        //Use this state just to request restart from outside.Maybe without stipping ADC.
-        //TODO:Save results of non-inverted analysis
-
-    } // CvbsAnalyzerState::k_restartInverted
-
-    //if(m_state == CvbsAnalyzerState::k_stopADC)
-    {
-        //Stop ADC unconditionally from any state. Except k_restartInverted ??
-        fastAdcState = m_fastAdc.StopADCSampling();
-    } // CvbsAnalyzerState::k_stopADC
-
-#if CVBS_ANALYZER_PROFILER
-    m_stateProfilers[CvbsAnalyzerState::k_totalAnalyzeTime].Stop();
-#endif // CVBS_ANALYZER_PROFILER    
-
-    CVBS_ANALYZER_LOG("Stopped ADC sampling for gpioPin %d, samplesReadTotal = %d, CvbsAnalyzerState = %d\n", 
-                      (int)gpioPin, (int)m_samplesReadTotal, (int)m_state);
+    SetState(CvbsAnalyzerState::k_stopADC);
+    fastAdcState = m_fastAdc.StopADCSampling();
 
     if (fastAdcState == FastADCState::k_initializedAdcStopped)
     {
-        SetState(CvbsAnalyzerState::k_finished);
+        CVBS_ANALYZER_LOG("Stopped ADC sampling for gpioPin %d, m_samplesPreFilter.m_samplesCount = %d,\
+                            m_rawSamplesReadTotal = %d, CvbsAnalyzerState = %d\n", 
+                      job.m_gpioPin, m_samplesPreFilter.m_samplesCount, m_rawSamplesReadTotal, (int)m_state);
+        //SetState(CvbsAnalyzerState::k_finished);
     }
     else
     {
-        CVBS_ANALYZER_LOG("FastADC::StopADCSampling() for gpioPin %d failed with state %d!", (int)gpioPin, (int)fastAdcState);
+        CVBS_ANALYZER_LOG("FastADC::StopADCSampling() for gpioPin %d failed with state %d!", job.m_gpioPin, (int)fastAdcState);
         SetState(CvbsAnalyzerState::k_failedFastADCStop);
     }
+
+    //Now proceed with calculations
+
+    for(auto calcStateIt = calculationStates.begin(); calcStateIt != calculationStates.end(); calcStateIt++)
+    {
+        if(IsInErrorState()){
+            break;
+        }
+        SetState(*calcStateIt);
+
+        if(m_state == CvbsAnalyzerState::k_amplitudeCalculation)
+        {
+            assert(m_amplitudeCaclulator.GetState() == AmplitudeCaclulatorState::k_needMoreSamples);
+            m_amplitudeCaclulator.PushSamples(m_samplesPreFilter.m_samplesBuf, m_samplesPreFilter.m_samplesCount);
+            
+            if(m_amplitudeCaclulator.GetState() == AmplitudeCaclulatorState::k_readyForCalculation)
+            {
+                m_amplitudeCaclulator.Calculate();
+                if(m_amplitudeCaclulator.GetState() == AmplitudeCaclulatorState::k_finished)
+                {
+                    continue; //Go to next state
+                }
+                else 
+                {                    
+                    CVBS_ANALYZER_LOG("AmplitudeCaclulator in error state %d\n", (int)m_amplitudeCaclulator.GetState());
+                    SetState(CvbsAnalyzerState::k_failedAmplitude);
+                }
+            }
+            else
+            {
+                SetState(CvbsAnalyzerState::k_failedAmplitude);
+            }
+        }
+        else if(m_state == CvbsAnalyzerState::k_syncIntervalsCalculation)
+        {
+            assert(m_syncIntervalsCalculator.GetState() == SyncIntervalsCalculatorState::k_needMoreSamples);
+            m_syncIntervalsCalculator.PushSamples(m_samplesPreFilter.m_samplesBuf, 
+                                                  m_samplesPreFilter.m_samplesCount,
+                                                  m_amplitudeCaclulator.m_syncTreshold);
+
+            if(m_syncIntervalsCalculator.GetState() == SyncIntervalsCalculatorState::k_finished)
+            {
+                continue; //Go to next state
+            }
+            else
+            {
+                CVBS_ANALYZER_LOG("SyncIntervalsCalculator in error state %d\n", (int)m_syncIntervalsCalculator.GetState()); 
+                SetState(CvbsAnalyzerState::k_failedSyncIntervals);
+            }
+        }
+        else if(m_state == CvbsAnalyzerState::k_averageCalculation)
+        {
+            assert(m_rssiAverageFilter.GetState() == AverageFilterState::k_needMoreSamples);
+
+            m_rssiAverageFilter.PushSamples(m_samplesPreFilter.m_samplesBuf, m_samplesPreFilter.m_samplesCount);
+            if(m_rssiAverageFilter.GetState() == AverageFilterState::k_finished)
+            {
+                m_pinAverage = m_rssiAverageFilter.GetAverage();
+                continue; //Go to next state
+            }
+            else
+            {
+                CVBS_ANALYZER_LOG("AverageFilter in error state %d\n", (int)m_rssiAverageFilter.GetState()); 
+                SetState(CvbsAnalyzerState::k_failedAverageFilter);
+            }
+        }
+        else if(m_state == CvbsAnalyzerState::k_videoScoreCalculation)
+        {
+            VideoScore& videoScore = (m_invertDataCurrentValue ? m_videoScoreFromInverted : m_videoScore);
+
+            videoScore.Reset();
+            videoScore.CalculateFromSyncIntervals(m_syncIntervalsCalculator,
+                                                    m_amplitudeCaclulator.GetState(),
+                                                    m_invertDataCurrentValue);
+        }
+        else if(m_state == CvbsAnalyzerState::k_restartInverted)
+        {
+            assert(!m_invertDataCurrentValue);
+            m_invertDataCurrentValue = true;
+
+            m_samplesPreFilter.InvertPrefilteredSamples();
+            m_amplitudeCaclulator.Reset();
+            m_syncIntervalsCalculator.Reset();
+        }
+        assert(m_state != CvbsAnalyzerState::k_stopADC &&
+               m_state != CvbsAnalyzerState::k_finished &&
+               m_state != CvbsAnalyzerState::k_stopADC);
+    }//for   
+
+#if CVBS_ANALYZER_PROFILER
+    m_stateProfilers[CvbsAnalyzerState::k_totalAnalyzeTime].Stop();
+#endif // CVBS_ANALYZER_PROFILER        
 
     //PrintJson();
     if(k_printCsvLearningData)
     {
         PrintCsv();
     }
-    if(k_printVideoScore)
+    
+    if(IsInErrorState())
     {
-        CVBS_ANALYZER_LOG_INFO("VideoScore: isVideo=%f\n",  m_videoScore.m_isVideo);
+        CVBS_ANALYZER_LOG("Finishing CvbsAnalyzer::ExecuteJob() with error state %d!\n", (int)m_state);
     }
 
-
+    SetState(CvbsAnalyzerState::k_finished);//Setting finished despite of error state.
     return m_state;
 }
 
@@ -344,7 +368,7 @@ void CvbsAnalyzer::PrintJson()
     CVBS_ANALYZER_LOG("\"CvbsAnalyzer\": {\n");
     CVBS_ANALYZER_LOG("\t\"m_invertDataCurrentValue\": %d,\n", m_invertDataCurrentValue ? 1 : 0);
     CVBS_ANALYZER_LOG("\t\"m_state\": %d,\n", (int)m_state);
-    CVBS_ANALYZER_LOG("\t\"m_samplesReadTotal\": %d,\n", m_samplesReadTotal);
+    CVBS_ANALYZER_LOG("\t\"m_rawSamplesReadTotal\": %d,\n", m_rawSamplesReadTotal);
     CVBS_ANALYZER_LOG("\t\"k_sampleRate\": %d,\n", k_sampleRate);
     CVBS_ANALYZER_LOG("\t\"k_sampleRateWithSkippedOversamples\": %d,\n", k_sampleRateWithSkippedOversamples);
     CVBS_ANALYZER_LOG("\t\"k_adcDataStrideSamples\": %d,\n", k_adcDataStrideSamples);
@@ -363,7 +387,7 @@ void CvbsAnalyzer::PrintJson()
     }
     CVBS_ANALYZER_LOG("},\n");
 #endif // CVBS_ANALYZER_PROFILER
-    CVBS_ANALYZER_LOG("\"FastADC\": { \"state\": %d, \"m_adcChannel\": %d },\n", (int)m_fastAdc.GetState(), (int)m_fastAdc.GetAdcChannel());
+    CVBS_ANALYZER_LOG("\"FastADC\": { \"state\": %d, \"m_adcChannel\": --- },\n", (int)m_fastAdc.GetState());
     m_amplitudeCaclulator.Print();
     m_syncIntervalsCalculator.Print();
     CVBS_ANALYZER_LOG("}\n");
@@ -419,20 +443,22 @@ void CvbsAnalyzer::PrintCsv()
         (int)m_state, 
         m_videoScore.m_isVideo,
         m_videoScore.m_isInvertedVideo,
-        (int)m_rawSamplesRead,
+        (int)m_rawSamplesReadTotal,
         (int)k_sampleRate, 
         (int)m_amplitudeCaclulator.m_syncTreshold,
         (int)m_syncIntervalsCalculator.m_syncSequenceLengthHistogram.m_binsRange.first,
         (int)m_syncIntervalsCalculator.m_syncSequenceLengthHistogram.m_binsRange.second,
         (int)m_syncIntervalsCalculator.m_syncSequenceLengthHistogram.size(),
         (int)m_syncIntervalsCalculator.m_syncSequenceLengthHistogram.GetSamplesCount());
+
+
     for(int i=0; i<m_syncIntervalsCalculator.m_syncSequenceLengthHistogram.size();i++)
     {
         const float samplesCountF = std::max((uint32_t)1u, m_syncIntervalsCalculator.m_syncSequenceLengthHistogram.GetSamplesCount());
         const float binWeight = m_syncIntervalsCalculator.m_syncSequenceLengthHistogram[i] / samplesCountF;
         CVBS_ANALYZER_LOG_INFO("%f,", binWeight);
         //CVBS_ANALYZER_LOG_INFO("%d,", (int)m_syncIntervalsCalculator.m_syncSequenceLengthHistogram[i]);
-    }\
+    }
 
     CVBS_ANALYZER_LOG_INFO("%d,%d,%d,%d,,",
         (int)m_syncIntervalsCalculator.m_notSyncSequenceLengthHistogram.m_binsRange.first,

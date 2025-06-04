@@ -30,6 +30,7 @@ public:
     inline SyncIntervalsCalculatorState GetState() const { return m_state; }
     inline bool IsInErrorState() const { return ((signed char)m_state < 0); }
     inline size_t GetSamplesProcessed() const { return m_samplesProcessed; }
+    inline size_t GetMinSamplesForCalculation() const { return k_minSamplesForCalculation; }
 
     void Print() const;
 

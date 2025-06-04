@@ -89,11 +89,11 @@ enum class CvbsAnalyzerState : signed char
     k_initializedAndIdle,
 
     //k_sampling,
-    k_preFilteringSamples,
+    k_samplingAndPreFiltering,
     k_averageCalculation,
-    k_amplitudeSampling,
+    //k_amplitudeSampling,
     k_amplitudeCalculation,
-    k_syncIntervalsSampling,
+    //k_syncIntervalsSampling,
     k_syncIntervalsCalculation,
     k_videoScoreCalculation,
     k_restartInverted,
@@ -108,6 +108,7 @@ enum class CvbsAnalyzerState : signed char
     k_failedAmplitude,
     k_failedSyncIntervals,
     k_failedVideoScore,
+    k_failedAverageFilter,
     k_failedFastADCStop,
     k_failedUnknownError,
 };    
