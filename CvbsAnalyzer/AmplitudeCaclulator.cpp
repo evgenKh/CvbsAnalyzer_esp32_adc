@@ -19,45 +19,26 @@ void AmplitudeCaclulator::Reset()
     m_amplitudeHistogram.Reset();
 }
 
-AmplitudeCaclulatorState AmplitudeCaclulator::PushSamples(const uint16_t *newData, size_t newDataLen, size_t dataStrideSamples)
+AmplitudeCaclulatorState AmplitudeCaclulator::PushSamples(const uint16_t *newData, size_t newDataLen)
 {
-    //Due to ADC hacks and calling zeroDma after ADC start, some datasets may have many zero samples at start.    
-    //TODO: also clean 4095. And move it outside of this class.
-    size_t firstNonZeroSampleIndex = 0;
-    if(k_skipLeadingZeroSamples)
-    {
-        for(firstNonZeroSampleIndex = 0; firstNonZeroSampleIndex < newDataLen; )
-        {
-            if(newData[firstNonZeroSampleIndex]!= 0 && newData[firstNonZeroSampleIndex] != 4095) break;
-            firstNonZeroSampleIndex += dataStrideSamples;
-        }
-    }
-    const size_t newDataLenNoZeroes = newDataLen - firstNonZeroSampleIndex;
-
-    if(newDataLenNoZeroes)
+    if(newDataLen)
     {
         const size_t samplesInHistogramBeforePush = m_amplitudeHistogram.GetSamplesCount();
         //Histogram<uint32_t, uint16_t, k_binsCount> newDataHistogram(0u, MAX_UINT_12BIT);        
         
-        for (size_t i = firstNonZeroSampleIndex; i < newDataLen; i += dataStrideSamples)
+        for (size_t i = 0; i < newDataLen; i ++)
         {
             //TODO: try skip repeated samples
             m_amplitudeHistogram.PushSample(newData[i]);
         }
 
-        if((m_amplitudeHistogram.GetSamplesCount()-samplesInHistogramBeforePush) * dataStrideSamples != newDataLen - firstNonZeroSampleIndex)
+        if((m_amplitudeHistogram.GetSamplesCount()-samplesInHistogramBeforePush) != newDataLen)
         {
             //Some samples were not pushed, probably out of bins range.
             //Could be an assert...
             m_state = AmplitudeCaclulatorState::k_samplesAccumulatedCountMismatch;
             return m_state;
         }
-
-        //if(newDataHistogram.GetSamplesCount() > 0)
-        //{
-        //    //Merge local histogram to main one.
-        //    m_amplitudeHistogram.Extend(newDataHistogram);
-        //}
     }
 
     if(m_amplitudeHistogram[m_amplitudeHistogram.size()-1] > static_cast<uint32_t>(m_amplitudeHistogram.GetSamplesCount() * k_highestBinMaxWeight))

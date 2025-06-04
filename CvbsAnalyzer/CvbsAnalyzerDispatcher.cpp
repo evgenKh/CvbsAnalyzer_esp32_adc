@@ -75,10 +75,8 @@ void CvbsAnalyzerDispatcher::WorkerThreadLoop()
             assert(jobToExecuteToken.m_job);
             CvbsAnalyzerJob* jobToExecute = jobToExecuteToken.m_job;
             
-            m_analyzer->AnalyzePin(jobToExecute->m_gpioPin, false);
+            m_analyzer->AnalyzePin(jobToExecute->m_gpioPin);
             jobToExecute->m_videoScore = m_analyzer->GetVideoScore();
-
-            m_analyzer->AnalyzePin(jobToExecute->m_gpioPin, true);
             jobToExecute->m_videoScoreInverted = m_analyzer->GetVideoScore();
 
             jobToExecute->ReturnToken(jobToExecuteToken); // Return the token back to the source queue

@@ -12,6 +12,14 @@ enum class CvbsAnalyzerJobType
     k_averageRssi
 };
 
+
+enum class CvbsAnalyzerInversionType
+{
+    k_nonInvertedOnly = 0,
+    k_invertedOnly,
+    k_nonInvertedThenInverted,
+};
+
 class CvbsAnalyzerJob;
 struct JobQueueToken
 {
@@ -21,11 +29,12 @@ struct JobQueueToken
 class CvbsAnalyzerJob
 {
 public:    
-    CvbsAnalyzerJob(CvbsAnalyzerJobType type, int gpioPin):
-    CvbsAnalyzerJob()
+    CvbsAnalyzerJob(int gpioPin, CvbsAnalyzerJobType type, CvbsAnalyzerInversionType inversionType):
+        CvbsAnalyzerJob()
     {
-        m_type = type;
         m_gpioPin = gpioPin;
+        m_type = type;
+        m_inversionType = inversionType;
     }
 
     CvbsAnalyzerJob()
@@ -89,6 +98,7 @@ public:
     
     int m_gpioPin = -1;
     CvbsAnalyzerJobType m_type = CvbsAnalyzerJobType::k_none;
+    CvbsAnalyzerInversionType m_inversionType = CvbsAnalyzerInversionType::k_nonInvertedOnly;
     QueueHandle_t m_tokensSourceQueue = nullptr;
 
     VideoScore m_videoScore;

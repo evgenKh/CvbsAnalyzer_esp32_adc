@@ -33,7 +33,7 @@ public:
 
     void Reset();
 
-    AmplitudeCaclulatorState PushSamples(const uint16_t *newData, size_t newDataLen, size_t dataStrideSamples);
+    AmplitudeCaclulatorState PushSamples(const uint16_t *newData, size_t newDataLen);
     AmplitudeCaclulatorState Calculate();
     void CalculateSyncTreshold();
     void CalculateWhiteLevel();

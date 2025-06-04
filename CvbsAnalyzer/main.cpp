@@ -5,8 +5,8 @@
 
 CvbsAnalyzer g_cvbsAnalyzer;
 CvbsAnalyzerDispatcher g_cvbsAnalyzerDispatcher(&g_cvbsAnalyzer);
-CvbsAnalyzerJob g_pin35Job(CvbsAnalyzerJobType::k_videoScore, 35);
-CvbsAnalyzerJob g_pin36Job(CvbsAnalyzerJobType::k_videoScore, 36);
+CvbsAnalyzerJob g_pin35Job(35, CvbsAnalyzerJobType::k_videoScore, CvbsAnalyzerInversionType::k_nonInvertedThenInverted);
+CvbsAnalyzerJob g_pin36Job(36, CvbsAnalyzerJobType::k_videoScore, CvbsAnalyzerInversionType::k_nonInvertedThenInverted);
 
 void setup()
 {

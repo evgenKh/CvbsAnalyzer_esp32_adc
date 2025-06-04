@@ -16,23 +16,9 @@ void SyncIntervalsCalculator::Reset()
 
 SyncIntervalsCalculatorState SyncIntervalsCalculator::PushSamples(const uint16_t *newData, 
                                                                     size_t newDataLen,
-                                                                    int16_t syncTreshold,
-                                                                    size_t dataStrideSamples )
+                                                                    int16_t syncTreshold)
 {
-    //Due to ADC hacks and calling zeroDma after ADC start, some datasets may have many zero samples at start.  
-    //Move it outside of this class.  
-    size_t firstNonZeroSampleIndex = 0;
-    if(k_skipLeadingZeroSamples)
-    {
-        for(firstNonZeroSampleIndex = 0; firstNonZeroSampleIndex < newDataLen; )
-        {
-            if(newData[firstNonZeroSampleIndex]!= 0 && newData[firstNonZeroSampleIndex] != 4095) break;
-            firstNonZeroSampleIndex += dataStrideSamples;
-        }
-    }
-    const size_t newDataLenNoZeroes = newDataLen - firstNonZeroSampleIndex;
-
-    if(!newDataLenNoZeroes)
+    if(!newDataLen)
     {
         return m_state;
     }
@@ -40,16 +26,16 @@ SyncIntervalsCalculatorState SyncIntervalsCalculator::PushSamples(const uint16_t
     if(!m_samplesProcessed)//Not samples in hystograms, but total processed
     {
         //For first run force calculate this.
-        m_lastSampleWasSync = (newData[firstNonZeroSampleIndex] < syncTreshold);
+        m_lastSampleWasSync = (newData[0] < syncTreshold);
         m_samplesSinceLastChange = 1;
     }
     
-    for (size_t i = firstNonZeroSampleIndex; i < newDataLenNoZeroes; i += dataStrideSamples)
+    for (size_t i = 0; i < newDataLen; i ++)
     {
         const bool currentSampleIsSync = (newData[i] < syncTreshold);
         if(currentSampleIsSync != m_lastSampleWasSync 
             || m_samplesSinceLastChange >= k_maxSequenceLength //break too long sequences
-            || (k_includeLastSequence && m_samplesProcessed >= k_minSamplesForCalculation && i == newDataLenNoZeroes - 1)//Last sequence of last(but maybe not!) Calculation cycle
+           // || (k_includeLastSequence && m_samplesProcessed >= k_minSamplesForCalculation && i == newDataLenNoZeroes - 1)//Last sequence of last(but maybe not!) Calculation cycle
         )    
         {
             //Store previous sequnce len

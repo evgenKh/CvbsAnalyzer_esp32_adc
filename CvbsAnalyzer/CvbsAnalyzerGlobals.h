@@ -51,8 +51,6 @@
     constexpr uint32_t k_sampleRate = k_i2sSampleRate * k_oversamplingMultiplier / k_adcDataStrideSamples;
     constexpr uint32_t k_sampleRateWithSkippedOversamples = k_i2sSampleRate;
     constexpr bool k_skipLeadingZeroSamples = true;
-    constexpr uint16_t k_adcDataMask = 0x0fff; //12 bit width, 0x0fff = 4095, max value for 12 bit ADC
-    constexpr uint16_t k_adcDataXorMaskForInvert = 0x0fff;// apply to data via ^ operato to invert it.(4095-data)
 
     //inline uint16_t PreProcessSample(const uint16_t sample, const uint16_t invertMask = 0x00)
     //{

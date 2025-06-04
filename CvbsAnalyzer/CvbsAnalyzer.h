@@ -9,6 +9,7 @@
 #include "VideoScore.h"
 #include "AverageFilter.h"
 #include "CvbsAnalyzerJob.h"
+#include "SamplesPreFilter.h"
 #include <map>
 
 
@@ -40,16 +41,22 @@ class CvbsAnalyzer
     CvbsAnalyzerState InitializeFastADC();
     CvbsAnalyzerState DeinitializeFastADC();
 
-    CvbsAnalyzerState AnalyzePin(int gpioPin, bool invertData)
+    CvbsAnalyzerState AnalyzePin(int gpioPin)
     {
-        return ExecuteJob(gpioPin, CvbsAnalyzerJobType::k_videoScore, invertData);
-    }
-    CvbsAnalyzerState AnalyzePinAverage(int gpioPin, bool invertData)
-    {
-        return ExecuteJob(gpioPin, CvbsAnalyzerJobType::k_averageRssi, invertData);
+        CvbsAnalyzerJob job(gpioPin, CvbsAnalyzerJobType::k_videoScore, 
+                                    CvbsAnalyzerInversionType::k_nonInvertedThenInverted);
+        return ExecuteJob(job);
     }
 
-    CvbsAnalyzerState ExecuteJob(int gpioPin, CvbsAnalyzerJobType jobType, bool invertData);
+    CvbsAnalyzerState AnalyzePinAverage(int gpioPin, bool invertData)
+    {
+        CvbsAnalyzerJob job(gpioPin, CvbsAnalyzerJobType::k_averageRssi,
+                                     CvbsAnalyzerInversionType::k_nonInvertedOnly);
+        
+        return ExecuteJob(job);
+    }
+
+    CvbsAnalyzerState ExecuteJob(const CvbsAnalyzerJob& job);
     
 
     const VideoScore& GetVideoScore() const { return m_videoScore; }
@@ -89,20 +96,18 @@ private:
     constexpr static bool k_printRawAdcData = false; //Slow!
     constexpr static bool k_printCsvLearningData = false;
     constexpr static bool k_printVideoScore = false;
-    constexpr static size_t k_preFilteredSamplesBufLenSamples = k_dmaBufLenSamples * k_dmaBufsCount/ k_adcDataStrideSamples; 
     
 
     bool m_invertDataCurrentValue;
-    size_t m_samplesReadTotal = 0;
+    size_t m_rawSamplesRead = 0;
     uint16_t m_rawAdcSamplesBuf[k_dmaBufLenSamples];//align to 4 bytes!
 
-    //uint16_t m_preFilteredSamplesBuf[k_preFilteredSamplesBufLenSamples];
-    //size_t m_preFilteredSamplesBufHead = 0;
     
     FastADC m_fastAdc;
     AmplitudeCaclulator m_amplitudeCaclulator;
     SyncIntervalsCalculator m_syncIntervalsCalculator;
     AverageFilter m_rssiAverageFilter;
+    SamplesPreFilter m_samplesPreFilter;
     
     //Results
     VideoScore m_videoScore;
