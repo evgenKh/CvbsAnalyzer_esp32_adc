@@ -135,7 +135,6 @@ FastADCState FastADC::Deinitialize()
 
 FastADCState FastADC::StartADCSampling(int8_t gpioPin, bool invertData)
 {
-    //m_gpioPin = gpioPin;
     if(k_gpioToAdc1Channel.count(gpioPin) == 0)
     {
         m_state = FastADCState::k_startFailedBadPin;
@@ -236,17 +235,49 @@ FastADCState FastADC::StartADCSampling(int8_t gpioPin, bool invertData)
     }
 
     //Settings done.
-    //Calling i2s_zero_dma_buffer to erase data that was sampled with default clock settings.
-    err = i2s_zero_dma_buffer(k_i2sPort);
-    if(err != ESP_OK)
-    {
-        m_state = FastADCState::k_startFailedZeroDma;
-        return m_state;
-    }
+    DrainDMA(); //Erase data that was sampled with default clock settings.
     
-
-    m_state = FastADCState::k_adcStarted;
+    if(!IsInErrorState())
+    {
+        m_state = FastADCState::k_adcStarted;
+    }
     return m_state;
+}
+
+void FastADC::DrainDMA()
+{
+    //esp_err_t err = i2s_zero_dma_buffer(k_i2sPort);
+    //if(err != ESP_OK)
+    //{
+    //    m_state = FastADCState::k_startFailedZeroDma;
+    //}
+
+    static uint8_t s_dummyBuf[k_dmaDrainDummyBufSizeBytes];
+
+    constexpr static size_t k_readCyclesNonBlocking = 
+    ((k_dmaBufsCount * k_dmaBufLenSamples * sizeof(uint16_t)) + (k_dmaDrainDummyBufSizeBytes - 1))
+     / k_dmaDrainDummyBufSizeBytes;
+
+    constexpr static size_t k_readCyclesBlocking = 2 * k_readCyclesNonBlocking / k_dmaBufsCount;
+
+    for(int i = 0; i < k_readCyclesNonBlocking; i++)
+    {
+        //Drain all samples that could be read prior to settings update
+        //Non-blocking!
+        uint32_t bytes_read = 0;
+        esp_err_t err = i2s_read(k_i2sPort, s_dummyBuf, k_dmaDrainDummyBufSizeBytes, &bytes_read, 0);
+        if (err != ESP_OK || bytes_read == 0){
+            break;
+        }
+    }
+
+    //I dont know why 1 blocking read is not enough after all non-blocking ones.
+    //So reading all +1 that could been in flight between ADc and DMA, all blocking.
+    for(int i = 0; i < k_readCyclesBlocking; i++)
+    {
+        size_t bytes_read = ReadSamplesBlockingTo((uint16_t*)s_dummyBuf, k_dmaDrainDummyBufSizeBytes);
+        //CVBS_ANALYZER_LOG_INFO("bytes_read in blocking read #%d in DrainDMA(): %d\n", i, bytes_read);
+    }
 }
 
 FastADCState FastADC::StopADCSampling()
@@ -276,46 +307,15 @@ FastADCState FastADC::StopADCSampling()
     return m_state;
 }
 
-#define TAG "I2S"
-
-size_t FastADC::ReadAndPrintSamples()
-{
-    static uint16_t buf[k_dmaBufLenSamples];
-    int samples = 0;
-    size_t bytes_read;
-    int i;
-
-    for(int run=0;run<5;run++)
-    {
-        if (i2s_read(k_i2sPort, buf, k_dmaBufLenSamples * sizeof(uint16_t), &bytes_read, k_dmaReadTimeout) != ESP_OK) {
-            CVBS_ANALYZER_LOG("i2s_read() fail");
-            continue;
-        }
-        //StopADCSampling();
-        samples += k_dmaBufLenSamples;
-
-        //4 run dry, print 5th
-        //if (samples >= k_dmaBufLenSamples*5) 
-        {
-            samples = 0;
-            
-            // output only 256 samples
-    	    for (i = 0; i < bytes_read / 2; i++) {
-                CVBS_ANALYZER_LOG("%d\n", buf[i] & 0x0fff);
-	        }
-            CVBS_ANALYZER_LOG("%d samples printed.(run %d) ----------------\n", bytes_read / 2, run);
-            //break;
-        }
-    }
-    return bytes_read;
-}
 
 size_t FastADC::ReadSamplesBlockingTo(uint16_t *outBuf, size_t bufSizeBytes)
 {
     size_t bytes_read;
     if (i2s_read(k_i2sPort, outBuf, bufSizeBytes, &bytes_read, k_dmaReadTimeout) != ESP_OK) {
-            CVBS_ANALYZER_LOG("i2s_read() fail");
-        }
+        //Unlinke continuous read, here error is real error, not some timeouts?
+        CVBS_ANALYZER_LOG_ERROR("i2s_read() failed");
+        m_state = FastADCState::k_i2sReadFailed;
+    }
     return bytes_read;
 }
 
@@ -420,4 +420,3 @@ void FastADC::PrintADCRegisters()
         I2S0.conf_chan.rx_chan_mod);
 }
 #endif // !USE_FAST_ADC_CONTINUOUS
-

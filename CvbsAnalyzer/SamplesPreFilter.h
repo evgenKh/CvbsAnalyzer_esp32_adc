@@ -54,7 +54,7 @@ class SamplesPreFilter
         }
     }
 
-    constexpr static size_t k_preFilteredSamplesBufLenSamples = k_dmaBufLenSamples * k_dmaBufsCount/ k_adcDataStrideSamples; 
+    constexpr static size_t k_preFilteredSamplesBufLenSamples = k_dmaBufLenSamples * k_maxDmaReadsPerAnalyzePin/ k_adcDataStrideSamples; 
     
     uint16_t m_samplesBuf[k_preFilteredSamplesBufLenSamples];
     size_t m_samplesCount = 0;

@@ -4,6 +4,8 @@
 
 #include "esp_arduino_version.h"
 
+#define CVBS_ANALYZER_LOG_ERROR(...) Serial.printf(__VA_ARGS__);
+//#define CVBS_ANALYZER_LOG_ERROR(...)
 #define CVBS_ANALYZER_LOG_INFO(...) Serial.printf(__VA_ARGS__);
 //#define CVBS_ANALYZER_LOG_INFO(...)
 //#define CVBS_ANALYZER_LOG_DEBUG(...) Serial.printf(__VA_ARGS__);
@@ -47,10 +49,17 @@
                                                 //For 16bit*1chan max=1024
 
     constexpr uint8_t k_dmaBufsCount = 12;//increase if we want to print values since print is slow
+    
+    //Too big values will take long filtering zeroes on pins with no video.
+    constexpr size_t k_maxDmaReadsPerAnalyzePin = k_dmaBufsCount * 2;//Each has timeout of k_dmaReadTimeoutMs and size of k_dmaBufLenSamples
+    
+    //Spending too much memory on this, but at least blocking read will read exactly one buffer.
+    constexpr static size_t k_dmaDrainDummyBufSizeBytes = k_dmaBufLenSamples * sizeof(uint16_t);
 
     constexpr uint32_t k_sampleRate = k_i2sSampleRate * k_oversamplingMultiplier / k_adcDataStrideSamples;
     constexpr uint32_t k_sampleRateWithSkippedOversamples = k_i2sSampleRate;
-    constexpr bool k_skipLeadingZeroSamples = true;
+
+    constexpr bool k_skipLeadingZeroSamples = true;//Not needed if DrainDMA() done well, but it is not done well.
 
     //inline uint16_t PreProcessSample(const uint16_t sample, const uint16_t invertMask = 0x00)
     //{
@@ -88,10 +97,10 @@ enum class CvbsAnalyzerState : signed char
     k_initializing,
     k_initializedAndIdle,
 
-    //k_sampling,
+    k_startADC,
     k_samplingAndPreFiltering,
     k_averageCalculation,
-    //k_amplitudeSampling,
+    k_amplitudeSampling,
     k_amplitudeCalculation,
     //k_syncIntervalsSampling,
     k_syncIntervalsCalculation,
@@ -105,6 +114,7 @@ enum class CvbsAnalyzerState : signed char
     k_failedBadFastADCState,
     k_failedFastADCInitialization,
     k_failedSampling,
+    k_failedSamplingNeedMoreRawSamples,
     k_failedAmplitude,
     k_failedSyncIntervals,
     k_failedVideoScore,

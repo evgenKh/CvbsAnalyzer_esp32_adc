@@ -71,7 +71,7 @@ FastADCState FastADC::Initialize()
 }
 FastADCState FastADC::Deinitialize()
 {
-    ESP_ERROR_CHECK(adc_continuous_deinit(m_handle));
+    adc_continuous_deinit(m_handle);
     return m_state;
 }
 
@@ -104,7 +104,7 @@ FastADCState FastADC::StartADCSampling(int8_t gpioPin, bool invertData)
     }
     m_state = FastADCState::k_adcStarting;
     adc1_channel_t adcChannel = k_gpioToAdc1Channel.at(gpioPin);
-
+    
     adc_digi_pattern_config_t adc_pattern[SOC_ADC_PATT_LEN_MAX] = {0};
     
     
@@ -121,13 +121,14 @@ FastADCState FastADC::StartADCSampling(int8_t gpioPin, bool invertData)
         adc_pattern[i].channel = adcChannel & 0x7;
         adc_pattern[i].unit = k_adcUnit;
         adc_pattern[i].bit_width = k_adcWidthBits;
-
-        ESP_LOGI(TAG, "adc_pattern[%d].atten is :%"PRIx8, i, adc_pattern[i].atten);
-        ESP_LOGI(TAG, "adc_pattern[%d].channel is :%"PRIx8, i, adc_pattern[i].channel);
-        ESP_LOGI(TAG, "adc_pattern[%d].unit is :%"PRIx8, i, adc_pattern[i].unit);
     }
     dig_cfg.adc_pattern = adc_pattern;
-    ESP_ERROR_CHECK(adc_continuous_config(m_handle, &dig_cfg));
+    esp_err_t err = adc_continuous_config(m_handle, &dig_cfg);
+    if(err != ESP_OK)
+    {
+        m_state = FastADCState::k_startFailedConfig;
+        return m_state;
+    }
     //ADC_CONVERT_LIMIT_DISABLE;
 
     adc_set_data_inv(k_adcUnit, invertData);
@@ -138,7 +139,12 @@ FastADCState FastADC::StartADCSampling(int8_t gpioPin, bool invertData)
     adc_ll_digi_set_convert_limit_num(255);//Maybe not needed idk
 
 
-    ESP_ERROR_CHECK(adc_continuous_start(m_handle));
+    err = adc_continuous_start(m_handle);
+    if(err != ESP_OK)
+    {
+        m_state = FastADCState::k_startFailedContinuousStart;
+        return m_state;
+    }
     
     adc_set_clk_div(2);
     adc_ll_set_sample_cycle(k_adcSampleCycle);   
@@ -148,24 +154,44 @@ FastADCState FastADC::StartADCSampling(int8_t gpioPin, bool invertData)
 
 
     //Settings done.
-    //Calling i2s_zero_dma_buffer to erase data that was sampled with default clock settings.
+    DrainDMA(); //Erase data that was sampled with default clock settings.
+    
+    if(!IsInErrorState())
+    {
+        m_state = FastADCState::k_adcStarted;
+    }
+    return m_state;
+}
+
+void FastADC::DrainDMA()
+{
     //esp_err_t err = adc_continuous_flush_pool(m_handle);
-    constexpr static size_t k_dummyBufSize = 100;
-    constexpr static size_t k_readCycles = ((k_dmaBufsCount * k_dmaBufLenSamples * sizeof(uint16_t)) + (k_dummyBufSize - 1)) / k_dummyBufSize;
-    static uint8_t s_dummyBuf[k_dummyBufSize];
-    for(int i = 0; i < k_readCycles; i++)
+    constexpr static size_t k_readCyclesNonBlocking = 
+                                ((k_dmaBufsCount * k_dmaBufLenSamples * sizeof(uint16_t)) + (k_dmaDrainDummyBufSizeBytes - 1))
+                                / k_dmaDrainDummyBufSizeBytes;
+
+    constexpr static size_t k_readCyclesBlocking = 2 * k_readCyclesNonBlocking / k_dmaBufsCount;
+
+    static uint8_t s_dummyBuf[k_dmaDrainDummyBufSizeBytes];
+    for(int i = 0; i < k_readCyclesNonBlocking; i++)
     {
         //Drain all samples that could be read prior to settings update
         uint32_t bytes_read = 0;
-        esp_err_t ret = adc_continuous_read(m_handle, s_dummyBuf, k_dummyBufSize, &bytes_read, 0);
+        esp_err_t ret = adc_continuous_read(m_handle, s_dummyBuf, k_dmaDrainDummyBufSizeBytes, &bytes_read, 0);
         if (ret != ESP_OK || bytes_read == 0){
             break;
         }
     }
-    
-    m_state = FastADCState::k_adcStarted;
-    return m_state;
+
+    //I dont know why 1 blocking read is not enough after all non-blocking ones.
+    //So reading all +1 that could been in flight between ADc and DMA, all blocking.
+    for(int i = 0; i <  k_readCyclesBlocking; i++)
+    {
+        size_t bytes_read = ReadSamplesBlockingTo((uint16_t*)s_dummyBuf, k_dmaDrainDummyBufSizeBytes);
+        //CVBS_ANALYZER_LOG_INFO("bytes_read in blocking read #%d in DrainDMA(): %d\n", i, bytes_read);
+    }
 }
+
 FastADCState FastADC::StopADCSampling()
 {
     if(m_state != FastADCState::k_adcStarted)
@@ -185,51 +211,29 @@ FastADCState FastADC::StopADCSampling()
     return m_state;
 }
 
-size_t FastADC::ReadAndPrintSamples()
-{
-    esp_err_t ret;
-
-    static uint16_t buf[k_dmaBufLenSamples];
-    uint8_t* bufAsBytes = (uint8_t*)buf;
-    int samples = 0;
-    uint32_t bytes_read = 0;
-
-    ret = adc_continuous_read(m_handle, bufAsBytes, k_dmaBufLenSamples * sizeof(uint16_t), &bytes_read, k_dmaReadTimeoutMs);
-    if (ret == ESP_OK) {
-        ESP_LOGI("TASK", "ret is %x, ret_num is %"PRIu32" bytes", ret, bytes_read);
-        for (int i = 0; i < bytes_read; i += SOC_ADC_DIGI_RESULT_BYTES) {
-            adc_digi_output_data_t *p = (adc_digi_output_data_t*)&bufAsBytes[i];
-            uint32_t chan_num = p->type1.channel;
-            uint32_t data = p->type1.data;
-            /* Check the channel number validation, the data is invalid if the channel num exceed the maximum channel */
-            if (chan_num < SOC_ADC_CHANNEL_NUM(k_adcUnit)) {
-                ESP_LOGI(TAG, "Unit: %s, Channel: %"PRIu32", Value: %"PRIx32, unit, chan_num, data);
-            } else {
-                ESP_LOGW(TAG, "Invalid data [%s_%"PRIu32"_%"PRIx32"]", unit, chan_num, data);
-            }
-        }
-    }
-    return bytes_read;
-}
 size_t FastADC::ReadSamplesBlockingTo(uint16_t* outBuf, size_t bufSizeBytes)
 {
     uint8_t* bufAsBytes = (uint8_t*)outBuf;
     uint32_t bytes_read = 0;
 
-    esp_err_t ret = adc_continuous_read(m_handle, bufAsBytes, bufSizeBytes, &bytes_read, k_dmaReadTimeoutMs);
-    if (ret == ESP_OK) {
-        ESP_LOGI("TASK", "ret is %x, ret_num is %"PRIu32" bytes", ret, bytes_read);
+    esp_err_t err = adc_continuous_read(m_handle, bufAsBytes, bufSizeBytes, &bytes_read, k_dmaReadTimeoutMs);
+    if (err == ESP_OK) {
         for (int i = 0; i < bytes_read; i += SOC_ADC_DIGI_RESULT_BYTES) {
             adc_digi_output_data_t *p = (adc_digi_output_data_t*)&bufAsBytes[i];
             uint32_t chan_num = p->type1.channel;
             uint32_t data = p->type1.data;
             /* Check the channel number validation, the data is invalid if the channel num exceed the maximum channel */
-            if (chan_num < SOC_ADC_CHANNEL_NUM(k_adcUnit)) {
-                ESP_LOGI(TAG, "Unit: %s, Channel: %"PRIu32", Value: %"PRIx32, unit, chan_num, data);
-            } else {
-                ESP_LOGW(TAG, "Invalid data [%s_%"PRIu32"_%"PRIx32"]", unit, chan_num, data);
+            if (chan_num >= SOC_ADC_CHANNEL_NUM(k_adcUnit)) {
+                CVBS_ANALYZER_LOG_ERROR("Invalid ADC channel %d, data %x\n", (int)chan_num, (int)data);
+                m_state = FastADCState::k_continuousReadFailedInvalidData;
             }
         }
+    }
+    else
+    {
+        CVBS_ANALYZER_LOG_DEBUG("adc_continuous_read returned %d (%s)\n", (int)err, esp_err_to_name(err));
+        //It's ok
+        //m_state = FastADCState::k_continuousReadFailed;
     }
     return bytes_read;
 }

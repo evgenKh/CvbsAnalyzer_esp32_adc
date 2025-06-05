@@ -56,6 +56,6 @@ void loop()
   CVBS_ANALYZER_LOG_INFO("\n");
   //CVBS_ANALYZER_LOG("CvbsAnalyzer finished with state %d.\n", (int)state);
 
-  delay(1000);
+  delay(500);
   loopNum++;
 }

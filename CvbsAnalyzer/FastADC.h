@@ -38,7 +38,12 @@ enum class FastADCState : signed char{
     k_startFailedSetAdcMode,
     k_startFailedZeroDma,
     k_startFailedAdcEnable,
+    k_startFailedConfig,
+    k_startFailedContinuousStart,
     k_stopFailedAdcDisable,
+    k_i2sReadFailed,
+    k_continuousReadFailed,
+    k_continuousReadFailedInvalidData,
 };
 
 struct adc_continuous_ctx_t;
@@ -56,7 +61,6 @@ public:
 
     void PrintADCRegisters();
     
-    size_t ReadAndPrintSamples();
     size_t ReadSamplesBlockingTo(uint16_t* outBuf, size_t bufSizeBytes);
 
     inline FastADCState GetState() const { return m_state; }
@@ -66,6 +70,7 @@ public:
 
 private:
     void SetClkDiv(uint16_t integer, uint16_t denominator, uint16_t numerator);
+    void DrainDMA();
 
     FastADCState m_state = FastADCState::k_notInitialized;
     adc_continuous_handle_t m_handle = nullptr;
@@ -78,8 +83,8 @@ private:
     //static constexpr adc_bits_width_t k_adcWidth = ADC_WIDTH_BIT_12;
     static constexpr uint8_t k_adcWidthBits = 12;
 
-    static constexpr uint32_t k_startAdcDelayMs = 10;
-    static constexpr TickType_t k_dmaReadTimeoutMs = 1;
+    //static constexpr uint32_t k_startAdcDelayMs = 10;
+    static constexpr TickType_t k_dmaReadTimeoutMs = 2* (1+((k_i2sSampleRate * k_oversamplingMultiplier) / 1000 / k_dmaBufLenSamples));
     static constexpr TickType_t k_dmaReadTimeout = k_dmaReadTimeoutMs * portTICK_PERIOD_MS; //default: portMAX_DELAY
 
     static constexpr uint8_t k_i2sEventQueueSize = 0;

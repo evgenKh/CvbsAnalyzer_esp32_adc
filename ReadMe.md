@@ -53,22 +53,23 @@
 
 ## Швидкодія:
 
-Наразі це 12-13мс на прохід одного канала АЦП без інверсії. Тобто х2 якщо перевіряти також з інверсієй. Можна пробувати знижувати, наприклад k_minSamplesForCalculationUs, і вкластить в <10мс.
+Наразі це 8-13мс на прохід одного канала АЦП (з інверсієй + без, разом).
 ```
-m_stateProfilers.k_amplitudeSampling	5715us
-m_stateProfilers.k_amplitudeCalculation	171us
-m_stateProfilers.k_syncIntervalsSampling	3276us
-m_stateProfilers.k_syncIntervalsCalculation	3045us
-m_stateProfilers.k_videoScoreCalculation	195us
-m_stateProfilers.k_restartInverted	0us
-m_stateProfilers.k_stopADC	1498us
-m_stateProfilers.k_finished	0us
-m_stateProfilers.k_totalAnalyzeTime	13339us
+"m_stateProfilers": {
+        "k_startADC": 1388,
+        "k_samplingAndPreFiltering": 1235,
+        "k_amplitudeSampling": 7804,
+        "k_amplitudeCalculation": 34,
+        "k_syncIntervalsCalculation": 1283,
+        "k_videoScoreCalculation": 1838,
+        "k_restartInverted": 70,
+        "k_stopADC": 51,
+        "k_totalAnalyzeTime": 11979,
+},
 ```
 
 Можлива асинхронна робота, приклад:
 ```
-
 CvbsAnalyzer g_cvbsAnalyzer;
 CvbsAnalyzerDispatcher g_cvbsAnalyzerDispatcher(&g_cvbsAnalyzer);
 CvbsAnalyzerJob g_pin35Job(CvbsAnalyzerJobType::k_videoScore, 35);
@@ -76,14 +77,18 @@ CvbsAnalyzerJob g_pin36Job(CvbsAnalyzerJobType::k_videoScore, 36);
 g_cvbsAnalyzer.InitializeFastADC();
 g_cvbsAnalyzerDispatcher.StartWorkerThread();
 
-g_cvbsAnalyzerDispatcher.RequestJob(&g_pin35Job);
-g_pin35Job.WaitUntilDone();
-CVBS_ANALYZER_LOG_INFO("m_videoScore.m_isVideo=%f\n", g_pin35Job.m_videoScore.m_isVideo);
+while(1)
+{
+	g_cvbsAnalyzerDispatcher.RequestJob(&g_pin35Job);
+	g_cvbsAnalyzerDispatcher.RequestJob(&g_pin36Job);
+	g_pin35Job.WaitUntilDone();
+	CVBS_ANALYZER_LOG_INFO("m_videoScore.m_isVideo=%f\n", g_pin35Job.m_videoScore.m_isVideo);
 
-//або
+	//або
 
-while(!g_pin35Job.IsDone()) {}
-CVBS_ANALYZER_LOG_INFO("m_videoScore.m_isVideo=%f\n", g_pin35Job.m_videoScore.m_isVideo);
+	while(!g_pin35Job.IsDone()) {}
+	CVBS_ANALYZER_LOG_INFO("m_videoScore.m_isVideo=%f\n", g_pin35Job.m_videoScore.m_isVideo);
+}
 ```
 
 

@@ -62,7 +62,7 @@ private:
     constexpr static int16_t k_minRange = 3;//k_binsCount;        // Condition for k_badAmplitudeTooLow
     constexpr static float k_highestBinMaxWeight = 0.90f;     // Condition for k_badAmplitudeTooHigh
 
-    constexpr static size_t k_minSamplesForCalculationUs = 1200;
+    constexpr static size_t k_minSamplesForCalculationUs = 1200;//~20 TV lines
     constexpr static size_t k_minSamplesForCalculation = UsToSamplesContexpr(k_minSamplesForCalculationUs);
     //Important, if stride>1, we consume more samples 
 

@@ -75,11 +75,11 @@ private:
         {
             CVBS_ANALYZER_LOG("CvbsAnalyzer state changed from %d to %d\n", (int)m_state, (int)state);
 #if CVBS_ANALYZER_PROFILER
-            m_stateProfilers[m_state].Stop();
+            if(m_stateProfilers.count(m_state)) m_stateProfilers[m_state].Stop();
 #endif
             m_state = state;
 #if CVBS_ANALYZER_PROFILER
-            m_stateProfilers[m_state].Start();
+            if(m_stateProfilers.count(m_state)) m_stateProfilers[m_state].Start();
 #endif            
         }
         return m_state;
@@ -90,12 +90,13 @@ private:
 #if CVBS_ANALYZER_PROFILER
     std::map<CvbsAnalyzerState, CvbsAnalyzerProfiler> m_stateProfilers;
 #endif // CVBS_ANALYZER_PROFILER
+    void PrintProfilersJson();
 
-    constexpr static size_t k_maxDmaReadsPerAnalyzePin = k_dmaBufsCount;//Each has timeout of k_dmaReadTimeoutMs and size of k_dmaBufLenSamples
-    constexpr static bool k_syncIntervalsCalculatorConsumeMaxDmaReads = true; 
+    constexpr static bool k_syncIntervalsCalculatorConsumeMaxDmaReads = false; 
 
     constexpr static bool k_printRawAdcData = false; //Slow!
     constexpr static bool k_printCsvLearningData = false;
+    constexpr static bool k_printJsonLearningData = false;
     
 
     bool m_invertDataCurrentValue;
