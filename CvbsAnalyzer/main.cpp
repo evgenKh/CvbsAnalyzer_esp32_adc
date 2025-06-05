@@ -7,6 +7,7 @@ CvbsAnalyzer g_cvbsAnalyzer;
 CvbsAnalyzerDispatcher g_cvbsAnalyzerDispatcher(&g_cvbsAnalyzer);
 CvbsAnalyzerJob g_pin35Job(35, CvbsAnalyzerJobType::k_videoScore, CvbsAnalyzerInversionType::k_nonInvertedThenInverted);
 CvbsAnalyzerJob g_pin36Job(36, CvbsAnalyzerJobType::k_videoScore, CvbsAnalyzerInversionType::k_nonInvertedThenInverted);
+CvbsAnalyzerJob g_pin36AverageJob(36, CvbsAnalyzerJobType::k_averageRssi, CvbsAnalyzerInversionType::k_nonInvertedOnly);
 
 void setup()
 {
@@ -53,6 +54,19 @@ void loop()
                             g_pin36Job.m_videoScoreInverted.m_isVideo);
   }
   
+  if(true)
+  {
+    CVBS_ANALYZER_LOG_INFO("Reading pin avg %d\t\t: ", g_pin36AverageJob.m_gpioPin);
+    g_cvbsAnalyzerDispatcher.RequestJob(&g_pin36AverageJob);
+    g_pin36AverageJob.WaitUntilDone();
+    //while(!g_pin35Job.IsDone()) {}
+
+    CVBS_ANALYZER_LOG_INFO("m_rssiAverage=%d\n",
+                            g_pin36AverageJob.m_rssiAverage);
+
+    delay(5);
+  }
+
   CVBS_ANALYZER_LOG_INFO("\n");
   //CVBS_ANALYZER_LOG("CvbsAnalyzer finished with state %d.\n", (int)state);
 

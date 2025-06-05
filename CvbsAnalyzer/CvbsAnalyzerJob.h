@@ -37,6 +37,9 @@ public:
         m_inversionType = inversionType;
     }
 
+    CvbsAnalyzerJob(const CvbsAnalyzerJob& other) = delete; //non copyable!
+    CvbsAnalyzerJob& operator=(const CvbsAnalyzerJob& other) = delete; //non copyable!
+
     CvbsAnalyzerJob()
     {
         m_tokensSourceQueue = xQueueCreate(k_tokensPerJob, sizeof(JobQueueToken));

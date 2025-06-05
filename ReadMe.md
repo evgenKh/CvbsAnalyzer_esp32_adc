@@ -55,6 +55,7 @@
 
 Наразі це 8-13мс на прохід одного канала АЦП (з інверсієй + без, разом).
 ```
+Video
 "m_stateProfilers": {
         "k_startADC": 1388,
         "k_samplingAndPreFiltering": 1235,
@@ -66,6 +67,14 @@
         "k_stopADC": 51,
         "k_totalAnalyzeTime": 11979,
 },
+RSSI
+"m_stateProfilers": {
+        "k_startADC": 1219,
+        "k_samplingAndPreFiltering": 431,
+        "k_averageCalculation": 2195,
+        "k_stopADC": 36,
+        "k_totalAnalyzeTime": 3513,
+},
 ```
 
 Можлива асинхронна робота, приклад:
@@ -74,6 +83,8 @@ CvbsAnalyzer g_cvbsAnalyzer;
 CvbsAnalyzerDispatcher g_cvbsAnalyzerDispatcher(&g_cvbsAnalyzer);
 CvbsAnalyzerJob g_pin35Job(CvbsAnalyzerJobType::k_videoScore, 35);
 CvbsAnalyzerJob g_pin36Job(CvbsAnalyzerJobType::k_videoScore, 36);
+CvbsAnalyzerJob g_pin36AverageJob(36, CvbsAnalyzerJobType::k_averageRssi, CvbsAnalyzerInversionType::k_nonInvertedOnly);
+
 g_cvbsAnalyzer.InitializeFastADC();
 g_cvbsAnalyzerDispatcher.StartWorkerThread();
 
@@ -86,8 +97,8 @@ while(1)
 
 	//або
 
-	while(!g_pin35Job.IsDone()) {}
-	CVBS_ANALYZER_LOG_INFO("m_videoScore.m_isVideo=%f\n", g_pin35Job.m_videoScore.m_isVideo);
+	while(!g_pin36AverageJob.IsDone()) {}
+	CVBS_ANALYZER_LOG_INFO("m_rssiAverage=%d\n", g_pin36AverageJob.m_rssiAverage);
 }
 ```
 
@@ -99,21 +110,15 @@ while(1)
     ```
     Reading pin 35          : m_videoScore.m_isVideo=0.000000 m_videoScoreInverted.m_isVideo=0.000000
 	Reading pin 36          : m_videoScore.m_isVideo=0.420000 m_videoScoreInverted.m_isVideo=0.050000
+	Reading pin avg 36              : m_rssiAverage=3908
 
 	Reading pin 35          : m_videoScore.m_isVideo=0.000000 m_videoScoreInverted.m_isVideo=0.000000
 	Reading pin 36          : m_videoScore.m_isVideo=0.909259 m_videoScoreInverted.m_isVideo=0.050000
+	Reading pin avg 36              : m_rssiAverage=3955
 
 	Reading pin 35          : m_videoScore.m_isVideo=0.000000 m_videoScoreInverted.m_isVideo=0.000000
 	Reading pin 36          : m_videoScore.m_isVideo=0.700000 m_videoScoreInverted.m_isVideo=0.700000
-
-	Reading pin 35          : m_videoScore.m_isVideo=0.000000 m_videoScoreInverted.m_isVideo=0.000000
-	Reading pin 36          : m_videoScore.m_isVideo=0.704464 m_videoScoreInverted.m_isVideo=0.053115
-
-	Reading pin 35          : m_videoScore.m_isVideo=0.000000 m_videoScoreInverted.m_isVideo=0.000000
-	Reading pin 36          : m_videoScore.m_isVideo=0.866667 m_videoScoreInverted.m_isVideo=0.050000
-
-	Reading pin 35          : m_videoScore.m_isVideo=0.000000 m_videoScoreInverted.m_isVideo=0.000000
-	Reading pin 36          : m_videoScore.m_isVideo=0.700000 m_videoScoreInverted.m_isVideo=0.050000
+	Reading pin avg 36              : m_rssiAverage=3959
 	```
 
 
