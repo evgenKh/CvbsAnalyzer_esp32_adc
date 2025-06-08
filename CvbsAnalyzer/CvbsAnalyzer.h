@@ -107,7 +107,7 @@ private:
     FastADC m_fastAdc;
     AmplitudeCaclulator m_amplitudeCaclulator;
     SyncIntervalsCalculator m_syncIntervalsCalculator;
-    AverageFilter m_rssiAverageFilter;
+    MeanAverageFilter m_rssiAverageFilter;
     SamplesPreFilter m_samplesPreFilter;
     
     //Results

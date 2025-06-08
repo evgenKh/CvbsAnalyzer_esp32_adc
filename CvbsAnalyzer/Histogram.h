@@ -5,14 +5,14 @@
 #include <algorithm>
 #include "CvbsAnalyzerGlobals.h"
 
-template <typename CounterType, typename DataType, size_t k_binsCount>
+template <typename CounterType, typename DataType, typename BinWidthType, size_t k_binsCount>
 class Histogram : public std::array<CounterType, k_binsCount>
 {
 public:
 
     Histogram(const DataType binsRangeMin, const DataType binsRangeMax)
         : m_binsRange(binsRangeMin, binsRangeMax),
-          m_binWidth((binsRangeMax - binsRangeMin) / static_cast<double>(k_binsCount))
+          m_binWidth((binsRangeMax - binsRangeMin) / static_cast<BinWidthType>(k_binsCount))
     {
         assert(binsRangeMin < binsRangeMax);
         Reset();
@@ -26,31 +26,32 @@ public:
         this->fill(0);
     }
 
-    inline double GetBinLowBound(size_t binIndex) const
+    inline BinWidthType GetBinLowBound(size_t binIndex) const
     {
         return m_binsRange.first + binIndex * m_binWidth;
     }
 
     inline DataType GetBinCenter(size_t binIndex) const
     {
-        if (std::is_floating_point<DataType>::value)
+        //if (std::is_floating_point<DataType>::value)
+        if(true)
         {
-            return static_cast<DataType>(m_binsRange.first + (binIndex + 0.5) * m_binWidth);
+            return static_cast<DataType>(m_binsRange.first + (binIndex * m_binWidth) + (m_binWidth / static_cast<BinWidthType>(2)));
         }
         else
         {
             // for integer types, add 0.5 to round to nearest
-            return static_cast<DataType>(m_binsRange.first + (binIndex + 0.5) * m_binWidth + 0.5);
+            //return static_cast<DataType>(m_binsRange.first + (binIndex + 0.5) * m_binWidth + 0.5);
         }
     }
-    inline double GetBinCenterPrecise(size_t binIndex) const
+    inline BinWidthType GetBinCenterPrecise(size_t binIndex) const
     {
-        return m_binsRange.first + (binIndex + 0.5) * m_binWidth;
+        return m_binsRange.first + (binIndex * m_binWidth) + (m_binWidth / static_cast<BinWidthType>(2));
     }
 
-    inline double GetBinHighBound(size_t binIndex) const
+    inline BinWidthType GetBinHighBound(size_t binIndex) const
     {
-        return m_binsRange.first + (binIndex + 1.0) * m_binWidth;
+        return m_binsRange.first + (binIndex + static_cast<BinWidthType>(1)) * m_binWidth;
     }
 
     inline DataType ClampValue(const DataType sampleValue) const
@@ -74,7 +75,7 @@ public:
     // May return bin index out of range if sampleValue is out of range
     inline int32_t GetBinIndexForValueNotClampingToBinRange(DataType sampleValue) const
     {
-        const int32_t binIndex = static_cast<int32_t>(((double)sampleValue - (double)m_binsRange.first) / m_binWidth);
+        const int32_t binIndex = static_cast<int32_t>((static_cast<BinWidthType>(sampleValue) - static_cast<BinWidthType>(m_binsRange.first)) / m_binWidth);
         return binIndex;
     }
 
@@ -96,7 +97,7 @@ public:
         m_samplesCount++;
     }
 
-    void Extend(const Histogram<CounterType, DataType, k_binsCount> &other)
+    void Extend(const Histogram<CounterType, DataType, BinWidthType, k_binsCount> &other)
     {
         if(!other.GetSamplesCount()) return;
         
@@ -192,7 +193,7 @@ public:
     constexpr bool empty() const noexcept = delete;
 
     const std::pair<const DataType, const DataType> m_binsRange;
-    const double m_binWidth;
+    const BinWidthType m_binWidth;
 
     std::pair<DataType, DataType> m_sampleValuesRange;
 

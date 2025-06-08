@@ -22,14 +22,17 @@ class SamplesPreFilter
     {
         const size_t filteredSamplesCountOld = m_samplesCount;
         const uint16_t xorMask = invertData ? k_adcDataXorMaskForInvert : 0x00;
-        bool firstNonZeroSampleFound = false;
+
+        //Skipping only from first rawDataSet
+        bool firstNonZeroSampleFound = !skipLeadingZeroes || (m_samplesCount > 0); 
+
         for(size_t i = 0; i < newRawSamplesCount; i += k_adcDataStrideSamples)
         {
             if(m_samplesCount >= k_preFilteredSamplesBufLenSamples)
             {
                 break;
             }
-            if(skipLeadingZeroes && !firstNonZeroSampleFound)
+            if(!firstNonZeroSampleFound)
             {                
                 //Due to ADC hacks and calling zeroDma after ADC start, some datasets may have many zero samples at start.    
                 if((newRawSamples[i] & k_adcDataMask) == 0)

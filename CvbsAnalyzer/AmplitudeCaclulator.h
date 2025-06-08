@@ -54,8 +54,8 @@ public:
     //int16_t m_blackValue;
     //int16_t m_colorMaxValue;
 
-    constexpr static size_t k_binsCount = 100;//Do not lower! 30 it loo low.
-    typedef Histogram<uint32_t, uint16_t, k_binsCount> HistogramType;
+    constexpr static size_t k_binsCount = 128;//Do not lower! 30 it loo low.
+    typedef Histogram<uint32_t, uint16_t, uint16_t, k_binsCount> HistogramType;
     HistogramType m_amplitudeHistogram;
 private:
 

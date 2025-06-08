@@ -44,7 +44,7 @@ public:
     constexpr static size_t k_binsCount = k_maxSequenceLength; // Makes sense to *2 for precision, if REAL sampling rate is 2Mhz
 
 
-    typedef Histogram<uint32_t, uint32_t, k_binsCount> HistogramType;
+    typedef Histogram<uint32_t, uint32_t, uint16_t, k_binsCount> HistogramType;
     HistogramType m_syncSequenceLengthHistogram;
     HistogramType m_notSyncSequenceLengthHistogram;
 
