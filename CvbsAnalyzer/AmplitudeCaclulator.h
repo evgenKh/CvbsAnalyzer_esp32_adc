@@ -26,7 +26,8 @@ enum class AmplitudeCaclulatorState : signed char
 class AmplitudeCaclulator
 {
 public:
-    AmplitudeCaclulator() : m_amplitudeHistogram(0, MAX_UINT_12BIT)
+    AmplitudeCaclulator() : m_amplitudeHistogram(0, MAX_UINT_12BIT),
+                            m_smallDiffsHistogram(0, MAX_UINT_12BIT)
     {
         Reset();
     }
@@ -36,8 +37,8 @@ public:
     AmplitudeCaclulatorState PushSamples(const uint16_t *newData, size_t newDataLen);
     AmplitudeCaclulatorState Calculate();
     void CalculateSyncTreshold();
-    void CalculateWhiteLevel();
-    void CalculateBlankingLevel();
+    //void CalculateWhiteLevel();
+    //void CalculateBlankingLevel();
     void Print() const;
 
     inline AmplitudeCaclulatorState GetState() const { return m_state; }
@@ -57,6 +58,9 @@ public:
     constexpr static size_t k_binsCount = 128;//Do not lower! 30 it loo low.
     typedef Histogram<uint32_t, uint16_t, uint16_t, k_binsCount> HistogramType;
     HistogramType m_amplitudeHistogram;
+    HistogramType m_smallDiffsHistogram; //Counting samples that are close to their neighbor.
+                                         // Group by sample value.
+                                         //For detecting flat lines, like sync pulse.
 private:
 
     constexpr static int16_t k_minRange = 3;//k_binsCount;        // Condition for k_badAmplitudeTooLow
@@ -64,21 +68,19 @@ private:
 
     constexpr static size_t k_minSamplesForCalculationUs = 1200;//~20 TV lines
     constexpr static size_t k_minSamplesForCalculation = UsToSamplesContexpr(k_minSamplesForCalculationUs);
-    //Important, if stride>1, we consume more samples 
-
-    // constexpr static float k_syncPulseOnlyAmplitudeColorbarsNtscM = 17.0f/170.0f;
-    // constexpr static float k_syncPulseOnlyAmplitudeBlackNtscMWithColorBurst = 20.0f/60.0f;
-    // constexpr static float k_syncPulseOnlyAmplitudeBlackNtscMBW = 40.0f/47.0f;
-    // constexpr static float k_syncPulseOnlyAmplitudeColorbarsNtscJ = 7.0f/173.0f;
-    // constexpr static float k_syncPulseOnlyAmplitudeColorbarsPal = 10.0f/176.0f;
-    //
-    // constexpr static float k_syncPulseMinWidthNtsc = 4.7f/63.5f;
-    // constexpr static float k_syncPulseMinWidthPal = 4.7f/64.0f;//7%, byt can be ~5% in practice
+    
+    
+    constexpr static size_t k_minSamplesForSmallDiffTresholdCalculationUs = 140;//~2 TV lines
+    constexpr static size_t k_minSamplesForSmallDiffTresholdCalculation = UsToSamplesContexpr(k_minSamplesForSmallDiffTresholdCalculationUs);
 
     constexpr static float k_syncTresholdDefault = 0.15f; // Fallbak. Let's assume 15% of full signal amplitude
     // constexpr static float k_syncTresholdMax = 0.5f;//
 
     AmplitudeCaclulatorState m_state;
+
+    constexpr static float k_smallDiffTresholdRelativeToSamplesRange = 0.02; //2% of samples range
+    uint16_t m_smallDiffTreshold = 0; //Threshold for diff between samples to consider it small, in ADC units.
+    bool m_smallDiffTresholdFound = false; 
 };
 
 #endif

@@ -1,3 +1,6 @@
+#if USE_CVBS_ANALYZER_MAIN
+// Code below if for test application. Don't need it when using as library.
+
 #include <Arduino.h>
 #include "CvbsAnalyzer.h"
 #include "CvbsAnalyzerDispatcher.h"
@@ -30,7 +33,7 @@ void loop()
   CVBS_ANALYZER_LOG("Running loop # %d.\n", loopNum);
   CvbsAnalyzerState state;
   
-  if(true)
+  if(false)
   {
     CVBS_ANALYZER_LOG_INFO("Reading pin %d\t\t: ", g_pin35Job.m_gpioPin);
     g_cvbsAnalyzerDispatcher.RequestJob(&g_pin35Job);
@@ -53,8 +56,8 @@ void loop()
                             g_pin36Job.m_videoScore.m_isVideo,
                             g_pin36Job.m_videoScoreInverted.m_isVideo);
   }
-  
-  if(true)
+
+  if(false)
   {
     CVBS_ANALYZER_LOG_INFO("Reading pin avg %d\t\t: ", g_pin36AverageJob.m_gpioPin);
     g_cvbsAnalyzerDispatcher.RequestJob(&g_pin36AverageJob);
@@ -73,3 +76,5 @@ void loop()
   delay(500);
   loopNum++;
 }
+
+#endif // USE_CVBS_ANALYZER_MAIN

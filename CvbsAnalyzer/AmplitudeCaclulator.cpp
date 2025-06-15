@@ -17,6 +17,10 @@ void AmplitudeCaclulator::Reset()
     //m_colorMaxValue = INVALID_VALUE;
 
     m_amplitudeHistogram.Reset();
+    
+    m_smallDiffTresholdFound = false;
+    m_smallDiffTreshold = 0;
+    m_smallDiffsHistogram.Reset();
 }
 
 AmplitudeCaclulatorState AmplitudeCaclulator::PushSamples(const uint16_t *newData, size_t newDataLen)
@@ -28,7 +32,6 @@ AmplitudeCaclulatorState AmplitudeCaclulator::PushSamples(const uint16_t *newDat
         
         for (size_t i = 0; i < newDataLen; i ++)
         {
-            //TODO: try skip repeated samples
             m_amplitudeHistogram.PushSample(newData[i]);
         }
 
@@ -63,8 +66,32 @@ AmplitudeCaclulatorState AmplitudeCaclulator::PushSamples(const uint16_t *newDat
         m_state = AmplitudeCaclulatorState::k_readyForCalculation;
     }else{        
         m_state = AmplitudeCaclulatorState::k_needMoreSamples;
-        return m_state;
     }
+
+    if(!m_smallDiffTresholdFound && 
+        m_amplitudeHistogram.GetSamplesCount() >= k_minSamplesForSmallDiffTresholdCalculation)
+    {
+        m_smallDiffTreshold = static_cast<uint16_t>(
+            static_cast<float>(m_amplitudeHistogram.m_sampleValuesRange.second - m_amplitudeHistogram.m_sampleValuesRange.first)
+             * k_smallDiffTresholdRelativeToSamplesRange
+        );
+        //0 is not not great, but OK value too.
+        m_smallDiffTresholdFound = true;
+    }
+    if(m_smallDiffTresholdFound)
+    {
+        for(size_t i = 1; i < newDataLen; i++)
+        {
+            //Compare with previous sample
+            const uint16_t diff = std::abs(static_cast<int16_t>(newData[i]) - static_cast<int16_t>(newData[i-1]));
+            if(diff <= m_smallDiffTreshold)
+            {
+                m_smallDiffsHistogram.PushSample(newData[i]);//Count value of current sample
+            }
+        }
+    }
+    //Do not check m_smallDiffsHistogram.GetSamplesCount().
+    //0% SNR data is still valid data, if m_amplitudeHistogram is full.
 
     return m_state;
 }
@@ -132,10 +159,10 @@ void AmplitudeCaclulator::CalculateSyncTreshold()
                 *k_syncTresholdDefault; 
     }
 }
-
+/*
 void AmplitudeCaclulator::CalculateBlankingLevel()
 { 
-    /*if(whiteBin != INVALID_VALUE && syncTresholdBin != INVALID_VALUE && syncTresholdBin < whiteBin - 1)
+    if(whiteBin != INVALID_VALUE && syncTresholdBin != INVALID_VALUE && syncTresholdBin < whiteBin - 1)
     {
         size_t maxCount = 0;
         size_t maxCountBin = syncTresholdBin;
@@ -149,8 +176,8 @@ void AmplitudeCaclulator::CalculateBlankingLevel()
             }
         }
         m_blankingValue = GetBinCenterValue(m_minValue, binWidth, maxCountBin);
-    }*/
-}
+    }
+}*/
 
 void AmplitudeCaclulator::Print() const
 {
@@ -161,6 +188,7 @@ void AmplitudeCaclulator::Print() const
     CVBS_ANALYZER_LOG("}, \n");
 }
 
+/*
 void AmplitudeCaclulator::CalculateWhiteLevel()
 {
     constexpr uint32_t k_edgesMinDelta = 1;
@@ -175,4 +203,4 @@ void AmplitudeCaclulator::CalculateWhiteLevel()
         m_whiteValue = m_amplitudeHistogram.GetBinCenter(whiteBin);
     }
 }
-
+*/
