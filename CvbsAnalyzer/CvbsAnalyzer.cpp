@@ -1,5 +1,6 @@
 #include "CvbsAnalyzer.h"
 #include <math.h>
+#include <string.h>
 
 #if CVBS_ANALYZER_PROFILER
 #   define TO_STR(x) #x
@@ -441,6 +442,9 @@ void CvbsAnalyzer::PrintJson()
 
 void CvbsAnalyzer::PrintCsv()
 {
+    static constexpr size_t k_csvBufCapacity = 5000; //150 floats with commas
+    static char csvBuf[k_csvBufCapacity] = "";
+
     static bool headerPrinted = false;
     if(!headerPrinted)
     {
@@ -457,22 +461,46 @@ void CvbsAnalyzer::PrintCsv()
             m_syncSequenceLengthHistogram.k_binsCount,\
             m_syncSequenceLengthHistogram.m_samplesCount,\
             m_syncSequenceLengthHistogram.bins_weights,");
+            
+        csvBuf[0] = '\0';
         for(int i=0; i<m_syncIntervalsCalculator.m_syncSequenceLengthHistogram.size();i++)
-            CVBS_ANALYZER_LOG_INFO("S%d,", m_syncIntervalsCalculator.m_syncSequenceLengthHistogram.GetBinCenter(i));
-        
+        {
+            snprintf(&csvBuf[strlen(csvBuf)], k_csvBufCapacity - strlen(csvBuf) - 1,
+                "S%d,", m_syncIntervalsCalculator.m_syncSequenceLengthHistogram.GetBinCenter(i));
+        }
+        CVBS_ANALYZER_LOG_INFO(csvBuf);
+
         CVBS_ANALYZER_LOG_INFO("m_notSyncSequenceLengthHistogram.m_binsRange.min,\
             m_notSyncSequenceLengthHistogram.m_binsRange.max,\
             m_notSyncSequenceLengthHistogram.k_binsCount,\
             m_notSyncSequenceLengthHistogram.m_samplesCount,\
             m_notSyncSequenceLengthHistogram.bins_weights,");
-        for(int i=0; i<m_syncIntervalsCalculator.m_notSyncSequenceLengthHistogram.size();i++)
-            CVBS_ANALYZER_LOG_INFO("N%d,", m_syncIntervalsCalculator.m_notSyncSequenceLengthHistogram.GetBinCenter(i));
         
+        csvBuf[0] = '\0';
+        for(int i=0; i<m_syncIntervalsCalculator.m_notSyncSequenceLengthHistogram.size();i++)
+        {
+            snprintf(&csvBuf[strlen(csvBuf)], k_csvBufCapacity - strlen(csvBuf) - 1,
+                "N%d,", m_syncIntervalsCalculator.m_notSyncSequenceLengthHistogram.GetBinCenter(i));
+        }
+        CVBS_ANALYZER_LOG_INFO(csvBuf);
+        
+        csvBuf[0] = '\0';
         for(int i = 0; i < m_amplitudeCaclulator.m_amplitudeHistogram.size();i++)
         {
-            CVBS_ANALYZER_LOG_INFO("m_amplitudeHistogram.%d,", i);
+            snprintf(&csvBuf[strlen(csvBuf)], k_csvBufCapacity - strlen(csvBuf) - 1,
+                "m_amplitudeHistogram.%d,", i);
         }
+        CVBS_ANALYZER_LOG_INFO(csvBuf);
+
         
+        csvBuf[0] = '\0';
+        for(int i = 0; i < m_amplitudeCaclulator.m_smallDiffsHistogram.size();i++)
+        {
+            snprintf(&csvBuf[strlen(csvBuf)], k_csvBufCapacity - strlen(csvBuf) - 1,
+                "m_smallDiffsHistogram.%d,", i);
+        }
+        CVBS_ANALYZER_LOG_INFO(csvBuf);
+
 #if CVBS_ANALYZER_PROFILER
         for(auto& pair: m_stateProfilers)
         {
@@ -498,33 +526,50 @@ void CvbsAnalyzer::PrintCsv()
         (int)m_syncIntervalsCalculator.m_syncSequenceLengthHistogram.GetSamplesCount());
 
 
+    csvBuf[0] = '\0';
     for(int i=0; i<m_syncIntervalsCalculator.m_syncSequenceLengthHistogram.size();i++)
     {
         const float samplesCountF = std::max((uint32_t)1u, m_syncIntervalsCalculator.m_syncSequenceLengthHistogram.GetSamplesCount());
         const float binWeight = m_syncIntervalsCalculator.m_syncSequenceLengthHistogram[i] / samplesCountF;
-        CVBS_ANALYZER_LOG_INFO("%f,", binWeight);
+        snprintf(&csvBuf[strlen(csvBuf)], k_csvBufCapacity - strlen(csvBuf) - 1,
+            "%f,", binWeight);
         //CVBS_ANALYZER_LOG_INFO("%d,", (int)m_syncIntervalsCalculator.m_syncSequenceLengthHistogram[i]);
     }
+    CVBS_ANALYZER_LOG_INFO(csvBuf);
 
     CVBS_ANALYZER_LOG_INFO("%d,%d,%d,%d,,",
         (int)m_syncIntervalsCalculator.m_notSyncSequenceLengthHistogram.m_binsRange.first,
         (int)m_syncIntervalsCalculator.m_notSyncSequenceLengthHistogram.m_binsRange.second,
         (int)m_syncIntervalsCalculator.m_notSyncSequenceLengthHistogram.size(),
         (int)m_syncIntervalsCalculator.m_notSyncSequenceLengthHistogram.GetSamplesCount());
-
+    
+    csvBuf[0] = '\0';
     for(int i=0; i<m_syncIntervalsCalculator.m_notSyncSequenceLengthHistogram.size();i++)
     {
         const float samplesCountF = std::max((uint32_t)1u, m_syncIntervalsCalculator.m_notSyncSequenceLengthHistogram.GetSamplesCount());
         const float binWeight = m_syncIntervalsCalculator.m_notSyncSequenceLengthHistogram[i] / samplesCountF;
-        CVBS_ANALYZER_LOG_INFO("%f,", binWeight);
+        snprintf(&csvBuf[strlen(csvBuf)], k_csvBufCapacity - strlen(csvBuf) - 1, "%f,", binWeight);
         //CVBS_ANALYZER_LOG_INFO("%d,", (int)m_syncIntervalsCalculator.m_notSyncSequenceLengthHistogram[i]);
     }
+    CVBS_ANALYZER_LOG_INFO(csvBuf);
 
+    csvBuf[0] = '\0';
     const float amplitudeHistogramDivider = std::max((uint32_t)1u, m_amplitudeCaclulator.m_amplitudeHistogram.GetSamplesCount());
     for(int i = 0; i < m_amplitudeCaclulator.m_amplitudeHistogram.size();i++)
     {
-        CVBS_ANALYZER_LOG_INFO("%f,", (float)m_amplitudeCaclulator.m_amplitudeHistogram[i]/amplitudeHistogramDivider);
+        //CVBS_ANALYZER_LOG_INFO("%f,", (float)m_amplitudeCaclulator.m_amplitudeHistogram[i]/amplitudeHistogramDivider);
+        snprintf(&csvBuf[strlen(csvBuf)], k_csvBufCapacity - strlen(csvBuf) - 1, "%d,",
+             m_amplitudeCaclulator.m_amplitudeHistogram[i]);
     }
+    CVBS_ANALYZER_LOG_INFO(csvBuf);
+
+    csvBuf[0] = '\0';
+    for(int i = 0; i < m_amplitudeCaclulator.m_smallDiffsHistogram.size();i++)
+    {
+        snprintf(&csvBuf[strlen(csvBuf)], k_csvBufCapacity - strlen(csvBuf) - 1, "%d,",
+             m_amplitudeCaclulator.m_smallDiffsHistogram[i]);
+    }
+    CVBS_ANALYZER_LOG_INFO(csvBuf);
     
 #if CVBS_ANALYZER_PROFILER
     for(auto& pair: m_stateProfilers)

@@ -12,7 +12,7 @@
 #define CVBS_ANALYZER_LOG_DEBUG(...)
 #define CVBS_ANALYZER_LOG(...) CVBS_ANALYZER_LOG_DEBUG(__VA_ARGS__);
 
-#define CVBS_ANALYZER_PROFILER 1
+#define CVBS_ANALYZER_PROFILER 0
 
 #ifndef ESP_ARDUINO_VERSION_MAJOR
     #error "Can't find esp32 core version, maybe esp_arduino_version.h not included"
