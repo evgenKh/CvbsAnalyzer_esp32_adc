@@ -79,13 +79,13 @@ public:
         return binIndex;
     }
 
-    void PushSample(DataType sampleValue)
+    void PushSample(DataType sampleValue, CounterType counterIncrement = 1)
     {
         const DataType clamped = ClampValue(sampleValue);
         const size_t binIndex = GetBinIndexForValue(clamped);
         assert(binIndex >= 0 && binIndex < k_binsCount); // shouldn't happed if we did clamp
 
-        this->operator[](binIndex)++;
+        this->operator[](binIndex) += counterIncrement;
 
         // Update MinMax using clamped value
         // So [m_sampleMin, m_sampleMax] is always in range of [m_binsRangeMin, m_binsRangeMax]

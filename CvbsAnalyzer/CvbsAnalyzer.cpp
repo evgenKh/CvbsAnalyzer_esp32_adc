@@ -315,6 +315,8 @@ CvbsAnalyzerState CvbsAnalyzer::ExecuteJob(const CvbsAnalyzerJob& job)
                 }
                 else
                 {
+                    CVBS_ANALYZER_LOG_DEBUG("m_amplitudeCaclulator.PushSamples finished with state %d, m_samplesPreFilter.m_samplesCount = %d\n", 
+                                            (int)m_amplitudeCaclulator.GetState(), m_samplesPreFilter.m_samplesCount);
                     SetState(CvbsAnalyzerState::k_failedAmplitude);
                 }
             }
@@ -494,10 +496,10 @@ void CvbsAnalyzer::PrintCsv()
 
         
         csvBuf[0] = '\0';
-        for(int i = 0; i < m_amplitudeCaclulator.m_smallDiffsHistogram.size();i++)
+        for(int i = 0; i < m_amplitudeCaclulator.m_flatnessAccumulator.size();i++)
         {
             snprintf(&csvBuf[strlen(csvBuf)], k_csvBufCapacity - strlen(csvBuf) - 1,
-                "m_smallDiffsHistogram.%d,", i);
+                "m_flatnessAccumulator.%d,", i);
         }
         CVBS_ANALYZER_LOG_INFO(csvBuf);
 
@@ -564,10 +566,10 @@ void CvbsAnalyzer::PrintCsv()
     CVBS_ANALYZER_LOG_INFO(csvBuf);
 
     csvBuf[0] = '\0';
-    for(int i = 0; i < m_amplitudeCaclulator.m_smallDiffsHistogram.size();i++)
+    for(int i = 0; i < m_amplitudeCaclulator.m_flatnessAccumulator.size();i++)
     {
-        snprintf(&csvBuf[strlen(csvBuf)], k_csvBufCapacity - strlen(csvBuf) - 1, "%d,",
-             m_amplitudeCaclulator.m_smallDiffsHistogram[i]);
+        snprintf(&csvBuf[strlen(csvBuf)], k_csvBufCapacity - strlen(csvBuf) - 1, "%f,",
+             m_amplitudeCaclulator.m_flatnessAccumulator[i]);
     }
     CVBS_ANALYZER_LOG_INFO(csvBuf);
     
