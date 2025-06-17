@@ -14,10 +14,11 @@ public:
     {
         Reset();
     }
+    void CalculateFromSyncIntervalsSimple(const SyncIntervalsCalculator &syncIntervalsCalculator,
+                                    const AmplitudeCaclulatorState amplitudeCalculatorState);
+
     void CalculateFromSyncIntervals(const SyncIntervalsCalculator &syncIntervalsCalculator,
-                                    const AmplitudeCaclulatorState amplitudeCalculatorState,
-                                    //const uint32_t sampleRate,
-                                    const bool dataWasInverted);
+                                    const AmplitudeCaclulatorState amplitudeCalculatorState);
 
     void Reset()
     {

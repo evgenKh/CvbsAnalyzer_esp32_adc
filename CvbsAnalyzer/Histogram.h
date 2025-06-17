@@ -121,6 +121,39 @@ public:
         return m_samplesCount;
     }
 
+    float CalculateMean(const size_t binIndexBegin, const size_t binIndexEnd) const
+    {        
+        CounterType meanAccumulator = 0;
+        CounterType countsAccumulator = 0;
+        assert(binIndexBegin <= binIndexEnd && binIndexEnd < k_binsCount);
+        for(size_t bin = binIndexBegin; bin <= binIndexEnd; bin++)
+        {
+            const BinWidthType binCenterSamples = GetBinCenter(bin);
+            meanAccumulator += binCenterSamples * this->operator[](bin);
+            countsAccumulator += this->operator[](bin);
+        }
+        const float meanSamples = (float)meanAccumulator / static_cast<float>(std::max((CounterType)1, countsAccumulator));
+        return meanSamples;
+    }
+    
+    float CalculateStdDeviation(const size_t binIndexBegin, const size_t binIndexEnd, const float meanSamples) const
+    {        
+        CounterType countsAccumulator = 0;
+        float sqDifferencesAccumulator = 0;
+        assert(binIndexBegin <= binIndexEnd && binIndexEnd < k_binsCount);
+        for(size_t bin = binIndexBegin; bin <= binIndexEnd; bin++)
+        {
+            const uint16_t binCenterSamples = GetBinCenter(bin);
+            float sqDifference = (float)binCenterSamples - (float)meanSamples;
+            sqDifference *= sqDifference;//Always positive after square
+
+            sqDifferencesAccumulator += (sqDifference * (float)this->operator[](bin));
+        }
+        const float variance = sqDifferencesAccumulator / static_cast<float>(std::max((CounterType)2, countsAccumulator)-1);
+        const float stDeviation = sqrtf(variance);
+        return stDeviation;
+    }
+
     static typename std::array<CounterType, k_binsCount>::iterator FindFallingEdge(
         typename std::array<CounterType, k_binsCount>::iterator begin,
         typename std::array<CounterType, k_binsCount>::iterator end,

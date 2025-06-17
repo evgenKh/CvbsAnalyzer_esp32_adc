@@ -3,10 +3,8 @@
 #include "AmplitudeCaclulator.h"
 #include "CvbsAnalyzerGlobals.h"
 
-void VideoScore::CalculateFromSyncIntervals(const SyncIntervalsCalculator &syncIntervalsCalculator,
-                                            const AmplitudeCaclulatorState amplitudeCalculatorState,
-                                            //const uint32_t sampleRate,
-                                            const bool dataWasInverted)
+void VideoScore::CalculateFromSyncIntervalsSimple(const SyncIntervalsCalculator &syncIntervalsCalculator,
+                                            const AmplitudeCaclulatorState amplitudeCalculatorState)
 {
     // Early exit when states not perfect.
     if (syncIntervalsCalculator.GetState() != SyncIntervalsCalculatorState::k_finished ||
@@ -68,4 +66,63 @@ float VideoScore::GetWeightOfIntervalsWithLength(const SyncIntervalsCalculator::
 
     const float weight = (float)samplesCountAccumulator / (float)histogram.GetSamplesCount();
     return weight;
+}
+
+
+void VideoScore::CalculateFromSyncIntervals(const SyncIntervalsCalculator &syncIntervalsCalculator,
+                                            const AmplitudeCaclulatorState amplitudeCalculatorState)
+{
+    // Early exit when states not perfect.
+    if (syncIntervalsCalculator.GetState() != SyncIntervalsCalculatorState::k_finished ||
+        amplitudeCalculatorState != AmplitudeCaclulatorState::k_finished)
+    {
+        m_isVideo = 0.0f;
+        return;
+    }
+    
+    // Range of interest on sync histogram - 
+
+    const size_t syncHistBeginBin = 1;    //skip bin [0]
+    const size_t syncHistEndBin = std::min( 
+        syncIntervalsCalculator.m_syncSequenceLengthHistogram.GetBinIndexForValue(
+        UsToSamplesContexpr(10)),
+        syncIntervalsCalculator.k_binsCount - 2// skip last bin
+    );
+    const float syncHistMeanSamples = syncIntervalsCalculator.m_syncSequenceLengthHistogram.CalculateMean(
+                                            syncHistBeginBin,
+                                            syncHistEndBin
+                                         );
+    const float syncHistStDeviation = syncIntervalsCalculator.m_syncSequenceLengthHistogram.CalculateStdDeviation(
+                                            syncHistBeginBin,
+                                            syncHistEndBin,
+                                            syncHistMeanSamples
+                                         );
+
+    //Break not-sync hyst to ranges
+
+   
+    const size_t notSyncHistBeginBin = syncIntervalsCalculator.m_notSyncSequenceLengthHistogram.GetBinIndexForValue(
+        UsToSamplesContexpr(40));
+    const size_t notSyncHistEndBin = std::min( 
+        syncIntervalsCalculator.m_notSyncSequenceLengthHistogram.GetBinIndexForValue(
+        UsToSamplesContexpr(80)),
+        syncIntervalsCalculator.k_binsCount - 2// skip last bin
+    );
+    const float notSyncHistMeanSamples = syncIntervalsCalculator.m_notSyncSequenceLengthHistogram.CalculateMean(
+                                            notSyncHistBeginBin,
+                                            notSyncHistEndBin
+                                         );
+    const float notSyncHistStDeviation = syncIntervalsCalculator.m_notSyncSequenceLengthHistogram.CalculateStdDeviation(
+                                            notSyncHistBeginBin,
+                                            notSyncHistEndBin,
+                                            notSyncHistMeanSamples
+                                         );
+    
+
+    CVBS_ANALYZER_LOG_INFO("syncHistMeanSamples=%f syncHistStDeviation=%f notSyncHistMeanSamples=%f notSyncHistStDeviation=%f\n",
+                            syncHistMeanSamples, syncHistStDeviation,
+                            notSyncHistMeanSamples, notSyncHistStDeviation);
+
+
+
 }

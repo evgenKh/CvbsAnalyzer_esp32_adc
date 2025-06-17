@@ -97,13 +97,13 @@ public:
         if (timeoutMs == 0)
         {
             JobQueueToken dummy;
-            const bool notEmpty = xQueuePeek(m_tokensSourceQueue, &dummy, pdMS_TO_TICKS(timeoutMs)) == pdTRUE;
+            const bool notEmpty = xQueuePeek(m_tokensSourceQueue, &dummy, portMAX_DELAY) == pdTRUE;
             return notEmpty;
         }
         else
         {
             JobQueueToken dummy;            
-            const bool notEmpty = xQueuePeek(m_tokensSourceQueue, &dummy, portMAX_DELAY) == pdTRUE;
+            const bool notEmpty = xQueuePeek(m_tokensSourceQueue, &dummy, pdMS_TO_TICKS(timeoutMs)) == pdTRUE;
             return notEmpty;
         }
     }

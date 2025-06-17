@@ -377,8 +377,7 @@ CvbsAnalyzerState CvbsAnalyzer::ExecuteJob(const CvbsAnalyzerJob& job)
 
                 videoScore.Reset();
                 videoScore.CalculateFromSyncIntervals(m_syncIntervalsCalculator,
-                                                        m_amplitudeCaclulator.GetState(),
-                                                        m_invertDataCurrentValue);
+                                                        m_amplitudeCaclulator.GetState() );
             }
             else if(m_state == CvbsAnalyzerState::k_restartInverted)
             {

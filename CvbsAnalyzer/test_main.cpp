@@ -33,7 +33,7 @@ void loop()
   CVBS_ANALYZER_LOG("Running loop # %d.\n", loopNum);
   CvbsAnalyzerState state;
   
-  if(false)
+  if(true)
   {
     CVBS_ANALYZER_LOG_INFO("Reading pin %d\t\t: ", g_pin35Job.m_gpioPin);
     g_cvbsAnalyzerDispatcher.RequestJob(&g_pin35Job);
