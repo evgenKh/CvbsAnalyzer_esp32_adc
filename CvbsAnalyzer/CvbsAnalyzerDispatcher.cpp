@@ -76,9 +76,8 @@ void CvbsAnalyzerDispatcher::WorkerThreadLoop()
             CvbsAnalyzerJob* jobToExecute = jobToExecuteToken.m_job;
             
             m_analyzer->ExecuteJob(*jobToExecute);
-            jobToExecute->m_videoScore = m_analyzer->GetVideoScore();
-            jobToExecute->m_videoScoreInverted = m_analyzer->GetVideoScoreFromInverted();
-            jobToExecute->m_rssiAverage = m_analyzer->GetPinAverage();
+            
+            jobToExecute->SetResult(m_analyzer->GetJobResult());
 
             jobToExecute->ReturnToken(jobToExecuteToken); // Return the token back to the source queue
         }

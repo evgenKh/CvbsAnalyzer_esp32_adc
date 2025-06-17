@@ -41,8 +41,8 @@ void loop()
     //while(!g_pin35Job.IsDone()) {}
 
     CVBS_ANALYZER_LOG_INFO("m_videoScore.m_isVideo=%f m_videoScoreInverted.m_isVideo=%f\n",
-                            g_pin35Job.m_videoScore.m_isVideo,
-                            g_pin35Job.m_videoScoreInverted.m_isVideo);
+                            g_pin35Job.GetResult().m_videoScore.m_isVideo,
+                            g_pin35Job.GetResult().m_videoScoreFromInverted.m_isVideo);
 
     delay(5);
   }
@@ -53,8 +53,8 @@ void loop()
     g_cvbsAnalyzerDispatcher.RequestJob(&g_pin36Job);
     g_pin36Job.WaitUntilDone();
     CVBS_ANALYZER_LOG_INFO("m_videoScore.m_isVideo=%f m_videoScoreInverted.m_isVideo=%f\n",
-                            g_pin36Job.m_videoScore.m_isVideo,
-                            g_pin36Job.m_videoScoreInverted.m_isVideo);
+                            g_pin36Job.GetResult().m_videoScore.m_isVideo,
+                            g_pin36Job.GetResult().m_videoScoreFromInverted.m_isVideo);
   }
 
   if(false)
@@ -65,7 +65,7 @@ void loop()
     //while(!g_pin35Job.IsDone()) {}
 
     CVBS_ANALYZER_LOG_INFO("m_rssiAverage=%d\n",
-                            g_pin36AverageJob.m_rssiAverage);
+                            g_pin36AverageJob.GetResult().m_rssiAverage);
 
     delay(5);
   }

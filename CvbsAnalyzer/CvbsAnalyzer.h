@@ -28,12 +28,20 @@ struct CvbsAnalyzerProfiler
 };
 #endif // CVBS_ANALYZER_PROFILER
 
+
 class CvbsAnalyzer
 {
     public:
     CvbsAnalyzer()
     {
         Reset();
+        assert(s_instance == nullptr); //In theory we may use many instances, but it will need some additional states handling.
+        s_instance = this;
+    }
+    ~CvbsAnalyzer()
+    {
+        assert(m_state == CvbsAnalyzerState::k_notInitialized);//You must deInit FastADC first.
+        s_instance = nullptr;
     }
 
     void Reset();
@@ -58,10 +66,7 @@ class CvbsAnalyzer
 
     CvbsAnalyzerState ExecuteJob(const CvbsAnalyzerJob& job);
     
-
-    const VideoScore& GetVideoScore() const { return m_videoScore; }
-    const VideoScore& GetVideoScoreFromInverted() const { return m_videoScoreFromInverted; }
-    uint16_t GetPinAverage() const { return m_pinAverage; }
+    inline const CvbsAnalyzerJob::Result GetJobResult() const { return m_result; }
 
     inline CvbsAnalyzerState GetState() const { return m_state; }
     inline bool IsInErrorState() const { return ((signed char)m_state < 0); }
@@ -80,6 +85,8 @@ private:
             if(m_stateProfilers.count(m_state)) m_stateProfilers[m_state].Stop();
 #endif
             m_state = state;
+            m_result.m_cvbsAnalyzerState = m_state; 
+            
 #if CVBS_ANALYZER_PROFILER
             if(m_stateProfilers.count(m_state)) m_stateProfilers[m_state].Start();
 #endif            
@@ -113,15 +120,14 @@ private:
     SamplesPreFilter m_samplesPreFilter;
     
     //Results
-    VideoScore m_videoScore;
-    VideoScore m_videoScoreFromInverted;
-    uint16_t m_pinAverage;
+    CvbsAnalyzerJob::Result m_result;
 
     float m_learningRssi = -1.0f; 
 
     //AmplitudeCaclulator m_invertedAmplitudeCaclulator;
     //SyncIntervalsCalculator m_invertedIntervalsCalculator;
 
+    static CvbsAnalyzer* s_instance;
 
 };
 

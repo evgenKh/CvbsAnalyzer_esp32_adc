@@ -22,11 +22,9 @@ public:
     void Reset()
     {
         m_isVideo = 0.0f;
-        m_isInvertedVideo = 0.0f;
     };
 
     float m_isVideo;
-    float m_isInvertedVideo;
 
 private:    
     float GetWeightOfIntervalsWithLength(const SyncIntervalsCalculator::HistogramType &histogram,

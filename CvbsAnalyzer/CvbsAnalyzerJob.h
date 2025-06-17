@@ -29,6 +29,15 @@ struct JobQueueToken
 class CvbsAnalyzerJob
 {
 public:    
+
+    struct Result
+    {        
+        VideoScore m_videoScore;
+        VideoScore m_videoScoreFromInverted;
+        uint16_t m_rssiAverage = 0;
+        CvbsAnalyzerState m_cvbsAnalyzerState; 
+    };
+
     CvbsAnalyzerJob(int gpioPin, CvbsAnalyzerJobType type, CvbsAnalyzerInversionType inversionType):
         CvbsAnalyzerJob()
     {
@@ -98,18 +107,26 @@ public:
             return notEmpty;
         }
     }
+
+    inline const Result GetResult() const
+    {
+        assert(IsDone()); 
+        return m_result; //Return copy!
+    }
+
+    inline void SetResult(const Result& result) { 
+        assert(!IsDone()); //When job is in done state, result no more changeable
+        m_result = result;
+    }    
     
     int m_gpioPin = -1;
     CvbsAnalyzerJobType m_type = CvbsAnalyzerJobType::k_none;
     CvbsAnalyzerInversionType m_inversionType = CvbsAnalyzerInversionType::k_nonInvertedOnly;
     QueueHandle_t m_tokensSourceQueue = nullptr;
 
-    VideoScore m_videoScore;
-    VideoScore m_videoScoreInverted;
-    uint16_t m_rssiAverage = 0;
-    //TODO: some rssi result
-    //TODO: some states of analyzers?
 private:
+    Result m_result; 
+
     constexpr static size_t k_tokensPerJob = 1; 
 
 };

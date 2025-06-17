@@ -13,7 +13,6 @@ void VideoScore::CalculateFromSyncIntervals(const SyncIntervalsCalculator &syncI
         amplitudeCalculatorState != AmplitudeCaclulatorState::k_finished)
     {
         m_isVideo = 0.0f;
-        m_isInvertedVideo = 0.0f;
         return;
     }
   

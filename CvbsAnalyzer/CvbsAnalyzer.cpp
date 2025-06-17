@@ -22,14 +22,18 @@ void CvbsAnalyzerProfiler::Stop()
 }
 #endif // CVBS_ANALYZER_PROFILER
 
+
+CvbsAnalyzer* CvbsAnalyzer::s_instance = nullptr;
+
 void CvbsAnalyzer::Reset()
 {
     m_samplesPreFilter.Reset();
     m_amplitudeCaclulator.Reset();
     m_syncIntervalsCalculator.Reset();
     m_rssiAverageFilter.Reset();
-    m_videoScore.Reset();
-    m_pinAverage = 0;
+    
+    m_result = CvbsAnalyzerJob::Result();//Reset
+
     m_rawSamplesReadTotal = 0;
     m_invertDataCurrentValue = false;
 
@@ -104,8 +108,7 @@ CvbsAnalyzerState CvbsAnalyzer::ExecuteJob(const CvbsAnalyzerJob& job)
     m_rssiAverageFilter.Reset();
     m_amplitudeCaclulator.Reset();
     m_syncIntervalsCalculator.Reset();
-    m_videoScore.Reset();
-    m_videoScoreFromInverted.Reset();
+    m_result = CvbsAnalyzerJob::Result();//Reset
     m_rawSamplesReadTotal = 0;
 
     if (m_state == CvbsAnalyzerState::k_notInitialized ||
@@ -358,7 +361,7 @@ CvbsAnalyzerState CvbsAnalyzer::ExecuteJob(const CvbsAnalyzerJob& job)
                 m_rssiAverageFilter.PushSamples(m_samplesPreFilter.m_samplesBuf, m_samplesPreFilter.m_samplesCount);
                 if(m_rssiAverageFilter.GetState() == AverageFilterState::k_finished)
                 {
-                    m_pinAverage = m_rssiAverageFilter.GetAverage();
+                    m_result.m_rssiAverage = m_rssiAverageFilter.GetAverage();
                     continue; //Go to next state
                 }
                 else
@@ -369,7 +372,8 @@ CvbsAnalyzerState CvbsAnalyzer::ExecuteJob(const CvbsAnalyzerJob& job)
             }
             else if(m_state == CvbsAnalyzerState::k_videoScoreCalculation)
             {
-                VideoScore& videoScore = (m_invertDataCurrentValue ? m_videoScoreFromInverted : m_videoScore);
+                VideoScore& videoScore = (m_invertDataCurrentValue ?
+                                             m_result.m_videoScoreFromInverted : m_result.m_videoScore);
 
                 videoScore.Reset();
                 videoScore.CalculateFromSyncIntervals(m_syncIntervalsCalculator,
@@ -454,7 +458,7 @@ void CvbsAnalyzer::PrintCsv()
             m_invertDataCurrentValue,\
             CvbsAnalyzerState,\
             m_videoScore.m_isVideo,\
-            m_videoScore.m_isInvertedVideo,\
+            m_videoScoreFromInverted.m_isVideo,\
             m_rawSamplesRead,\
             k_sampleRate,\
             m_syncTreshold,\
@@ -517,9 +521,9 @@ void CvbsAnalyzer::PrintCsv()
     CVBS_ANALYZER_LOG_INFO(",%f,%d,%d,%f,%f,%d,%d,%d,%d,%d,%d,%d,,",
         m_learningRssi,
         m_invertDataCurrentValue ? 1 : 0, 
-        (int)m_state, 
-        m_videoScore.m_isVideo,
-        m_videoScore.m_isInvertedVideo,
+        (int)m_state,
+        m_result.m_videoScore.m_isVideo,
+        m_result.m_videoScoreFromInverted.m_isVideo,
         (int)m_rawSamplesReadTotal,
         (int)k_sampleRate, 
         (int)m_amplitudeCaclulator.m_syncTreshold,
