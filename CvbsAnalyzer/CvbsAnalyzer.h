@@ -67,6 +67,8 @@ class CvbsAnalyzer
     inline bool IsInErrorState() const { return ((signed char)m_state < 0); }
     void PrintJson();
     void PrintCsv();
+    void SetLearningRssi(float rssi) { m_learningRssi = rssi; }
+    
 
 private:
     inline CvbsAnalyzerState SetState(CvbsAnalyzerState state)
@@ -114,6 +116,8 @@ private:
     VideoScore m_videoScore;
     VideoScore m_videoScoreFromInverted;
     uint16_t m_pinAverage;
+
+    float m_learningRssi = -1.0f; 
 
     //AmplitudeCaclulator m_invertedAmplitudeCaclulator;
     //SyncIntervalsCalculator m_invertedIntervalsCalculator;

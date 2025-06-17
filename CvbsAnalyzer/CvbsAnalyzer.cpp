@@ -404,7 +404,7 @@ CvbsAnalyzerState CvbsAnalyzer::ExecuteJob(const CvbsAnalyzerJob& job)
         PrintProfilersJson();
     }
 
-    if(k_printCsvLearningData)
+    if(k_printCsvLearningData && job.m_type == CvbsAnalyzerJobType::k_videoScore)
     {
         PrintCsv();
     }
@@ -450,7 +450,7 @@ void CvbsAnalyzer::PrintCsv()
     static bool headerPrinted = false;
     if(!headerPrinted)
     {
-        CVBS_ANALYZER_LOG_INFO("_Comment,_IsVideoLearning,\
+        CVBS_ANALYZER_LOG_INFO("_Comment,m_learningRssi,\
             m_invertDataCurrentValue,\
             CvbsAnalyzerState,\
             m_videoScore.m_isVideo,\
@@ -514,7 +514,8 @@ void CvbsAnalyzer::PrintCsv()
         headerPrinted = true;
     }
 
-    CVBS_ANALYZER_LOG_INFO(",,%d,%d,%f,%f,%d,%d,%d,%d,%d,%d,%d,,",
+    CVBS_ANALYZER_LOG_INFO(",%f,%d,%d,%f,%f,%d,%d,%d,%d,%d,%d,%d,,",
+        m_learningRssi,
         m_invertDataCurrentValue ? 1 : 0, 
         (int)m_state, 
         m_videoScore.m_isVideo,
