@@ -123,6 +123,22 @@ void VideoScore::CalculateFromSyncIntervals(const SyncIntervalsCalculator &syncI
                             syncHistMeanSamples, syncHistStDeviation,
                             notSyncHistMeanSamples, notSyncHistStDeviation);
 
+    //Probably doing double work, first calculating mean+dev, then interpolating them, and get rid of one of steps...
 
+    //https://www.wolframalpha.com/input?i=y%3D+max%280%2C+1+-+%28%28x-4.2%29%2F3%29%5E4%29
+    const float syncMeanScore = std::max(0.0f, 1.0f - powf((syncHistMeanSamples - UsToSamplesf(4.2f))/3.0f, 4.0f));
 
+    //https://www.wolframalpha.com/input?i=y%3D+max%280%2C+1+-+%28%28x-0%29%2F13%29%5E4%29
+    const float syncStDevScore = std::max(0.0f, 1.0f - powf((syncHistStDeviation - 0.0f)/13.0f, 4.0f));
+
+    
+    //https://www.wolframalpha.com/input?i=y%3D+max%280%2C+1+-+%28%28x-60%29%2F4%29%5E4%29
+    const float notSyncMeanScore = std::max(0.0f, 1.0f - powf((notSyncHistMeanSamples - UsToSamplesf(60.0f))/4.0f, 4.0f));
+
+    //https://www.wolframalpha.com/input?i=y%3D+max%280%2C+1+-+%28%28x-0%29%2F20%29%5E4%29
+    const float notSyncStDevScore = std::max(0.0f, 1.0f - powf((notSyncHistStDeviation - 0.0f)/20.0f, 4.0f));
+
+    const float totalScore = ((syncMeanScore * syncStDevScore)* 0.6f + (notSyncMeanScore * notSyncStDevScore)) /
+                                             (0.6f + 1.0f);
+    m_isVideo = totalScore;
 }

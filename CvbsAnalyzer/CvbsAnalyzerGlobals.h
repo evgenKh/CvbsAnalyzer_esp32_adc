@@ -77,6 +77,14 @@
         static_assert(k_sampleRate == 1000000 || k_sampleRate == 2000000);
         //k_sampleRate is 1Mhz or 2Mhz, so we can use integer math.
         return (microseconds * (k_sampleRate / 1000000));
+
+    }
+    inline float UsToSamplesf(const float microseconds)
+    {
+        static_assert(k_sampleRate == 1000000 || k_sampleRate == 2000000);
+        //k_sampleRate is 1Mhz or 2Mhz, so we can use integer math.
+        constexpr float samplesInUs = (k_sampleRate / 1000000);
+        return (microseconds * samplesInUs);
     }
 
     //Use in case k_sampleRate is not 1Mhz or 2Mhz.
